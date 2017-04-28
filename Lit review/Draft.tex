@@ -106,7 +106,9 @@ CFD can be used as a design and troubleshooting tool, as well as making the proc
 
 
 \subsection{Macroscopic scale}
-In this approach, the fluid can be seen as a collection of a huge number of particles. To solve these governing equations, one needs to apply conservation of energy, mass and momentum\cite{lbm_springer}. But since these equations are difficult, or even impossible to solve analytically, discrete schemes, boundary and initial conditions are used to convert these equations into a system of algebraic equations. These equations can then be solved until an appropriate solution is produced. {\color{red}NAVIERSTOKES}
+In this approach, the fluid can be seen as a collection of a huge number of particles. To solve these governing equations, one needs to apply conservation of energy, mass and momentum \cite{lbm_springer}. But since these equations are difficult, or even impossible to solve analytically, discrete schemes, boundary and initial conditions are used to convert these equations into a system of algebraic equations. These equations can then be solved until an appropriate solution is produced. 
+\par These problems are usually solved using Navier-Stokes equations that describe the fluid being solved as a continuum, which apply Newton's second law to fluid motion.
+
 \subsection{Microscopic scale}
 If we consider the fluid to be represented by individual particles then we will fall under the microscopic approach. In this approach, there is no definition of temperature or viscosity and collision between particles needs to be considered. Thus one needs to solve the differential equation of Newton’s second law \cite{lbm_springer}. Hence, the location and velocity of each particle needs to be taken into account.
 	\par We can easily see that this approach becomes unfeasible for normal fluid sizes as the number of equations needed to be solved grows to the order of billions (consider that one mole of water contains more than $6 \times 10^{23}$ molecules.
@@ -136,23 +138,34 @@ This way we can reap the advantages of both the macro and microscale approaches 
 
 
 \section{High Performance Computing}
-As humanity evolves, so too does our desire for expanding previous unobtainable goals. As computer technology kept progressing further and further, we soon realised that some problems simply took too many resources to be completed. But what if instead of focusing on computational power we focused our efforts in splitting the workload? MOORE's LAW\par
-High performance computing (HPC) comes from the harnessing of computer power to deliver a much higher performance that one could not obtain from a typical computer. To this end, we can talk of HPC as being a collection of computer resources, all of them working simulateously to achieve a solution of the same problem. DIFFERENT PARALLELISATION STRATEGIES FOR SPLITTING THE WORKLOAD EMERGE, DEPENDING ON THE UNDERLYING HARDWARE. Problems that could otherwise take weeks, months or even years can now be solved in minutes, hours or days under these powerful devices. 
+As humanity evolves, so too does our desire for expanding previous unobtainable goals. As computer technology kept progressing further and further, we soon realised that some problems simply took too many resources to be completed.\par
+Figure \ref{fig:moore} shows the evolution of computing power over the past 120 years. Moore's Law states that ''processor speeds, or overall processing power for computers will double every two years'' \cite{moore}. Note that the last 7 most recent data points are NVIDIA GPUs.
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.6\linewidth]{Resources/Images/moore120.png}
+  \caption{Moore's law over 120 years}
+  \label{fig:moore}
+\end{figure}
+
+However, this evolution in computational power could only be achieved by combining CPU cores together.
+So what if we focused our efforts in splitting the workload, effectively using the multiple cores available to produce a solution?\par
+High performance computing (HPC) comes from the harnessing of computer power to deliver a much higher performance that one could not obtain from a typical computer. To this end, we can talk of HPC as being a collection of computer resources, all of them working simultaneously to achieve a solution of the same problem. Problems that could otherwise take weeks, months or even years can now be solved in minutes, hours or days under these powerful devices. However, different parallelisation strategies for splitting the workload emerge, depending on the underlying hardware. 
 
 \subsection{Distributed memory}
 \subsection{Shared memory}
 
 \subsection{GPGPU}
 
-General Purpose computing on Graphical Processing Units stands for the use of Graphics Processing unit (GPU) to perform computations on applications normally performed by the CPU. One of the main advantages of using this approach is the amount of cores that a single GPU has. While a typical desktop CPU has up to 4 cores, a GPU can have thousands of cores, allowing users to take advantage of its massively parallel architecture. GPUS CAN NOW SOLVE PROBLEMS THAT WERE TRADITIONAL FOR CPU. GPU ARE CHEAPER AND ITS NOT POSSIBLE TO GET CPUS AS POWERFULL\par
-	CUDA was then developed by NVIDIA SWITCH THE ORDER. CUDA code allows programmers to take advantage of GPUs by employing a unified shader pipeline under the familiar C language \cite{cuda_by_example}. Users were no longer required to have specific knowledge of OpenGL or DirectX and could now perform general computations (rather than graphic-specific computations) whilst benefiting from the massive computational powered offered by GPUs.  OPENCL
+General Purpose computing on Graphical Processing Units stands for the use of Graphics Processing unit (GPU) to perform computations on applications normally performed by the CPU. One of the main advantages of using this approach is the amount of cores that a single GPU has. While a typical desktop CPU has up to 4 cores, a GPU can have thousands of cores, allowing users to take advantage of its massively parallel architecture. GPUs can now solve problems that were traditionally solved by the CPU. This is a big improvement, since GPUs are cheaper to acquire and more powerful than CPUs.\par
+	NVIDIA then developed CUDA. CUDA code allows programmers to take advantage of GPUs by employing a unified shader pipeline under the familiar C language \cite{cuda_by_example}. Users were no longer required to have specific knowledge of OpenGL or DirectX and could now perform general computations (rather than graphic-specific computations) whilst benefiting from the massive computational powered offered by GPUs. 
 
 \section{Previous parallelisation works}
 This thesis is a continuation of work that started some years ago in Cranfield University. As such, the work from the previous students needs to be analysed. \par
-In 2014, Tamás Józsa and Máté Szőke, adapted two different inhouse C and C++ codes into one single C code unifying the advantages of each one of the two original codes \cite{jozsa_thesis,szoke_thesis}. Józsa then parallelised the critical parts of the C code using CUDA and ran tests on the Fermi GPU Cluster from Cranfield, achieving a three times speedup in general, with a peak of 15 times speedup \cite{jozsa_thesis}. \par
+In 2014, Tamás Józsa and Máté Szőke, adapted two different in-house C and C++ codes into one single C code unifying the advantages of each one of the two original codes \cite{jozsa_thesis,szoke_thesis}. Józsa then parallelised the critical parts of the C code using CUDA and ran tests on the Fermi GPU Cluster from Cranfield, achieving a three times speed-up in general, with a peak of 15 times speed-up \cite{jozsa_thesis}. \par
 Szőke proposes a CPU APPROACH different parallelisation approach using Unified Parallel C, which is a Partitioned Global Address Space language\cite{szoke_thesis}. This means that it’s possible to use shared memory to compute the solution. However, the author verified that a local memory-based approach (like MPI) provided the best results. He also compared the results obtained with the ones obtained by Józsa on the CUDA approach. They found that to achieve the same speed-up as that of a single GPU card, one needs an entire workstation (16 threads in the case of Astral) \cite{szoke_thesis}.\par
 In 2015, Ádám Koleszár continued the work and further optimised the parallel version of the LBM method using CUDA \cite{koleszar_thesis}. He did an excellent job, resulting in a 10 times faster execution than the previous 2D parallel solver, which means that his new optimised code was 30 times faster than the original, in-house, serial solver.\par
-Finally, in 2016, Maciej Kubat proposed a new version of the LBM solver.Firstly he converts the 2D parallel solver to a 3D parallel solver which entailed a major reengineering of the code, from data containers to logic cycles \cite{maciej_thesis}. After first trying for a direct adaptation, he found that his code was too slow to produce meaningful solutions. After optimising his own code he was able to reach an almost one hundred times speedup.
+Finally, in 2016, Maciej Kubat proposed a new version of the LBM solver.Firstly he converts the 2D parallel solver to a 3D parallel solver which entailed a major re-engineering of the code, from data containers to logic cycles \cite{maciej_thesis}. After first trying for a direct adaptation, he found that his code was too slow to produce meaningful solutions. After optimising his own code he was able to reach an almost one hundred times speed-up.
 However, Kubat states that a lot can be done to improve his code, from boundary conditions to code readability and maintainability. 
 
 \chapter{Conclusions}
