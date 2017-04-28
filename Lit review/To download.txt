@@ -1,0 +1,7 @@
+Chen S. and Doolen G. Lattice Boltzmann method for Fluid Flows. IBM Research Division, 1998.
+
+Y. B. Bao, J. Meskas. Lattice Boltzmann Method for Fluid Simulations. 2011.
+
+S. Succi. The Lattice Boltzmann Equation: For Fluid Dynamics and Beyond.
+Oxford, 2001.
+

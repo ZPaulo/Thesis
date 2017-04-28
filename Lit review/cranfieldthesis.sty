@@ -1,0 +1,121 @@
+\ProvidesPackage{cranfieldthesis}[2014/08/05 Daniel Auger's unofficial Cranfield thesis .sty file]
+\typeout{cranfieldthesis.sty - unofficial Cranfield thesis style file.}
+\typeout{    This file was prepared by Daniel Auger to help students wanting to use LaTeX.}
+\typeout{    It does not have `official' endorsement, but it will probably be fine.}
+\typeout{    The author is not able to offer support individual users, but if you are}
+\typeout{    using LaTeX, you will probably not run into any problems you can't fix}
+\typeout{    yourself.}
+
+\RequirePackage{geometry,calc,mathptmx,setspace,helvet}
+
+
+\setlength{\paperheight}{297mm}
+\setlength{\paperwidth}{210mm}
+\setlength{\textwidth}{\paperwidth-60mm}
+\setlength{\textheight}{\paperheight-60mm-\headheight-\headsep-\footskip}
+\setlength{\topmargin}{3cm-1in}
+\setlength{\oddsidemargin}{3cm-1in}
+\setlength{\evensidemargin}{0in}
+\setlength{\hoffset}{0in}
+\setlength{\voffset}{0in}
+
+\newcommand\school[1]{\def\theschool{#1}}
+\newcommand\supervisor[1]{\def\thesupervisor{#1}}
+\newcommand\course[1]{\def\thecourse{#1}}
+\newcommand\degree[1]{\def\thedegree{#1}}
+\newcommand\academicyear[1]{\def\theacademicyear{#1}}
+\renewcommand\date[1]{\def\thedate{#1}}
+\renewcommand\author[1]{\def\theauthor{#1}}
+\renewcommand\title[1]{\def\thetitle{#1}}
+\newcommand\copyrightyear[1]{\def\thecopyrightyear{#1}}
+\newcommand\fulfilment[1]{\def\thefulfilment{#1}}
+
+\fulfilment{This thesis is submitted in partial fulfilment of the requirements for the degree of \thedegree.\par\vfill}
+
+
+\school{\protect{$\backslash$school\{Aerospace, Technology and Manufacturing\}}}
+
+
+\author{$\backslash$author\{A.\ Student\}}
+\course{$\backslash$course\{Automotive Engineering\}}
+\degree{$\backslash$degree\{MSc\}}
+\academicyear{$\backslash$academicyear\{2013--2014\}}
+\date{$\backslash$date\{August 2014\}}
+\supervisor{$\backslash$supervisor\{Dr A.\ Supervisor\}}
+\title{$\backslash$title\{My Thesis Title\}}
+\copyrightyear{$\backslash$copyrightyear\{2014\}}
+
+
+\renewcommand\maketitle{
+\clearpage
+{  \makeatletter
+    \centering\Large\singlespacing%
+    \pagestyle{empty}%
+    \null\vfill
+    CRANFIELD UNIVERSITY\par
+    \vfill%
+    \MakeUppercase{\theauthor}\par
+    \vfill
+    \MakeUppercase{\thetitle}\par
+    \vfill%
+    SCHOOL OF~\MakeUppercase{\theschool}\\%
+    \thecourse\par%
+    \vfill
+    \thedegree\\
+     Academic Year: \theacademicyear\par
+   \vfill
+   Supervisor: \thesupervisor\\%
+   \thedate\par
+    \vfill\null\cleardoublepage
+    \centering\Large%
+    \pagestyle{empty}
+    \null\vfill
+    CRANFIELD UNIVERSITY\par
+    \vfill%
+    SCHOOL OF~\MakeUppercase{\theschool}\\%
+    \thecourse\par%
+    \vfill
+    \thedegree\par%
+    \vfill
+    Academic Year: \theacademicyear\par%
+    \vfill
+    \MakeUppercase{\theauthor}\par
+    \vfill
+    \thetitle\par
+    \vfill
+    Supervisor: \thesupervisor\\
+    \thedate\par
+     \vfill
+     \thefulfilment
+     \copyright\ Cranfield University \thecopyrightyear. All rights reserved.
+    No part of this publication may be reproduced without the written
+     permission of the copyright owner.
+    \cleardoublepage
+    \makeatother
+}}
+
+
+\newenvironment{references}
+{\cleardoublepage\addcontentsline{toc}{chapter}{References}\begin{thebibliography}{999}}
+{\end{thebibliography}\cleardoublepage}
+
+
+\setcounter{tocdepth}{1}
+\renewcommand{\bibname}{References}
+
+\newcommand\sstableofcontents{\cleardoublepage\addcontentsline{toc}{chapter}{Table of Contents}\singlespacing\tableofcontents\doublespacing}
+\newcommand\sslistoffigures{\cleardoublepage\addcontentsline{toc}{chapter}{List of Figures}\singlespacing\listoffigures\doublespacing}
+\newcommand\sslistoftables{\cleardoublepage\addcontentsline{toc}{chapter}{List of Tables}\singlespacing\listoftables\doublespacing}
+
+\newenvironment{abstract}
+{\chapter{Abstract}}
+{}%
+
+\newenvironment{listofabbreviations}%
+{\chapter{List of Abbreviations}}
+{}%
+\newcommand{\abbrev}[2]{{\noindent\parbox[t]{1in-3ex}{#1}\rule{3ex}{0ex}\parbox[t]{0.99\textwidth-1in}{#2}\par}}
+
+
+
+\endinput
