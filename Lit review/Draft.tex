@@ -150,9 +150,20 @@ Figure \ref{fig:moore} shows the evolution of computing power over the past 120 
 
 However, this evolution in computational power could only be achieved by combining CPU cores together.
 So what if we focused our efforts in splitting the workload, effectively using the multiple cores available to produce a solution?\par
-High performance computing (HPC) comes from the harnessing of computer power to deliver a much higher performance that one could not obtain from a typical computer. To this end, we can talk of HPC as being a collection of computer resources, all of them working simultaneously to achieve a solution of the same problem. Problems that could otherwise take weeks, months or even years can now be solved in minutes, hours or days under these powerful devices. However, different parallelisation strategies for splitting the workload emerge, depending on the underlying hardware. 
+High performance computing (HPC) comes from the harnessing of computer power to deliver a much higher performance that one could not obtain from a typical computer. To this end, we can talk of HPC as being a collection of computer resources, all of them working simultaneously to achieve a solution of the same problem. Problems that could otherwise take weeks, months or even years can now be solved in minutes, hours or days under these powerful devices. However, different parallelisation strategies for splitting the workload emerge, depending on the underlying hardware. \par
+It is also important to understand that parallel computing is achieved with the help of processors that will execute different calculations or processes simultaneously. To measure the parallelisation's efficiency, it is worth introducing the term Speed-up. The Speed-up is the ratio of the execution time of the parallel algorithm on a single processor with the execution time of the parallel algorithm on P processors \cite{irenehpc}. However, Amdahl's law states that ''in parallelization, if P is the proportion of a system or program that can be made parallel (...), then the maximum speed-up that can be achieved using N number of processors is $\frac{1}{\left(1-P\right)+\frac{P}{N}}$'' \cite{amdahl}. This means that our parallelisation efforts are limited by the amount of work that can be parallelised and, theoretically, should follow the distribution represented in Figure \ref{fig:amdahl}. 
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.6\linewidth]{Resources/Images/amdahl.png}
+  \caption{A graphical representation of Amdahl's law}
+  \label{fig:amdahl}
+\end{figure}
 
 \subsection{Distributed memory}
+Following a distributed memory architecture for parallel computing means that each processor will have it's own independent local memory. In these systems, all the work that one process executes remains local to it, without interfering with the address space of all other processors. Hence, to solve meaningful computations, a communication network needs to be established in order for processes to share data with each other. Such is the case of the Message Passing Interface (MPI).\par
+This means that this architecture is very scalable: with each processor being added to the system the size of the total memory increases. Also, each processor will be able to access it's own memory rapidly and without interference, reducing the usual constraint of memory access penalties.
+\par However, this type of system requires a higher degree of skill from the programmer. The programmer will be the one responsible for most of the details of memory passing between processors and will need to ensure that no race conditions or deadlocks arise from the data communication. Also, whenever data from another processor is needed, the latency of the bandwidth in the network will introduce a heavy time penalty to the computations, as this data will need to be communicated before computations can be performed over it.
 \subsection{Shared memory}
 
 \subsection{GPGPU}
