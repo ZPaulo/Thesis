@@ -1,0 +1,58 @@
+This is the 3D lattice Boltzmann *.log file
+
+
+:::: Imported variables from the *.ini file :::: 
+>>> Uavg              : 0.026455
+>>> Vavg              : 0.000000
+>>> Wavg              : 0.000000
+>>> Force             : 0.000000
+>>> Initial density   : 1.0
+>>> Viscosity         : 0.05555556
+>>> # of iterations   : 20000
+>>> Autosave after    : 0
+>>> Autosave every    : 100000
+>>> CollisionModel    : BGKW
+>>> InletProfile      : CONSTANT
+>>> OutletProfile     : OPEN (2nd)
+>>> CurvedBoundaries  : OFF
+>>> Residuals type    : MaxMacroDiffs
+>>> Boundary model    : HHmodel
+>>> Results format    : Paraview (*.vti)
+>>> Initial conditions from file : YES
+>>> Initial conditions filename: Profiles/inlet60_21.vti
+>>> Residuals and macro diffs calculated each: 1 iterations
+>>> Stop conditions: 0.000000 0.000000 0.000000 0.000000
+>>> Drag, lift was not calculated
+>>> UpdateInltOutl	:	yes
+
+:::: Calculated variables from mesh :::: 
+>>> Grid spacing             = 0.050000
+>>> # of nodes in x (n)      = 161
+>>> # of nodes in y (m)      = 21
+>>> # of nodes in z (h)      = 21
+>>> NumInletNodes            = 361
+>>> MaxInletCoordY           = 0.475000
+>>> MinInletCoordY           = -0.475000
+>>> MaxInletCoordZ           = 0.475000
+>>> MinInletCoordZ           = -0.475000
+
+:::: Initializing ::::
+>>> Number of nodes                      = 71001
+>>> Number of boundary nodes             = 13602
+>>> Number of connectors in BC nodes     = 71218
+
+:::: Initialization done! ::::
+
+:::: Start Iterations ::::
+
+Overall calculations took 66.122185 seconds
+Main while loop took 64.714745 seconds
+Initialization took 0.747165 seconds
+Collision took 27.656445 seconds
+Streaming took 8.211471 seconds
+Calculating Boundaries took 5.860604 seconds
+Update Macroscopic took 4.258651 seconds
+Calculating residuals took 16.714333 seconds
+Writing results took 0.066783 seconds
+
+:::: Iterations done! ::::

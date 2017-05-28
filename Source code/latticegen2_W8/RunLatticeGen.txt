@@ -1,0 +1,2 @@
+./latticegen lid3D_5by5 5 0.5 0.5 0.5
+./latticegen channel3D 200 0.1 0.1 0.1
