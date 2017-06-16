@@ -134,6 +134,7 @@ The Lattice Boltzmann method (LBM) is a mesoscopic scale approach to CFD. It is 
 
 \par
 This way we can reap the advantages of both the macro and microscale approaches without the need of high end computers \cite{lbm_springer}. Since communications between nodes are very limited, LBM also offers the possibility of employing parallel computing to achieve the solution in even faster times.
+\subsection{Multiphase flow}
 
 
 
@@ -181,7 +182,30 @@ Szőke proposes a CPU APPROACH different parallelisation approach using Unified 
 In 2015, Ádám Koleszár continued the work and further optimised the parallel version of the LBM method using CUDA \cite{koleszar_thesis}. He did an excellent job, resulting in a 10 times faster execution than the previous 2D parallel solver, which means that his new optimised code was 30 times faster than the original, in-house, serial solver.\par
 Finally, in 2016, Maciej Kubat proposed a new version of the LBM solver.Firstly he converts the 2D parallel solver to a 3D parallel solver which entailed a major re-engineering of the code, from data containers to logic cycles \cite{maciej_thesis}. After first trying for a direct adaptation, he found that his code was too slow to produce meaningful solutions. After optimising his own code he was able to reach an almost one hundred times speed-up.
 However, Kubat states that a lot can be done to improve his code, from boundary conditions to code readability and maintainability. 
+\chapter{Methodology}
+\section{In-house LBM solver}
+The implementation of a 3D multiphase flow using the Lattice Botzmann method will be based on an existing in-house code. As such, the first step in developing the new solver is to acquire a good understanding of how the previous solver works, specifically, it’s structure and organisation, it’s input and output data, it’s performance and it’s depending software (if any). Furthermore, the previous code needs to be validated so as to provide and accurate foundation for the project being developed. Without this validation, it would prove to be an arduous work to discover whether the new solver is behaving correctly.
+\subsection{Code organisation}
+After spending some time analysing the LBM solver and debugging some of the core features, I was able to obtain a generous understanding of how the existing code is organised and where most of the necessary algorithms are located. The solver itself was very well documented and most of the solver’s features were written in a very user-friendly way. Because of this good work from the authors of this solver, the following flow chart, Figure \ref{fig:codeFlow}, was able to be made in a relatively small amount of time, which helps to gain a general understanding of the solver.
 
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{Resources/Images/CodeFlowchart.png}
+  \caption{A simplified flowchart of the solver's activity}
+  \label{fig:codeFlow}
+\end{figure}
+
+The previous authors strived for a performant and easy to use code. As such, the SetUpData.ini file contains all the information needed to build the problem to be solved. This file, combined with the mesh files that the user wishes to simulate, provide the initial step in running the solver.\par
+Similarly, when the solver finishes computations, a Results folder is created containing information pertinent to the solution of the solver. These files include the final solution, the residuals, the run time, etc. The user also has the option of selecting which output format to produce the solution in (.vti, .dat or .csv).
+
+\subsection{Performance}
+This thesis will be based on the work of previous Cranfield MSc students. As such, the received solver needs to be validated regarding the established performance in Kubat’s thesis \cite{maciej_thesis}. To this end, I generated the same meshes as the ones used in his thesis, specifically the lid driven cavity 128 and 256. \par
+The lid driven cavity is a commonly used benchmark test for CFD solvers. It consists of a cube with a moving lid on the top which acts as the inlet for the flows. The numbers refer to the number of nodes in each direction, i.e. cavity 128 represents a 128x128x128 cube, resulting in 2097152 nodes.
+The final runtimes of both meshes were very similar to the ones previously obtained, as shown in Figure /ref{fig:compareTimes}. Because of this, we can be sure that our version of the solver is the same as the final one used by the previous authors during their theses. 
+
+\subsection{Validation}
+
+\chapter{Results and Discussion}
 \chapter{Conclusions}
 
 %% Back matter
