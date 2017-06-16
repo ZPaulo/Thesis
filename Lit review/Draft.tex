@@ -201,7 +201,28 @@ Similarly, when the solver finishes computations, a Results folder is created co
 \subsection{Performance}
 This thesis will be based on the work of previous Cranfield MSc students. As such, the received solver needs to be validated regarding the established performance in Kubat’s thesis \cite{maciej_thesis}. To this end, I generated the same meshes as the ones used in his thesis, specifically the lid driven cavity 128 and 256. \par
 The lid driven cavity is a commonly used benchmark test for CFD solvers. It consists of a cube with a moving lid on the top which acts as the inlet for the flows. The numbers refer to the number of nodes in each direction, i.e. cavity 128 represents a 128x128x128 cube, resulting in 2097152 nodes.
-The final runtimes of both meshes were very similar to the ones previously obtained, as shown in Figure /ref{fig:compareTimes}. Because of this, we can be sure that our version of the solver is the same as the final one used by the previous authors during their theses. 
+\par
+The final runtimes of both meshes were very similar to the ones previously obtained, as shown in Figure \ref{fig:compareTimes}. Because of this, we can be sure that our version of the solver is the same as the final one used by the previous authors during their theses. \par
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.9\linewidth]{Resources/Images/compareTimes.pdf}
+  \caption{Runtime for Cavity\_128 and Cavity\_256}
+  \label{fig:compareTimes}
+\end{figure}
+
+
+To gain a better understanding of the code, the solver’s runtimes were profiled according to the main phases of the method. Figure \ref{fig:initialProfiling} shows that the solver spends about 40\% of it’s time calculating residuals. The residuals are used to check whether the solution has converged or diverged, making them a valuable method for potentially saving computation time (which in HPC centres means saving money). However, if the user is sure that the problem being solved needs to run for the specified iterations, he might be able to speed up the solver by not calculating the residuals, or even by specifying an interval of iterations before calculating residuals again.
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.9\linewidth]{Resources/Images/initialProfiling.pdf}
+  \caption{Code profiling for the runtimes of Cavity\_128 with MacroDiff residuals}
+  \label{fig:initialProfiling}
+\end{figure}
+
+\par The remaining time is split between the collision, streaming and macroscopic values calculation, with boundary condition calculations and file writing occupying a less important slice of execution time.
+
 
 \subsection{Validation}
 
