@@ -19,8 +19,6 @@
 % following line.
 %\renewcommand{\familydefault}{\sfdefault}
 
-
-% Example parameters for a typical taught MSc course
 \title{Development of Physics or HPC Optimisation of a parallel 2D lattice Boltzmann solver using GPUs/CUDA}
 \author{José Oliveira}
 \date{August 2017}
@@ -66,6 +64,8 @@
     \abbrev{CUDA}{Compute Unified Device Architecture}
     \abbrev{CFD}{Computational Fluid Dynamics}
     \abbrev{GPGPU}{General-purpose computing on graphics processing units}
+    \abbrev{GPU}{Graphics Processing Unit}
+    \abbrev{LBM}{Lattice Boltzmann Method}
 \end{listofabbreviations}
 
 % Acknowledgements
@@ -135,7 +135,7 @@ The Lattice Boltzmann method (LBM) is a mesoscopic scale approach to CFD. It is 
 \par
 This way we can reap the advantages of both the macro and microscale approaches without the need of high end computers \cite{lbm_springer}. Since communications between nodes are very limited, LBM also offers the possibility of employing parallel computing to achieve the solution in even faster times.
 \subsection{Multiphase flow}
-
+Multiphase flows represent the simultaneous flow of materials in different states (phases). As such, multiphase flows have an enormous spectrum of representation and stand for interactions between gas/solid flows, liquid/solid flows or even liquid/liquid flows with different chemical properties \cite{multiphase}.
 
 
 \section{High Performance Computing}
@@ -195,14 +195,14 @@ After spending some time analysing the LBM solver and debugging some of the core
   \label{fig:codeFlow}
 \end{figure}
 
-The previous authors strived for a performant and easy to use code. As such, the SetUpData.ini file contains all the information needed to build the problem to be solved. This file, combined with the mesh files that the user wishes to simulate, provide the initial step in running the solver.\par
+The previous authors strived for a optimized and easy to use code. As such, the SetUpData.ini file contains all the information needed to build the problem to be solved. This file, combined with the mesh files that the user wishes to simulate, provide the initial step in running the solver. Note that external calculations need to be used to guarantee some aspects of the initial conditions, such as the Reynolds number.\par
 Similarly, when the solver finishes computations, a Results folder is created containing information pertinent to the solution of the solver. These files include the final solution, the residuals, the run time, etc. The user also has the option of selecting which output format to produce the solution in (.vti, .dat or .csv).
 
 \subsection{Performance}
 This thesis will be based on the work of previous Cranfield MSc students. As such, the received solver needs to be validated regarding the established performance in Kubat’s thesis \cite{maciej_thesis}. To this end, I generated the same meshes as the ones used in his thesis, specifically the lid driven cavity 128 and 256. \par
 The lid driven cavity is a commonly used benchmark test for CFD solvers. It consists of a cube with a moving lid on the top which acts as the inlet for the flows. The numbers refer to the number of nodes in each direction, i.e. cavity 128 represents a 128x128x128 cube, resulting in 2097152 nodes.
 \par
-The final runtimes of both meshes were very similar to the ones previously obtained, as shown in Figure \ref{fig:compareTimes}. Because of this, we can be sure that our version of the solver is the same as the final one used by the previous authors during their theses. \par
+The final run-times of both meshes were very similar to the ones previously obtained, as shown in Figure \ref{fig:compareTimes}. Because of this, we can be sure that our version of the solver is the same as the final one used by the previous authors during their theses. \par
 
 \begin{figure}[H]
 \centering
@@ -212,19 +212,22 @@ The final runtimes of both meshes were very similar to the ones previously obtai
 \end{figure}
 
 
-To gain a better understanding of the code, the solver’s runtimes were profiled according to the main phases of the method. Figure \ref{fig:initialProfiling} shows that the solver spends about 40\% of it’s time calculating residuals. The residuals are used to check whether the solution has converged or diverged, making them a valuable method for potentially saving computation time (which in HPC centres means saving money). However, if the user is sure that the problem being solved needs to run for the specified iterations, he might be able to speed up the solver by not calculating the residuals, or even by specifying an interval of iterations before calculating residuals again.
+To gain a better understanding of the code, the solver’s run-times were profiled according to the main phases of the method. Figure \ref{fig:initialProfiling} shows that the solver spends about 40\% of it’s time calculating residuals. The residuals are used to check whether the solution has converged or diverged, making them a valuable method for potentially saving computation time (which in HPC centres means saving money). However, if the user is sure that the problem being solved needs to run for the specified iterations, he might be able to speed up the solver by not calculating the residuals, or even by specifying an interval of iterations before calculating residuals again.
 
 \begin{figure}[H]
 \centering
   \includegraphics[width=0.9\linewidth]{Resources/Images/initialProfiling.pdf}
-  \caption{Code profiling for the runtimes of Cavity\_128 with MacroDiff residuals}
+  \caption{Code profiling for the run-times of Cavity\_128 with MacroDiff residuals}
   \label{fig:initialProfiling}
 \end{figure}
 
-\par The remaining time is split between the collision, streaming and macroscopic values calculation, with boundary condition calculations and file writing occupying a less important slice of execution time.
+\par The remaining time is split between the collision, streaming and macroscopic values calculation, with boundary condition calculations and file writing occupying a less important slice of execution time. With this profiling, we now know which are the most critical parts of the software (residuals, collision and streaming) and can focus our efforts in optimising those areas when developing the method for multiphase flows 
 
 
 \subsection{Validation}
+Now that the received code has been validated to perform under the same conditions as the final version used by the previous authors, we now have to verify whether the results that the received version is producing are the same as the final one. The validation of the results obtained throughout this project will be under the responsibility of Antonio González. As such, the details for this initial validation can be found in his thesis \cite{antonioThesis}.
+\par This initial validation is essential for the development of a multiphase flow using the in-house solver. Without it, there would be no way of telling whether the solver would be functioning incorrectly due to a faulty algorithm implemented by us or if the solver was already producing wrong results. By doing so we can be sure that our code behaves correctly and that a proper result is achieved.
+
 
 \chapter{Results and Discussion}
 \chapter{Conclusions}
