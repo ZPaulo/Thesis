@@ -115,7 +115,7 @@ If we consider the fluid to be represented by individual particles then we will 
 
 
 \section{Lattice Boltzmann Method}
-The Lattice Boltzmann method (LBM) is a mesoscopic scale approach to CFD. It is used to describe a fluid based on probabilities using the Maxwell-Boltzmann equation in the fluid’s equilibrium state \cite{lbm_springer}. 
+The Lattice Boltzmann method (LBM) is a mesoscopic scale approach to CFD and was first introduced as a Lattice-Gas Automata for the Navier-Stokes Equation \cite{gasautomata}. It is used to describe a fluid based on probabilities using the Maxwell-Boltzmann equation in the fluid’s equilibrium state \cite{lbm_springer}. 
 \par In this method, we do not consider the individual characteristics of each particle. By grouping particles together in a D2Q9 (nodes containing 9 particles for 2D problems - Fig \ref{fig:d2q9})  or in a D3Q19 (nodes containing 19 particles for 3D problems - Fig \ref{fig:d3q19}) model, we can analyse the behaviour of the particles collectively  \cite{lbm_springer}. 
 
 \begin{figure}[H]
@@ -134,8 +134,12 @@ The Lattice Boltzmann method (LBM) is a mesoscopic scale approach to CFD. It is 
 
 \par
 This way we can reap the advantages of both the macro and microscale approaches without the need of high end computers \cite{lbm_springer}. Since communications between nodes are very limited, LBM also offers the possibility of employing parallel computing to achieve the solution in even faster times.
+
 \subsection{Multiphase flow}
-Multiphase flows represent the simultaneous flow of materials in different states (phases). As such, multiphase flows have an enormous spectrum of representation and stand for interactions between gas/solid flows, liquid/solid flows or even liquid/liquid flows with different chemical properties \cite{multiphase}.
+Multiphase flows represent the simultaneous flow of materials in different states (phases). As such, multiphase flows have an enormous spectrum of representation and stand for interactions between gas/solid flows, liquid/solid flows or even liquid/liquid flows with different chemical properties \cite{multiphase}.\par
+These simulations present challenging problems because of inherent difficulties during modelling and the importance of engineering applications. However, the Lattice Boltzmann method provides an alternative for these simulations due to it's relative simplicity when compared with traditional Navier-Stokes equation \cite{chenDoolenMP}.
+\par These flows have several applications in the scientific and industrial community, ranging from pourous media fluid interactions \cite{pourous} to flows containing gas bubbles dispersed in liquids \cite{gasBubble}. Furthermore, almost every processing technology must take multiphase flows into account, including cavitating pumps, papermaking and many others \cite{multiphase}.
+\par Several implementation strategies exist for Multiphase flows, however, for the purpose of this thesis, we will first follow the simple ''two-color'' approach first proposed by Gunstensen et al \cite{gunstensen}.
 
 
 \section{High Performance Computing}
@@ -178,7 +182,7 @@ General Purpose computing on Graphical Processing Units stands for the use of Gr
 \section{Previous parallelisation works}
 This thesis is a continuation of work that started some years ago in Cranfield University. As such, the work from the previous students needs to be analysed. \par
 In 2014, Tamás Józsa and Máté Szőke, adapted two different in-house C and C++ codes into one single C code unifying the advantages of each one of the two original codes \cite{jozsa_thesis,szoke_thesis}. Józsa then parallelised the critical parts of the C code using CUDA and ran tests on the Fermi GPU Cluster from Cranfield, achieving a three times speed-up in general, with a peak of 15 times speed-up \cite{jozsa_thesis}. \par
-Szőke proposes a CPU APPROACH different parallelisation approach using Unified Parallel C, which is a Partitioned Global Address Space language\cite{szoke_thesis}. This means that it’s possible to use shared memory to compute the solution. However, the author verified that a local memory-based approach (like MPI) provided the best results. He also compared the results obtained with the ones obtained by Józsa on the CUDA approach. They found that to achieve the same speed-up as that of a single GPU card, one needs an entire workstation (16 threads in the case of Astral) \cite{szoke_thesis}.\par
+Szőke proposes a CPU parallelisation approach using Unified Parallel C, which is a Partitioned Global Address Space language\cite{szoke_thesis}. This means that it is possible to use shared memory to compute the solution. However, the author verified that a local memory-based approach (like MPI) provided the best results. He also compared the results obtained with the ones obtained by Józsa on the CUDA approach. They found that to achieve the same speed-up as that of a single GPU card, one needs an entire workstation (16 threads in the case of Astral) \cite{szoke_thesis}.\par
 In 2015, Ádám Koleszár continued the work and further optimised the parallel version of the LBM method using CUDA \cite{koleszar_thesis}. He did an excellent job, resulting in a 10 times faster execution than the previous 2D parallel solver, which means that his new optimised code was 30 times faster than the original, in-house, serial solver.\par
 Finally, in 2016, Maciej Kubat proposed a new version of the LBM solver.Firstly he converts the 2D parallel solver to a 3D parallel solver which entailed a major re-engineering of the code, from data containers to logic cycles \cite{maciej_thesis}. After first trying for a direct adaptation, he found that his code was too slow to produce meaningful solutions. After optimising his own code he was able to reach an almost one hundred times speed-up.
 However, Kubat states that a lot can be done to improve his code, from boundary conditions to code readability and maintainability. 
