@@ -13,6 +13,8 @@
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
 
 % By default, LaTeX uses a serif font - these are traditionally thought to be
 % easier to read.   If you'd prefer sans-serif, please uncomment the 
@@ -226,7 +228,24 @@ To gain a better understanding of the code, the solver’s run-times were profil
   \label{fig:initialProfiling}
 \end{figure}
 
-\par The remaining time is split between the collision, streaming and macroscopic values calculation, with boundary condition calculations and file writing occupying a less important slice of execution time. With this profiling, we now know which are the most critical parts of the software (residuals, collision and streaming) and can focus our efforts in optimising those areas when developing the method for multiphase flows 
+\par The remaining time is split between the collision, streaming and macroscopic values calculation, with boundary condition calculations and file writing occupying a less important slice of execution time. With this profiling, we now know which are the most critical parts of the software (residuals, collision and streaming) and can focus our efforts in optimising those areas when developing the method for multiphase flows.
+\par Finally, the received solver was programmed to run with a 2D configuration in the kernel calls. Both the blocks per grid and threads per block are set up to run with an equal number of elements in the two directions. \textcolor{red}{The number of blocks is calculated dynamically with problem size in mind and sets 1 block per node.} However, the number of threads per block is declared statically with a value of 16x16. This means that the solver will use 16 threads in the x direction and another 16 in the y direction per block, meaning that each block uses 256 threads. To understand how this value affects the solver, I have benchmarked the solver using two more configurations for the Cavity\_128 and Cavity\_256 meshes.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{.49\textwidth}
+  \includegraphics[width=\linewidth]{Resources/Images/timesThreads128.pdf}
+  \caption{Cavity\_128}
+  \end{subfigure}
+  \begin{subfigure}{.49\textwidth}
+  \includegraphics[width=\linewidth]{Resources/Images/timesThreads256.pdf}
+  \caption{Cavity\_256}
+  \end{subfigure} 
+   \caption{Overall time comparison using three different threads per block configuration}
+  \label{fig:timesThreads}
+  \end{figure} 
+  
+  Figure \ref{fig:timesThreads} shows that the initial configuration (16x16) provides the best results. Because of this, the parallelisation strategy for the multiphase algorithm development will also start with this number of threads per block.
 
 
 \subsection{Validation}
