@@ -15,6 +15,7 @@
 #include "Iterate.h"
 #include "ArrayUtils.h"
 #include "Check.h"
+#include "Multiphase.h"
 
 int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	// Time measurement: declaration, begin
@@ -50,7 +51,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	int numInletNodes;         // number of inlet nodes
 
 	int *nodeIdX, *nodeIdY, *nodeType, *bcNodeIdX, *bcNodeIdY, *latticeId,
-			*bcType, *bcBoundId,*tempi;
+	*bcType, *bcBoundId,*tempi;
 	FLOAT_TYPE *nodeX, *nodeY, *bcX, *bcY,*temp;
 
 	FLOAT_TYPE taskTime[9];
@@ -76,6 +77,10 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	}
 
 	int *fluid_d = createGpuArrayInt(numNodes, ARRAY_COPY, 0, nodeType);
+	//TODO:Serial mp only
+	int *fluid;
+	if(args->multiPhase)
+		fluid = createHostArrayInt(numNodes, ARRAY_COPY, 0, nodeType);
 	FLOAT_TYPE *coordX_d = createGpuArrayFlt(numNodes, ARRAY_COPY, 0., nodeX);
 	FLOAT_TYPE *coordY_d = createGpuArrayFlt(numNodes, ARRAY_COPY, 0., nodeY);
 
@@ -132,7 +137,80 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *w = createHostArrayFlt(m * n, ARRAY_ZERO);
 	FLOAT_TYPE *rho = createHostArrayFlt(m * n, ARRAY_ZERO);
 
+	//Multiphase
+	FLOAT_TYPE *r_rho;
+	FLOAT_TYPE *b_rho;
+	FLOAT_TYPE *color_gradient;
+	FLOAT_TYPE *r_f;
+	FLOAT_TYPE *b_f;
+	FLOAT_TYPE *r_fColl;
+	FLOAT_TYPE *b_fColl;
+	FLOAT_TYPE *r_fPert;
+	FLOAT_TYPE *b_fPert;
+	FLOAT_TYPE *r_fReCol;
+	FLOAT_TYPE *b_fReCol;
+	FLOAT_TYPE *r_phi;
+	FLOAT_TYPE *b_phi;
+	FLOAT_TYPE *w_pert;
+	FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
+	FLOAT_TYPE b_omega = 1.0/(3.0 * args->b_viscosity+0.5);
+
+	if(args->multiPhase){
+		r_rho = createHostArrayFlt(m * n, ARRAY_ZERO);
+		b_rho = createHostArrayFlt(m * n, ARRAY_ZERO);
+		color_gradient = createHostArrayFlt(m * n * 2, ARRAY_ZERO);
+
+		r_f = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+		b_f = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+
+		r_fColl = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+		b_fColl = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+
+		r_fPert = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+		b_fPert = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+
+		r_fReCol = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+		b_fReCol = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
+
+
+		w_pert = createHostArrayFlt(9, ARRAY_ZERO);
+		int i;
+		w_pert[0] = -4.0/ 27.0;
+		for(i = 1; i < 5; i++)
+			w_pert[i] = 2.0 / 27.0;
+		for(i = 5; i < 9; i++)
+			w_pert[i] = 5.0 / 108.0;
+
+		r_phi = createHostArrayFlt(9, ARRAY_ZERO);
+		b_phi = createHostArrayFlt(9, ARRAY_ZERO);
+
+		r_phi[0] = args->r_alpha;
+		for(i = 1; i < 5; i++)
+			r_phi[i] = (1.0 - args->r_alpha) / 5.0;
+		for(i = 5; i < 9; i++)
+			r_phi[i] = (1.0 - args->r_alpha) / 20.0;
+
+		b_phi[0] = args->b_alpha;
+		for(i = 1; i < 5; i++)
+			b_phi[i] = (1.0 - args->b_alpha) / 5.0;
+		for(i = 5; i < 9; i++)
+			b_phi[i] = (1.0 - args->b_alpha) / 20.0;
+
+
+		createBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho);
+
+		FILE * fp1;                 // file pointer to output file
+		fp1 = fopen("Results/bubbletest.vti", "w"); // open file
+		for(int i = 0; i < n; i++)
+			for(int j = 0; j < m; j++){
+				fprintf(fp1, "%f\n", r_rho[i*m+j]);
+				printf("%f\n", r_rho[i*m+j]);
+			}
+		fclose(fp1);
+	}
+
 	FLOAT_TYPE *rho_d = createGpuArrayFlt(m * n, ARRAY_FILL, args->rho);
+	//TODO: add gpu array
 
 	FLOAT_TYPE *u0_d, *v0_d;
 	if (args->inletProfile == NO_INLET) {
@@ -149,8 +227,11 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *drag_d = createGpuArrayFlt(m * n, ARRAY_ZERO);
 	FLOAT_TYPE *lift_d = createGpuArrayFlt(m * n, ARRAY_ZERO);
 
+
+
 	FLOAT_TYPE *f_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
+	//TODO: add gpu array
 
 	FLOAT_TYPE *temp9a_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
 	FLOAT_TYPE *temp9b_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
@@ -227,7 +308,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 	tInstant1 = clock(); // Start measuring time
 	WriteResults3D(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho, nodeType,
-				n, m, 1, args->outputFormat);
+			n, m, 1, args->outputFormat);
 	tInstant2 = clock();
 	taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1) / CLOCKS_PER_SEC;
 
@@ -249,8 +330,14 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		switch (args->collisionModel) {
 
 		case BGKW:
-			gpuCollBgkw2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, f_d,
-					fColl_d);
+			if(args->multiPhase)
+				//Collision
+
+				mp2DColl(fluid, n,m,rho, u,v, r_f,b_f,r_rho,b_rho,r_phi,b_phi,w_pert, color_gradient, r_omega, b_omega, args->control_param,args->del,
+						args->beta, args->g_limit, args->r_A, args->b_A, r_fPert, b_fPert);
+			else
+				gpuCollBgkw2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, f_d,
+						fColl_d);
 			break;
 
 		case TRT:
@@ -352,7 +439,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 		printf("Iterating... %d/%d (%3.1f %%)\r", iter + 1, args->iterations,
 				(FLOAT_TYPE) (iter + 1) * 100
-						/ (FLOAT_TYPE) (args->iterations));
+				/ (FLOAT_TYPE) (args->iterations));
 
 		iter++; // update loop variable
 
@@ -384,7 +471,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-						/ CLOCKS_PER_SEC;
+																				/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////

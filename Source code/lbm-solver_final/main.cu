@@ -21,6 +21,7 @@
  * @return 0: success n: error
  */
 int main(int argc, char* argv[]) {
+
 	eraseAlertLog();
 	Arguments args;
 	args.u = 0.;
@@ -47,6 +48,27 @@ int main(int argc, char* argv[]) {
 	args.TypeOfResiduals = MacroDiff;
 	args.ShowMacroDiff = 0;
 	args.UpdateInltOutl=1;
+
+	args.multiPhase = 1;
+	if(args.multiPhase){
+		//Read from file
+
+		args.r_density = 1.0;
+		args.gamma = 1.0;
+		args.b_alpha = 0.6;
+		args.r_viscosity = 1.0/6.0;
+		args.b_viscosity = 1.0/6.0;
+		args.beta = 0.99;
+		args.r_A = 0.0004;
+		args.b_A = 0.0004;
+		args.control_param = 0.9;
+		args.del = 0.1;
+		args.g_limit = 0.000001;
+		args.bubble_radius = 0.2;
+		//Not file
+		args.b_density = args.r_density / args.gamma;
+		args.r_alpha = (1.0 - ((1.0 - args.b_alpha) / args.gamma));
+	}
 
 	InputFilenames inFn;
 	strcpy(inFn.init, "SetUpData.ini");

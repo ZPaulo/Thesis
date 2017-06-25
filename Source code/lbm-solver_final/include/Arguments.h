@@ -109,9 +109,23 @@ typedef struct arg
     int ShowMacroDiff;
     int TypeOfProblem;
     int UpdateInltOutl;
-
-
-
+    //New
+    int multiPhase;
+    FLOAT_TYPE r_density;
+    FLOAT_TYPE b_density;
+    FLOAT_TYPE r_alpha;
+    FLOAT_TYPE b_alpha;
+    FLOAT_TYPE gamma;
+    FLOAT_TYPE r_viscosity;
+    FLOAT_TYPE b_viscosity;
+    FLOAT_TYPE r_A;
+    FLOAT_TYPE b_A;
+    FLOAT_TYPE beta;
+    FLOAT_TYPE del;
+    FLOAT_TYPE control_param;
+    FLOAT_TYPE g_limit;
+    //Bubble case
+    FLOAT_TYPE bubble_radius;
 
 } Arguments;
 
