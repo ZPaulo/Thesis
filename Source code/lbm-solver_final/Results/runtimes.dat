@@ -1,9 +1,9 @@
-Overall 0.090291
-Iteration 0.002275
-Initialisation 0.005908
-Collision 0.000011
-Streaming 0.000119
-Boundaries 0.000225
-Macroscopic 0.000099
-Residuals 0.000302
-File writing 0.001156
+Overall 1.017881
+Iteration 0.938301
+Initialisation 0.001288
+Collision 0.519181
+Streaming 0.043527
+Boundaries 0.005701
+Macroscopic 0.094420
+Residuals 0.094243
+File writing 0.001580

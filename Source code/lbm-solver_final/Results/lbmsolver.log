@@ -8,7 +8,7 @@ This is the 3D lattice Boltzmann *.log file
 >>> Force             : 0.000000
 >>> Initial density   : 1.0
 >>> Viscosity         : 0.05555556
->>> # of iterations   : 10
+>>> # of iterations   : 1000
 >>> Autosave after    : 0
 >>> Autosave every    : 100000
 >>> CollisionModel    : BGKW
@@ -44,18 +44,18 @@ This is the 3D lattice Boltzmann *.log file
 :::: Initialization done! ::::
 
 :::: Start Iterations ::::
-^^^^ Free : 3753 Mbytes 
+^^^^ Free : 3604 Mbytes 
 ^^^^ Total: 4044 Mbytes 
-^^^^ 92.792681% free, 7.207319% used
+^^^^ 89.130300% free, 10.869700% used
 
-Overall calculations took 0.090291 seconds
-Main while loop took 0.002275 seconds
-Initialization took 0.005908 seconds
-Collision took 0.000011 seconds
-Streaming took 0.000119 seconds
-Calculating Boundaries took 0.000225 seconds
-Update Macroscopic took 0.000099 seconds
-Calculating residuals took 0.000302 seconds
-Writing results took 0.001156 seconds
+Overall calculations took 1.017881 seconds
+Main while loop took 0.938301 seconds
+Initialization took 0.001288 seconds
+Collision took 0.519181 seconds
+Streaming took 0.043527 seconds
+Calculating Boundaries took 0.005701 seconds
+Update Macroscopic took 0.094420 seconds
+Calculating residuals took 0.094243 seconds
+Writing results took 0.001580 seconds
 
 :::: Iterations done! ::::
