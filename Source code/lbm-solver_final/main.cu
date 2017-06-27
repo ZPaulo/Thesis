@@ -61,10 +61,10 @@ int main(int argc, char* argv[]) {
 		args.beta = 0.99;
 		args.r_A = 0.0004;
 		args.b_A = 0.0004;
-		args.control_param = 0.9;
+		args.control_param = 0.9999;
 		args.del = 0.1;
-		args.g_limit = 0.000001;
-		args.bubble_radius = 0.2;
+		args.g_limit = 0.0;
+		args.bubble_radius = 20.0/128.0;
 		//Not file
 		args.b_density = args.r_density / args.gamma;
 		args.r_alpha = (1.0 - ((1.0 - args.b_alpha) / args.gamma));

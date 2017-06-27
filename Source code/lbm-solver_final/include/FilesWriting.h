@@ -32,4 +32,10 @@ void WriteChannelCrossSection3D(FLOAT_TYPE* CoordX, FLOAT_TYPE* CoordY, FLOAT_TY
 					FLOAT_TYPE* U, FLOAT_TYPE* V, FLOAT_TYPE* W, int n, int m, int h, FLOAT_TYPE Ulid);
 void eraseAlertLog();
 
+void WriteResultsMultiPhase(char* OutputFile, int* fluid, FLOAT_TYPE* CoordX, FLOAT_TYPE* CoordY,
+		FLOAT_TYPE* CoordZ,
+		FLOAT_TYPE* U, FLOAT_TYPE* V, FLOAT_TYPE* W, FLOAT_TYPE* Rho,FLOAT_TYPE* r_Rho, FLOAT_TYPE* b_Rho,
+		int* Fluid, int n, int m, int h, OutputFormat outputFormat);
+
+void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h = 1);
 #endif

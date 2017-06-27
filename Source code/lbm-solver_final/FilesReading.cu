@@ -23,8 +23,10 @@ int getNumberOfLines(const char *filename) {
 	}
 
 	int lines = 0;
+	char c;
 	while (!feof(f)) {
-		if (fgetc(f) == '\n') {
+		c = fgetc(f);
+		if (c == '\n' || c == '\r') {
 			lines++;
 		}
 	}
@@ -207,14 +209,14 @@ void readInitFile(const char* filename, Arguments *args) {
 		}
 	}
 	if (line[22].find("yes") != std::string::npos)
-			args->UpdateInltOutl = 1;
+		args->UpdateInltOutl = 1;
+	else {
+		if (line[22].find("no") != std::string::npos)
+			args->UpdateInltOutl = 0;
 		else {
-			if (line[22].find("no") != std::string::npos)
-				args->UpdateInltOutl = 0;
-			else {
-				fprintf(stderr, "Error reading initial file\n");
-			}
+			fprintf(stderr, "Error reading initial file\n");
 		}
+	}
 
 	setOptions(args, ipr, coll, curved, opr, format, bcwalltype, ResidualsType);
 }
@@ -240,7 +242,7 @@ int readInitConditionsFile(const char* filename, int NoOfNodes, int n, int m,
 	FILE *f = fopen(filename, "r");
 	getline(&line, &len, f);
 	if (NoOfLines - 3 == NoOfNodes && line[0] == 'T' && line[1] == 'i') {
-//tecplot format
+		//tecplot format
 	} else {
 		if (line[0] == '<' && line[1] == '?'
 				&& NoOfLines == (18 + 3 * h * m * n)) {
@@ -266,7 +268,7 @@ int readInitConditionsFile(const char* filename, int NoOfNodes, int n, int m,
 }
 
 int readNodeFile(const char *filename, int **ni, int **nj, int **nk,
-FLOAT_TYPE **nx, FLOAT_TYPE **ny, FLOAT_TYPE **nz, int **nf, int problemtype) {
+		FLOAT_TYPE **nx, FLOAT_TYPE **ny, FLOAT_TYPE **nz, int **nf, int problemtype) {
 	int n = getNumberOfLines(filename);
 	if (!n) {
 		return 0;
@@ -385,7 +387,7 @@ int readResultFile(const char *filename, FLOAT_TYPE ***results) {
 				for (i = 0; i < (n - 18) / 3; ++i) {
 
 					fscanf(f,
-					FLOAT_FORMAT" "FLOAT_FORMAT" "FLOAT_FORMAT"\n",
+							FLOAT_FORMAT" "FLOAT_FORMAT" "FLOAT_FORMAT"\n",
 							results[0][3] + i, results[0][4] + i,
 							results[0][5] + i);
 				}
@@ -394,7 +396,7 @@ int readResultFile(const char *filename, FLOAT_TYPE ***results) {
 				for (i = 0; i < (n - 18) / 3; ++i) {
 
 					fscanf(f,
-					FLOAT_FORMAT"\n", results[0][7] + i);
+							FLOAT_FORMAT"\n", results[0][7] + i);
 				}
 			}
 		}
@@ -508,7 +510,7 @@ int getNumInletNodes(int *bc, int *dir, int n, int problemtype) {
 }
 
 FLOAT_TYPE getMaxInletCoordY(int *bc, int *dir, FLOAT_TYPE *bcy,
-FLOAT_TYPE delta, int n, int problemtype) {
+		FLOAT_TYPE delta, int n, int problemtype) {
 	int i = 0;
 	FLOAT_TYPE maxY;
 	while (bc[i] != 2 && i < n) //inlet
@@ -535,7 +537,7 @@ FLOAT_TYPE delta, int n, int problemtype) {
 }
 
 FLOAT_TYPE getMaxInletCoordZ(int *bc, int *dir, FLOAT_TYPE *bcz,
-FLOAT_TYPE delta, int n, int problemtype) {
+		FLOAT_TYPE delta, int n, int problemtype) {
 	if (problemtype == (ProblemType) _2D)
 		return 0.0;
 	int i = 0;
@@ -555,7 +557,7 @@ FLOAT_TYPE delta, int n, int problemtype) {
 }
 
 FLOAT_TYPE getMinInletCoordY(int *bc, int *dir, FLOAT_TYPE *bcy,
-FLOAT_TYPE delta, int n, int problemtype) {
+		FLOAT_TYPE delta, int n, int problemtype) {
 	int i = 0;
 	FLOAT_TYPE minY;
 	while (bc[i] != 2 && i < n) //inlet
@@ -583,7 +585,7 @@ FLOAT_TYPE delta, int n, int problemtype) {
 }
 
 FLOAT_TYPE getMinInletCoordZ(int *bc, int *dir, FLOAT_TYPE *bcz,
-FLOAT_TYPE delta, int n, int problemtype) {
+		FLOAT_TYPE delta, int n, int problemtype) {
 	if (problemtype == (ProblemType) _2D)
 		return 0.0;
 	int i = 0;
@@ -600,4 +602,59 @@ FLOAT_TYPE delta, int n, int problemtype) {
 	}
 
 	return minZ - delta / 2;
+}
+
+int readArray(const char *file,FLOAT_TYPE **array){
+
+	int i, n = getNumberOfLines(file);
+	if (!n) {
+		return 0;
+	}
+
+	FILE *f = fopen(file, "r");
+	*array = createHostArrayFlt(n,ARRAY_NONE);
+
+	for(i = 0; i < n; i++){
+		fscanf(f,"%f\n", (array[0] + i));
+	}
+	fclose(f);
+	return 1;
+}
+
+int compareTestFiles(const char* f1, const char* f2){
+	printf("Comparing results\n");
+	int l1 = getNumberOfLines(f1);
+	int l2 = getNumberOfLines(f2);
+	if (l1 != l2) {
+		printf("Line number mismatch %d vs %d\n", l1,l2);
+		exit(1);
+	}
+
+	FLOAT_TYPE *arr1;
+	FLOAT_TYPE *arr2;
+
+	if(!readArray(f1, &arr1)){
+		printf("Error reading file\n");
+		exit(1);
+	}
+
+	if(!readArray(f2, &arr2)){
+		printf("Error reading file\n");
+		exit(1);
+	}
+
+	FLOAT_TYPE max = 0.0, sum = 0.0, diff;
+	int max_index = -1;
+	for(int i = 0; i < l1; i++){
+		diff = abs(arr1[i] - arr2[i]);
+		if(diff > max){
+			max = diff;
+			max_index = i;
+		}
+		sum += diff;
+	}
+
+	printf("\nFiles finished comparing\nMax error: %f at %d\nSum: %f\n", max,max_index,sum);
+
+	return 0;
 }

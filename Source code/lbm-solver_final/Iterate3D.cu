@@ -113,6 +113,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	m = getLastValue(nodeIdY, numNodes);
 	n = getLastValue(nodeIdX, numNodes);
 	h = getLastValue(nodeIdZ, numNodes);
+
 	delta = getGridSpacing(nodeIdX, nodeIdY, nodeX, numNodes);
 //  printf("checkComment: delta, %f \n",delta);//checkComment
 	numInletNodes = getNumInletNodes(bcType, latticeId, numConns,
