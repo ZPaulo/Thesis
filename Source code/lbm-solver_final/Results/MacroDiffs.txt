@@ -1,1 +1,0 @@
-iteration	Max u diff	Max v diff	Max w diff	Max rho diff
