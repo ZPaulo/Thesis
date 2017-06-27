@@ -177,11 +177,11 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 //		}
 		printf("n and m: %d %d\n", n,m);
 
-		//r_rho = createHostArrayFlt(m * n, ARRAY_ZERO);
+		r_rho = createHostArrayFlt(m * n, ARRAY_ZERO);
 		b_rho = createHostArrayFlt(m * n, ARRAY_ZERO);
 
-		readArray("./TestValues/Matlab/r_rho_after_creation.txt",&r_rho);
-		r_rho = convertArray(n,m,r_rho);
+		//readArray("./TestValues/Matlab/r_rho_after_creation.txt",&r_rho);
+		//r_rho = convertArray(n,m,r_rho);
 
 		st_error = createHostArrayFlt(args->iterations, ARRAY_ZERO);
 		color_gradient = createHostArrayFlt(m * n * 2, ARRAY_ZERO);
@@ -370,8 +370,6 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						r_omega, b_omega, args->control_param,args->del,
 						args->beta, args->g_limit, args->r_A, args->b_A, r_fPert, b_fPert);
 
-
-
 				WriteArray("color_gradient_1",color_gradient, n,m,2);
 			}else
 				gpuCollBgkw2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, f_d,
@@ -405,9 +403,6 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 		if(args->multiPhase){
 			streamMP(n, m, r_f, b_f, r_fPert, b_fPert);
-
-
-
 //
 //			gpuStreaming2D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fPert_d);
 //			gpuStreaming2D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fPert_d);
@@ -449,8 +444,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 			peridicBoundaries(n, m, r_f, b_f, r_rho, b_rho,	args->b_density, u, v);
 
-			WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
-											n, m, 1, args->outputFormat);
+
 		} else{
 			gpuBcInlet2D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
 					u0_d, v0_d, bcCount);
@@ -603,8 +597,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		break;
 	}
 	if(args->multiPhase){
-//		WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
-//				n, m, 1, args->outputFormat);
+		WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
+				n, m, 1, args->outputFormat);
 		printf("\n\nSurface tension error: %f\n", st_error[iter-1]);
 	}
 	else

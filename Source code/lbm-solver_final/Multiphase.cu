@@ -30,10 +30,10 @@ void mp2DColl(int *fluid,int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 	FLOAT_TYPE r_feq, b_feq;
 	FLOAT_TYPE fn05;
 	int index, index9, temp_index;
-	for (int i=0;i < n; i++){
-		for (int j=0; j < m; j++){
+	for (int j=0; j < m; j++){
+		for (int i=0;i < n; i++){
 			// temporary variable 1
-			index = i*m + i;
+			index = j*n + i;
 			cu1 = u[index]*u[index] + v[index]*v[index];
 
 			for (int k=0; k<9; k++){
@@ -44,41 +44,29 @@ void mp2DColl(int *fluid,int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 				//	if (k!=0){ // the rest node (k=0) does not contribute to the color gradient
 
 				if (i!=0 && j!=0 && i!=(n-1) && j!=(m-1)){ // Interior points - In the boundary it is calculated by "mirroring" the density
-					temp_index = (i + cx[k]) * m + j + cy[k];
+					temp_index = (j + cy[k]) * n + i + cx[k];
 					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k];
 					color_gradient[index * 2 + 1] += (r_rho[temp_index] - b_rho[temp_index]) * cy[k];
-					if(index * 2 + 1 == 32459)
-						printf("interior\n");
 				}
 				else if (j==(m-1) && i!=0 && i!=(n-1)) {// north boundary
-					temp_index = (i + cx[k]) * m + j - abs(cy[k]);
+					temp_index = (j - abs(cy[k])) * n + i + cx[k];
 					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k];
 					color_gradient[index * 2 + 1] = 0;
-					//						if(abs(color_gradient[index * 2]) > 0)
-					//						printf("north %d\n", index * 2);
-					if(index * 2 + 1 == 13215)
-						printf("north\n");
 				}
 				else if (j==0 && i!=0 && i!=(n-1)){  // south boundary
-					temp_index = (i + cx[k]) * m + j + abs(cy[k]);
+					temp_index = (j + abs(cy[k])) * n + i + cx[k];
 					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k];
 					color_gradient[index * 2 + 1] = 0;
-					if(index * 2 + 1 == 13215)
-						printf("south\n");
 				}
 				else if (i==(n-1) && j!=0 && j!=(m-1)){  // east boundary
-					temp_index = (i - abs(cx[k])) * m + j + cy[k];
+					temp_index = (j + cy[k]) * n + i - abs(cx[k]);
 					color_gradient[index * 2] = 0;
 					color_gradient[index * 2 + 1] +=  (r_rho[temp_index] - b_rho[temp_index]) * cy[k];
-					if(index * 2 + 1 == 13215)
-						printf("east\n");
 				}
 				else if (i==0 && j!=0 && j!=(m-1)){ //  west boundary
-					temp_index = (i + abs(cx[k])) * m + j + cy[k];
+					temp_index = (j + cy[k]) * n + i + abs(cx[k]);
 					color_gradient[index * 2] = 0;
 					color_gradient[index * 2 + 1] +=  (r_rho[temp_index] - b_rho[temp_index]) * cy[k];
-					if(index * 2 + 1 == 13215)
-						printf("west\n");
 				}
 				//}
 			}
@@ -155,35 +143,18 @@ void createBubble(float *x, float *y,int n, int m, FLOAT_TYPE radius, FLOAT_TYPE
 		FLOAT_TYPE r_density, FLOAT_TYPE b_density, FLOAT_TYPE *r_phi, FLOAT_TYPE *b_phi, FLOAT_TYPE *rho) {
 	int i, j, k;
 	int index, index2;
-	for(i = 0; i < n; i++){
-		for (j=0; j < m; j++){
-			index = i * m + j;
-			if(r_rho[index] > 0){
-				b_rho[index]=0.0;
-				for (k=0; k < 9; k++){
-					// initialise distribution function with small, non-zero values
-					index2 = index * 9 + k;
-					r_f[index2] = r_rho[index] * r_phi[k];
-				}
-			}
-			else{
-				b_rho[index]=b_density;
-				for (k=0; k < 9; k++){
-					// initialise distribution function with small, non-zero values
-					index2 = k + index * 9;
-					b_f[index2]   = b_rho[index]*b_phi[k];
-				}
-			}
-
-			//			if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5),2)) <= radius ){
-			//				r_rho[index] = r_density;
+	for (j=0; j < m; j++){
+		for(i = 0; i < n; i++){
+			index = j * n + i;
+			//			if(r_rho[index] > 0){
+			//				b_rho[index]=0.0;
 			//				for (k=0; k < 9; k++){
 			//					// initialise distribution function with small, non-zero values
-			//					index2 = k + index * 9;
+			//					index2 = index * 9 + k;
 			//					r_f[index2] = r_rho[index] * r_phi[k];
 			//				}
 			//			}
-			//			else {
+			//			else{
 			//				b_rho[index]=b_density;
 			//				for (k=0; k < 9; k++){
 			//					// initialise distribution function with small, non-zero values
@@ -191,6 +162,23 @@ void createBubble(float *x, float *y,int n, int m, FLOAT_TYPE radius, FLOAT_TYPE
 			//					b_f[index2]   = b_rho[index]*b_phi[k];
 			//				}
 			//			}
+
+			if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5),2)) <= radius ){
+				r_rho[index] = r_density;
+				for (k=0; k < 9; k++){
+					// initialise distribution function with small, non-zero values
+					index2 = k + index * 9;
+					r_f[index2] = r_rho[index] * r_phi[k];
+				}
+			}
+			else {
+				b_rho[index]=b_density;
+				for (k=0; k < 9; k++){
+					// initialise distribution function with small, non-zero values
+					index2 = k + index * 9;
+					b_f[index2]   = b_rho[index]*b_phi[k];
+				}
+			}
 			// initialise density
 			rho[index] = r_rho[index]+b_rho[index];
 		}
@@ -212,14 +200,14 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 	int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
 	FLOAT_TYPE st_laplace;
 	// Density and Velocity
-	for (int i=1; i < n - 1; i++){
-		for (int j=1; j < m - 1;j++){
+	for (int j=1; j < m - 1;j++){
+		for (int i=1; i < n - 1; i++){
 			// auxiliar variables
 			u_cum=0.0;
 			v_cum=0.0;
 
 			// densities
-			index = i * m + j;
+			index = j * n + i;
 			r_sum = 0.0;
 			b_sum = 0.0;
 			for(int k = 0; k < 9; k++){
@@ -445,169 +433,169 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fColl, FLOAT_TYPE *b_fColl){
 	// stream on interior first
 	int index,i,j;
-	for (i=1; i < n-1; i++){
-		for (j=1;j < m-1;j++){
-			index = i*m+j;
+	for (j=1;j < m-1;j++){
+		for (i=1; i < n-1; i++){
+			index = j*n+i;
 			r_f[index * 9] = r_fColl[index * 9];
-			r_f[index * 9 + 1] = r_fColl[((i-1)*m + j) * 9 + 1];
-			r_f[index * 9 + 2] = r_fColl[(i*m+j-1) * 9 + 2];
-			r_f[index * 9 + 3] = r_fColl[((i+1)*m + j) * 9 + 3];
-			r_f[index * 9 + 4] = r_fColl[(i*m+j+1) * 9 + 4];
-			r_f[index * 9 + 5] = r_fColl[((i-1)*m + j-1) * 9 + 5];
-			r_f[index * 9 + 6] = r_fColl[((i+1)*m + j-1) * 9 + 6];
-			r_f[index * 9 + 7] = r_fColl[((i+1)*m + j+1) * 9 + 7];
-			r_f[index * 9 + 8] = r_fColl[((i-1)*m + j+1) * 9 + 8];
+			r_f[index * 9 + 1] = r_fColl[(j*n+i-1) * 9 + 1];
+			r_f[index * 9 + 2] = r_fColl[((j-1) * n + i) * 9 + 2];
+			r_f[index * 9 + 3] = r_fColl[(j*n + i + 1) * 9 + 3];
+			r_f[index * 9 + 4] = r_fColl[((j+1) * n + i) * 9 + 4];
+			r_f[index * 9 + 5] = r_fColl[((j-1) * n + i - 1) * 9 + 5];
+			r_f[index * 9 + 6] = r_fColl[((j-1) * n + i + 1) * 9 + 6];
+			r_f[index * 9 + 7] = r_fColl[((j+1) * n + i + 1) * 9 + 7];
+			r_f[index * 9 + 8] = r_fColl[((j+1) * n + i - 1) * 9 + 8];
 
 			b_f[index * 9] = b_fColl[index * 9];
-			b_f[index * 9 + 1] = b_fColl[((i-1)*m + j) * 9 + 1];
-			b_f[index * 9 + 2] = b_fColl[(i*m+j-1) * 9 + 2];
-			b_f[index * 9 + 3] = b_fColl[((i+1)*m + j) * 9 + 3];
-			b_f[index * 9 + 4] = b_fColl[(i*m+j+1) * 9 + 4];
-			b_f[index * 9 + 5] = b_fColl[((i-1)*m + j-1) * 9 + 5];
-			b_f[index * 9 + 6] = b_fColl[((i+1)*m + j-1) * 9 + 6];
-			b_f[index * 9 + 7] = b_fColl[((i+1)*m + j+1) * 9 + 7];
-			b_f[index * 9 + 8] = b_fColl[((i-1)*m + j+1) * 9 + 8];
+			b_f[index * 9 + 1] = b_fColl[(j*n+i-1) * 9 + 1];
+			b_f[index * 9 + 2] = b_fColl[((j-1) * n + i) * 9 + 2];
+			b_f[index * 9 + 3] = b_fColl[(j*n + i + 1) * 9 + 3];
+			b_f[index * 9 + 4] = b_fColl[((j+1) * n + i) * 9 + 4];
+			b_f[index * 9 + 5] = b_fColl[((j-1) * n + i - 1) * 9 + 5];
+			b_f[index * 9 + 6] = b_fColl[((j-1) * n + i + 1) * 9 + 6];
+			b_f[index * 9 + 7] = b_fColl[((j+1) * n + i + 1) * 9 + 7];
+			b_f[index * 9 + 8] = b_fColl[((j+1) * n + i - 1) * 9 + 8];
 		}
 	}
 	for (i=1; i < n-1; i++){
 		//north boundary
 		j = m-1;
-		index = i*m+j;
+		index = j*n+i;
 
 		r_f[index * 9] = r_fColl[index * 9];
-		r_f[index * 9 + 1] = r_fColl[((i-1)*m + j) * 9 + 1];
-		r_f[index * 9 + 2] = r_fColl[(i*m+j-1) * 9 + 2];
-		r_f[index * 9 + 3] = r_fColl[((i+1)*m + j) * 9 + 3];
-		r_f[index * 9 + 5] = r_fColl[((i-1)*m + j-1) * 9 + 5];
-		r_f[index * 9 + 6] = r_fColl[((i+1)*m + j-1) * 9 + 6];
+		r_f[index * 9 + 1] = r_fColl[(j*n+i-1) * 9 + 1];
+		r_f[index * 9 + 2] = r_fColl[((j-1) * n + i) * 9 + 2];
+		r_f[index * 9 + 3] = r_fColl[(j*n + i + 1) * 9 + 3];
+		r_f[index * 9 + 5] = r_fColl[((j-1) * n + i - 1) * 9 + 5];
+		r_f[index * 9 + 6] = r_fColl[((j-1) * n + i + 1) * 9 + 6];
 
 		b_f[index * 9] = b_fColl[index * 9];
-		b_f[index * 9 + 1] = b_fColl[((i-1)*m + j) * 9 + 1];
-		b_f[index * 9 + 2] = b_fColl[(i*m+j-1) * 9 + 2];
-		b_f[index * 9 + 3] = b_fColl[((i+1)*m + j) * 9 + 3];
-		b_f[index * 9 + 5] = b_fColl[((i-1)*m + j-1) * 9 + 5];
-		b_f[index * 9 + 6] = b_fColl[((i+1)*m + j-1) * 9 + 6];
+		b_f[index * 9 + 1] = b_fColl[(j*n+i-1) * 9 + 1];
+		b_f[index * 9 + 2] = b_fColl[((j-1) * n + i) * 9 + 2];
+		b_f[index * 9 + 3] = b_fColl[(j*n + i + 1) * 9 + 3];
+		b_f[index * 9 + 5] = b_fColl[((j-1) * n + i - 1) * 9 + 5];
+		b_f[index * 9 + 6] = b_fColl[((j-1) * n + i + 1) * 9 + 6];
 
 		//South boundary
 		j = 0;
-		index = i*m+j;
+		index = j*n+i;
 
 		r_f[index * 9] = r_fColl[index * 9];
-		r_f[index * 9 + 1] = r_fColl[((i-1)*m + j) * 9 + 1];
-		r_f[index * 9 + 3] = r_fColl[((i+1)*m + j) * 9 + 3];
-		r_f[index * 9 + 4] = r_fColl[(i*m+j+1) * 9 + 4];
-		r_f[index * 9 + 7] = r_fColl[((i+1)*m + j+1) * 9 + 7];
-		r_f[index * 9 + 8] = r_fColl[((i-1)*m + j+1) * 9 + 8];
+		r_f[index * 9 + 1] = r_fColl[(j*n+i-1) * 9 + 1];
+		r_f[index * 9 + 3] = r_fColl[(j*n + i + 1) * 9 + 3];
+		r_f[index * 9 + 4] = r_fColl[((j+1) * n + i) * 9 + 4];
+		r_f[index * 9 + 7] = r_fColl[((j+1) * n + i + 1) * 9 + 7];
+		r_f[index * 9 + 8] = r_fColl[((j+1) * n + i - 1) * 9 + 8];
 
 		b_f[index * 9] = b_fColl[index * 9];
-		b_f[index * 9 + 1] = b_fColl[((i-1)*m + j) * 9 + 1];
-		b_f[index * 9 + 3] = b_fColl[((i+1)*m + j) * 9 + 3];
-		b_f[index * 9 + 4] = b_fColl[(i*m+j+1) * 9 + 4];
-		b_f[index * 9 + 7] = b_fColl[((i+1)*m + j+1) * 9 + 7];
-		b_f[index * 9 + 8] = b_fColl[((i-1)*m + j+1) * 9 + 8];
+		b_f[index * 9 + 1] = b_fColl[(j*n+i-1) * 9 + 1];
+		b_f[index * 9 + 3] = b_fColl[(j*n + i + 1) * 9 + 3];
+		b_f[index * 9 + 4] = b_fColl[((j+1) * n + i) * 9 + 4];
+		b_f[index * 9 + 7] = b_fColl[((j+1) * n + i + 1) * 9 + 7];
+		b_f[index * 9 + 8] = b_fColl[((j+1) * n + i - 1) * 9 + 8];
 	}
 
 	for (j=1;j < m-1;j++){
 		//east
 		i = n-1;
-		index = i*m+j;
+		index = j*n+i;
 
 		r_f[index * 9] = r_fColl[index * 9];
-		r_f[index * 9 + 1] = r_fColl[((i-1)*m + j) * 9 + 1];
-		r_f[index * 9 + 2] = r_fColl[(i*m+j-1) * 9 + 2];
-		r_f[index * 9 + 4] = r_fColl[(i*m+j+1) * 9 + 4];
-		r_f[index * 9 + 5] = r_fColl[((i-1)*m + j-1) * 9 + 5];
-		r_f[index * 9 + 8] = r_fColl[((i-1)*m + j+1) * 9 + 8];
+		r_f[index * 9 + 1] = r_fColl[(j*n+i-1) * 9 + 1];
+		r_f[index * 9 + 2] = r_fColl[((j-1) * n + i) * 9 + 2];
+		r_f[index * 9 + 4] = r_fColl[((j+1) * n + i) * 9 + 4];
+		r_f[index * 9 + 5] = r_fColl[((j-1) * n + i - 1) * 9 + 5];
+		r_f[index * 9 + 8] = r_fColl[((j+1) * n + i - 1) * 9 + 8];
 
 		b_f[index * 9] = b_fColl[index * 9];
-		b_f[index * 9 + 1] = b_fColl[((i-1)*m + j) * 9 + 1];
-		b_f[index * 9 + 2] = b_fColl[(i*m+j-1) * 9 + 2];
-		b_f[index * 9 + 4] = b_fColl[(i*m+j+1) * 9 + 4];
-		b_f[index * 9 + 5] = b_fColl[((i-1)*m + j-1) * 9 + 5];
-		b_f[index * 9 + 8] = b_fColl[((i-1)*m + j+1) * 9 + 8];
+		b_f[index * 9 + 1] = b_fColl[(j*n+i-1) * 9 + 1];
+		b_f[index * 9 + 2] = b_fColl[((j-1) * n + i) * 9 + 2];
+		b_f[index * 9 + 4] = b_fColl[((j+1) * n + i) * 9 + 4];
+		b_f[index * 9 + 5] = b_fColl[((j-1) * n + i - 1) * 9 + 5];
+		b_f[index * 9 + 8] = b_fColl[((j+1) * n + i - 1) * 9 + 8];
 
 		//west
 		i = 0;
-		index = i*m+j;
+		index = j*n+i;
 
 		r_f[index * 9] = r_fColl[index * 9];
-		r_f[index * 9 + 2] = r_fColl[(i*m+j-1) * 9 + 2];
-		r_f[index * 9 + 3] = r_fColl[((i+1)*m + j) * 9 + 3];
-		r_f[index * 9 + 4] = r_fColl[(i*m+j+1) * 9 + 4];
-		r_f[index * 9 + 6] = r_fColl[((i+1)*m + j-1) * 9 + 6];
-		r_f[index * 9 + 7] = r_fColl[((i+1)*m + j+1) * 9 + 7];
+		r_f[index * 9 + 2] = r_fColl[((j-1) * n + i) * 9 + 2];
+		r_f[index * 9 + 3] = r_fColl[(j*n + i + 1) * 9 + 3];
+		r_f[index * 9 + 4] = r_fColl[((j+1) * n + i) * 9 + 4];
+		r_f[index * 9 + 6] = r_fColl[((j-1) * n + i + 1) * 9 + 6];
+		r_f[index * 9 + 7] = r_fColl[((j+1) * n + i + 1) * 9 + 7];
 
 		b_f[index * 9] = b_fColl[index * 9];
-		b_f[index * 9 + 2] = b_fColl[(i*m+j-1) * 9 + 2];
-		b_f[index * 9 + 3] = b_fColl[((i+1)*m + j) * 9 + 3];
-		b_f[index * 9 + 4] = b_fColl[(i*m+j+1) * 9 + 4];
-		b_f[index * 9 + 6] = b_fColl[((i+1)*m + j-1) * 9 + 6];
-		b_f[index * 9 + 7] = b_fColl[((i+1)*m + j+1) * 9 + 7];
+		b_f[index * 9 + 2] = b_fColl[((j-1) * n + i) * 9 + 2];
+		b_f[index * 9 + 3] = b_fColl[(j*n + i + 1) * 9 + 3];
+		b_f[index * 9 + 4] = b_fColl[((j+1) * n + i) * 9 + 4];
+		b_f[index * 9 + 6] = b_fColl[((j-1) * n + i + 1) * 9 + 6];
+		b_f[index * 9 + 7] = b_fColl[((j+1) * n + i + 1) * 9 + 7];
 	}
 
 	// north-east corner
 	i=n-1; j=m-1;
-	index = i*m+j;
+	index = j*n+i;
 
 	r_f[index * 9] = r_fColl[index * 9];
-	r_f[index * 9 + 1] = r_fColl[((i-1)*m + j) * 9 + 1];
-	r_f[index * 9 + 2] = r_fColl[(i*m+j-1) * 9 + 2];
-	r_f[index * 9 + 5] = r_fColl[((i-1)*m + j-1) * 9 + 5];
+	r_f[index * 9 + 1] = r_fColl[(j*n+i-1) * 9 + 1];
+	r_f[index * 9 + 2] = r_fColl[((j-1) * n + i) * 9 + 2];
+	r_f[index * 9 + 5] = r_fColl[((j-1) * n + i - 1) * 9 + 5];
 
 	b_f[index * 9] = b_fColl[index * 9];
-	b_f[index * 9 + 1] = b_fColl[((i-1)*m + j) * 9 + 1];
-	b_f[index * 9 + 2] = b_fColl[(i*m+j-1) * 9 + 2];
-	b_f[index * 9 + 5] = b_fColl[((i-1)*m + j-1) * 9 + 5];
+	b_f[index * 9 + 1] = b_fColl[(j*n+i-1) * 9 + 1];
+	b_f[index * 9 + 2] = b_fColl[((j-1) * n + i) * 9 + 2];
+	b_f[index * 9 + 5] = b_fColl[((j-1) * n + i - 1) * 9 + 5];
 
 	//north-west corner
 	i=0; j=m-1;
-	index = i*m+j;
+	index = j*n+i;
 
 	r_f[index * 9] = r_fColl[index * 9];
-	r_f[index * 9 + 2] = r_fColl[(i*m+j-1) * 9 + 2];
-	r_f[index * 9 + 3] = r_fColl[((i+1)*m + j) * 9 + 3];
-	r_f[index * 9 + 6] = r_fColl[((i+1)*m + j-1) * 9 + 6];
+	r_f[index * 9 + 2] = r_fColl[((j-1) * n + i) * 9 + 2];
+	r_f[index * 9 + 3] = r_fColl[(j*n + i + 1) * 9 + 3];
+	r_f[index * 9 + 6] = r_fColl[((j-1) * n + i + 1) * 9 + 6];
 
 	b_f[index * 9] = b_fColl[index * 9];
-	b_f[index * 9 + 2] = b_fColl[(i*m+j-1) * 9 + 2];
-	b_f[index * 9 + 3] = b_fColl[((i+1)*m + j) * 9 + 3];
-	b_f[index * 9 + 6] = b_fColl[((i+1)*m + j-1) * 9 + 6];
+	b_f[index * 9 + 2] = b_fColl[((j-1) * n + i) * 9 + 2];
+	b_f[index * 9 + 3] = b_fColl[(j*n + i + 1) * 9 + 3];
+	b_f[index * 9 + 6] = b_fColl[((j-1) * n + i + 1) * 9 + 6];
 
 	// south-east corner
 	i=n-1; j=0;
-	index = i*m+j;
+	index = j*n+i;
 
 	r_f[index * 9] = r_fColl[index * 9];
-	r_f[index * 9 + 1] = r_fColl[((i-1)*m + j) * 9 + 1];
-	r_f[index * 9 + 4] = r_fColl[(i*m+j+1) * 9 + 4];
-	r_f[index * 9 + 8] = r_fColl[((i-1)*m + j+1) * 9 + 8];
+	r_f[index * 9 + 1] = r_fColl[(j*n+i-1) * 9 + 1];
+	r_f[index * 9 + 4] = r_fColl[((j+1) * n + i) * 9 + 4];
+	r_f[index * 9 + 8] = r_fColl[((j+1) * n + i - 1) * 9 + 8];
 
 	b_f[index * 9] = b_fColl[index * 9];
-	b_f[index * 9 + 1] = b_fColl[((i-1)*m + j) * 9 + 1];
-	b_f[index * 9 + 4] = b_fColl[(i*m+j+1) * 9 + 4];
-	b_f[index * 9 + 8] = b_fColl[((i-1)*m + j+1) * 9 + 8];
+	b_f[index * 9 + 1] = b_fColl[(j*n+i-1) * 9 + 1];
+	b_f[index * 9 + 4] = b_fColl[((j+1) * n + i) * 9 + 4];
+	b_f[index * 9 + 8] = b_fColl[((j+1) * n + i - 1) * 9 + 8];
 
 	// south-west corner
 	i=0; j=0;
-	index = i*m+j;
+	index = j*n+i;
 
 	r_f[index * 9] = r_fColl[index * 9];
-	r_f[index * 9 + 3] = r_fColl[((i+1)*m + j) * 9 + 3];
-	r_f[index * 9 + 4] = r_fColl[(i*m+j+1) * 9 + 4];
-	r_f[index * 9 + 7] = r_fColl[((i+1)*m + j+1) * 9 + 7];
+	r_f[index * 9 + 3] = r_fColl[(j*n + i + 1) * 9 + 3];
+	r_f[index * 9 + 4] = r_fColl[((j+1) * n + i) * 9 + 4];
+	r_f[index * 9 + 7] = r_fColl[((j+1) * n + i + 1) * 9 + 7];
 
 	b_f[index * 9] = b_fColl[index * 9];
-	b_f[index * 9 + 3] = b_fColl[((i+1)*m + j) * 9 + 3];
-	b_f[index * 9 + 4] = b_fColl[(i*m+j+1) * 9 + 4];
-	b_f[index * 9 + 7] = b_fColl[((i+1)*m + j+1) * 9 + 7];
+	b_f[index * 9 + 3] = b_fColl[(j*n + i + 1) * 9 + 3];
+	b_f[index * 9 + 4] = b_fColl[((j+1) * n + i) * 9 + 4];
+	b_f[index * 9 + 7] = b_fColl[((j+1) * n + i + 1) * 9 + 7];
 
 }
 
 void resetArrays(FLOAT_TYPE *color_gradient, int n, int m){
 	int index;
-	for(int i = 0; i < n; i++){
-		for(int j = 0; j < m; j++){
-			index = i*m+j;
+	for(int j = 0; j < m; j++){
+		for(int i = 0; i < n; i++){
+			index = j*n+i;
 			color_gradient[index*2] = 0.0;
 			color_gradient[index*2 + 1] = 0.0;
 		}
