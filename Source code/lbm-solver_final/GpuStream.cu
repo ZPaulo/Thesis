@@ -24,6 +24,7 @@ __global__ void gpuStreaming2D(int* fluid_d, int* stream_d, FLOAT_TYPE* f_d, FLO
         f[ind+5*ms] = (stream_d[ind+5*ms] == 1) ? mf[ind+5*ms-n+1] : mf[ind+5*ms];
         f[ind+6*ms] = (stream_d[ind+6*ms] == 1) ? mf[ind+6*ms+n+1] : mf[ind+6*ms];
         f[ind+7*ms] = (stream_d[ind+7*ms] == 1 && ind < ms-n+1) ? mf[ind+7*ms+n-1] : mf[ind+7*ms];
+
     }
 }
 

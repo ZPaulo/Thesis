@@ -425,6 +425,12 @@ __global__ void gpuUpdateMacro3D(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* coordX_d, FLOAT_TYPE* coordY_d, FLOAT_TYPE* coordZ_d,
 		FLOAT_TYPE* f_d, FLOAT_TYPE g, unsigned long long *bcMask_d,int UpdateInltOutl); //FLOAT_TYPE* drag_d, FLOAT_TYPE* lift_d, FLOAT_TYPE* latF_d,
 
+__host__ void initColorGradient(int *color_gradient_directions_d, int n, int m);
+
+__global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
+		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d,
+		int *color_gradient_directions_d, FLOAT_TYPE *test_d);
+
 // to be used in 2D inlet profile computation in gpuInitInletProfile3D
 //from: http://stackoverflow.com/questions/18455414/how-to-do-power-of-complex-number-in-cublas
 //__host__ __device__ FLOAT_TYPE  carg(const cuDoubleComplex& z) {return (FLOAT_TYPE )atan2(cuCimag(z), cuCreal(z));} // polar angle

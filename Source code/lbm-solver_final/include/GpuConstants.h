@@ -67,6 +67,25 @@ extern __constant__ FLOAT_TYPE w2D_d[9];             ///< lattice weights
 extern __constant__ FLOAT_TYPE velMomMap2D_d[81];    ///< MRT constants: mapping between velocity and momentum space \f$ \mathbf{M} \f$
 extern __constant__ FLOAT_TYPE momCollMtx2D_d[81];   ///< MRT constants: collision matrix in momentum space \f$ \mathbf{M}^{-1}\mathbf{S} \f$
 
+//#### 2D Color Gradient ####//
+extern __constant__ FLOAT_TYPE a1_d;
+extern __constant__ FLOAT_TYPE a2_d;
+extern __constant__ FLOAT_TYPE a3_d;
+extern __constant__ FLOAT_TYPE a4_d;
+extern __constant__ FLOAT_TYPE a5_d;
+extern __constant__ FLOAT_TYPE r_omega_d;
+extern __constant__ FLOAT_TYPE b_omega_d;
+extern __constant__ FLOAT_TYPE control_param_d;
+extern __constant__ FLOAT_TYPE del_d;
+extern __constant__ FLOAT_TYPE beta_d;
+extern __constant__ FLOAT_TYPE b_A_d;
+extern __constant__ FLOAT_TYPE r_A_d;
+extern __constant__ FLOAT_TYPE b_phi_d[9];
+extern __constant__ FLOAT_TYPE r_phi_d[9];
+extern __constant__ FLOAT_TYPE w_pert_d[9];
+extern __constant__ FLOAT_TYPE g_limit_d;
+extern __constant__ FLOAT_TYPE c_norms_d[9];
+
 //#### 3D d3q19 ####//
 extern __constant__ int cx3D_d[19];                   ///< velocity x unit vector components
 extern __constant__ int cy3D_d[19];                   ///< velocity y unit vector components

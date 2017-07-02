@@ -615,7 +615,7 @@ int readArray(const char *file,FLOAT_TYPE **array){
 	*array = createHostArrayFlt(n,ARRAY_NONE);
 
 	for(i = 0; i < n; i++){
-		fscanf(f,"%f\n", (array[0] + i));
+		fscanf(f, FLOAT_FORMAT"\n", (array[0] + i));
 	}
 	fclose(f);
 	return 1;
