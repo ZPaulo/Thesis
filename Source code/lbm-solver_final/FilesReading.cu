@@ -512,7 +512,7 @@ int getNumInletNodes(int *bc, int *dir, int n, int problemtype) {
 FLOAT_TYPE getMaxInletCoordY(int *bc, int *dir, FLOAT_TYPE *bcy,
 		FLOAT_TYPE delta, int n, int problemtype) {
 	int i = 0;
-	FLOAT_TYPE maxY;
+	FLOAT_TYPE maxY = 0.0;
 	while (bc[i] != 2 && i < n) //inlet
 	{
 		maxY = bcy[++i];
@@ -559,7 +559,7 @@ FLOAT_TYPE getMaxInletCoordZ(int *bc, int *dir, FLOAT_TYPE *bcz,
 FLOAT_TYPE getMinInletCoordY(int *bc, int *dir, FLOAT_TYPE *bcy,
 		FLOAT_TYPE delta, int n, int problemtype) {
 	int i = 0;
-	FLOAT_TYPE minY;
+	FLOAT_TYPE minY= 0.0;
 	while (bc[i] != 2 && i < n) //inlet
 	{
 		minY = bcy[++i];

@@ -207,6 +207,9 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 				b_pert=0;
 			}
 
+//			r_pert=0;
+//			b_pert=0;
+
 			index9 = ind + k * ms;
 			// calculate updated distribution function
 			if(fluid_d[ind] == 1){
@@ -217,11 +220,15 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 				b_CollPert = omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]) + (1-omega_temp)*b_f_d[index9]+b_pert;
 			}
 			//perform recolor step
-			r_fColl_d[index9]=k_r*(r_CollPert + b_CollPert)+k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
-			b_fColl_d[index9]=k_b*(r_CollPert + b_CollPert)-k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
+			r_fColl_d[index9]=k_r*(r_pert + b_pert)+k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
+			b_fColl_d[index9]=k_b*(r_pert + b_pert)-k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
 
-			r_fColl_d[index9]=feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]);
-			b_fColl_d[index9]=feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]);
+//			r_fColl_d[index9] = r_CollPert;
+//			b_fColl_d[index9] = b_CollPert;
+
+
+			//			r_fColl_d[index9]=feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]);
+			//			b_fColl_d[index9]=feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]);
 		}
 
 
@@ -245,8 +252,8 @@ __global__ void gpuCollBgkw3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																		+ (threadIdx.y * blockDim.x)
-																																		+ threadIdx.x;
+																																						+ (threadIdx.y * blockDim.x)
+																																						+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE r, u, v, w;
@@ -406,8 +413,8 @@ __global__ void gpuCollMrt3D(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																		+ (threadIdx.y * blockDim.x)
-																																		+ threadIdx.x;
+																																						+ (threadIdx.y * blockDim.x)
+																																						+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], mEq2[19], mEq0[19], m[19], collision[19], f[19];
@@ -539,8 +546,8 @@ __global__ void gpuCollMrt3D_short(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																		+ (threadIdx.y * blockDim.x)
-																																		+ threadIdx.x;
+																																						+ (threadIdx.y * blockDim.x)
+																																						+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], m[19], collision[19];

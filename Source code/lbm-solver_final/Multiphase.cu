@@ -29,13 +29,12 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 	int index, index9, temp_index;
 	for (int j=0; j < m; j++){
 		for (int i=0;i < n; i++){
-			// temporary variable 1
 			index = j*n + i;
-			cu1 = u[index]*u[index] + v[index]*v[index];
 
+
+			color_gradient[index * 2] = 0;
+			color_gradient[index * 2 + 1] = 0;
 			for (int k=0; k<9; k++){
-				// temporary variable 2
-				cu2 = u[index]*cx[k] + v[index]*cy[k];
 
 				// calculate color gradient - 4th order
 
@@ -85,6 +84,8 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 
 			b_omega_temp=r_omega_temp;
 
+			cu1 = u[index]*u[index] + v[index]*v[index];
+
 			// invariable quantities
 			color_gradient_norm = sqrt(pow(color_gradient[index * 2],2) + pow(color_gradient[index * 2 + 1],2));
 			k_r=r_rho[index]/rho[index];
@@ -111,14 +112,13 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 					b_pert=0.0;
 				}
 
-				//				r_pert=0.0;
-				//				b_pert=0.0;
 
+				cu2 = u[index]*cx[k] + v[index]*cy[k];
 				// calculate equilibrium distribution function
 				r_feq = r_rho[index] * (r_phi[k] + weight[k] * (3 * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
 				b_feq = b_rho[index] * (b_phi[k] + weight[k] * (3 * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
 
-				index9 = i + j * n+ k * m * n ;
+				index9 = i + j * n + k * m * n;
 				// calculate updated distribution function
 				r_CollPert = r_omega_temp*r_feq + (1-r_omega_temp)*r_f[index9]+r_pert;
 				b_CollPert = b_omega_temp*b_feq + (1-b_omega_temp)*b_f[index9]+b_pert;
@@ -127,9 +127,6 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 				//				// perform recolor step
 				r_fPert[index9]=k_r*fn05+k_k*cosin*(r_rho[index]*r_phi[k]+b_rho[index]*b_phi[k]);
 				b_fPert[index9]=k_b*fn05-k_k*cosin*(r_rho[index]*r_phi[k]+b_rho[index]*b_phi[k]);
-
-				r_fPert[index9] = r_feq;
-				b_fPert[index9] = b_feq;
 			}
 		}
 	}
@@ -145,22 +142,6 @@ void createBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, 
 	for (j=0; j < m; j++){
 		for(i = 0; i < n; i++){
 			index = j * n + i;
-			//			if(r_rho[index] > 0){
-			//				b_rho[index]=0.0;
-			//				for (k=0; k < 9; k++){
-			//					// initialise distribution function with small, non-zero values
-			//					index2 = index * 9 + k;
-			//					r_f[index2] = r_rho[index] * r_phi[k];
-			//				}
-			//			}
-			//			else{
-			//				b_rho[index]=b_density;
-			//				for (k=0; k < 9; k++){
-			//					// initialise distribution function with small, non-zero values
-			//					index2 = k + index * 9;
-			//					b_f[index2]   = b_rho[index]*b_phi[k];
-			//				}
-			//			}
 
 			if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5),2)) <= radius ){
 				r_rho[index] = r_density;
@@ -187,8 +168,8 @@ void createBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, 
 void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *rho, FLOAT_TYPE control_param,
 		FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE *st_error, int iteration, FLOAT_TYPE st_predicted){
 
-	int index_aux1=1;
-	int index_aux2=1;
+	int index_aux1=0;
+	int index_aux2=0;
 	FLOAT_TYPE p_in=0.0;
 	FLOAT_TYPE p_out=0.0;
 	FLOAT_TYPE u_cum, v_cum;
@@ -220,11 +201,13 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 
 			// p_in and p_out for the surface tension
 			chi=(r_rho[index]-b_rho[index])/rho[index];
-			if (chi>=control_param){
+//			printf("chi "FLOAT_FORMAT" ",chi);
+//			printf("control "FLOAT_FORMAT" \n", control_param);
+			if (chi >= control_param){
 				index_aux1++;
 				p_in += r_rho[index];
 			}
-			else if (chi<control_param){
+			else if (chi < control_param){
 				index_aux2++;
 				p_out+=b_rho[index];
 			}
@@ -273,10 +256,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_end + 8 * m * n] = b_f[index_start + 8 * m * n];
 
 		// macroscopic boundary conditions
-		r_rho[index_end] = 0;
-		b_rho[index_end] = b_density;
-		u[index_end]   = 0;
-		v[index_end]   = 0;
+//		r_rho[index_end] = 0;
+//		b_rho[index_end] = b_density;
+//		u[index_end]   = 0;
+//		v[index_end]   = 0;
 
 		//south boundary
 		r_f[index_start + 2 * m * n] = r_f[index_end + 2 * m * n];
@@ -287,10 +270,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
 		b_f[index_start + 6 * m * n] = b_f[index_end + 6 * m * n];
 
-		r_rho[index_start] = 0;
-		b_rho[index_start] = b_density;
-		u[index_start]   = 0;
-		v[index_start]   = 0;
+//		r_rho[index_start] = 0;
+//		b_rho[index_start] = b_density;
+//		u[index_start]   = 0;
+//		v[index_start]   = 0;
 	}
 
 
@@ -309,10 +292,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_end + 6 * m * n] = b_f[index_start + 6 * m * n];
 
 		//macroscopic boundary conditions
-		r_rho[index_end] = 0;
-		b_rho[index_end] = b_density;
-		u[index_end]   = 0;
-		v[index_end]   = 0;
+//		r_rho[index_end] = 0;
+//		b_rho[index_end] = b_density;
+//		u[index_end]   = 0;
+//		v[index_end]   = 0;
 
 		// west boundary
 		r_f[index_start + 1 * m * n] = r_f[index_end + 1 * m * n];
@@ -323,10 +306,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
 		b_f[index_start + 8 * m * n] = b_f[index_end + 8 * m * n];
 
-		r_rho[index_start] = 0;
-		b_rho[index_start] = b_density;
-		u[index_start]   = 0;
-		v[index_start]   = 0;
+//		r_rho[index_start] = 0;
+//		b_rho[index_start] = b_density;
+//		u[index_start]   = 0;
+//		v[index_start]   = 0;
 
 	}
 
@@ -349,11 +332,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[jn*n+ie] = sum_r;
 	//	b_rho[jn*n+ie] = sum_b;
 
-	r_rho[jn*n+ie] = 0;
-	b_rho[jn*n+ie] = b_density;
-
-	u[jn*n+ie]   = 0;
-	v[jn*n+ie]   = 0;
+//	r_rho[jn*n+ie] = 0;
+//	b_rho[jn*n+ie] = b_density;
+//
+//	u[jn*n+ie]   = 0;
+//	v[jn*n+ie]   = 0;
 
 	// north-west corner
 	r_f[(jn*n+iw) + 1 * m * n] = r_f[(jn*n+ie) + 1 * m * n];
@@ -374,11 +357,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[jn*n+iw] = sum_r;
 	//	b_rho[jn*n+iw] = sum_b;
 
-	r_rho[jn*n+iw] = 0;
-	b_rho[jn*n+iw] = b_density;
-
-	u[jn*n+iw]   = 0;
-	v[jn*n+iw]   = 0;
+//	r_rho[jn*n+iw] = 0;
+//	b_rho[jn*n+iw] = b_density;
+//
+//	u[jn*n+iw]   = 0;
+//	v[jn*n+iw]   = 0;
 
 	// south-east corner
 	r_f[(js*n+ie) + 2 * m * n] = r_f[(jn*n+ie) + 2 * m * n];
@@ -399,11 +382,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[js*n+ie] = sum_r;
 	//	b_rho[js*n+ie] = sum_b;
 
-	r_rho[js*n+ie] = 0;
-	b_rho[js*n+ie] = b_density;
-
-	u[js*n+ie]   = 0;
-	v[js*n+ie]   = 0;
+//	r_rho[js*n+ie] = 0;
+//	b_rho[js*n+ie] = b_density;
+//
+//	u[js*n+ie]   = 0;
+//	v[js*n+ie]   = 0;
 
 
 	// south-west corner
@@ -425,11 +408,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[js*n+iw] = sum_r;
 	//	b_rho[js*n+iw] = sum_b;
 
-	r_rho[js*n+iw] = 0;
-	b_rho[js*n+iw] = b_density;
-
-	u[js*n+iw]   = 0;
-	v[js*n+iw]  = 0;
+//	r_rho[js*n+iw] = 0;
+//	b_rho[js*n+iw] = b_density;
+//
+//	u[js*n+iw]   = 0;
+//	v[js*n+iw]  = 0;
 }
 
 void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fColl, FLOAT_TYPE *b_fColl){
@@ -438,7 +421,7 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 	for (j=1;j < m-1;j++){
 		for (i=1; i < n-1; i++){
 			index = j*n+i;
-			r_f[index * 9] = r_fColl[index * 9];
+			r_f[index] = r_fColl[index];
 			r_f[index + 1 * m * n] = r_fColl[(j*n+i-1) + 1 * m * n];
 			r_f[index + 2 * m * n] = r_fColl[((j-1) * n + i) + 2 * m * n];
 			r_f[index + 3 * m * n] = r_fColl[(j*n + i + 1) + 3 * m * n];
@@ -448,7 +431,7 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 			r_f[index + 7 * m * n] = r_fColl[((j+1) * n + i + 1) + 7 * m * n];
 			r_f[index + 8 * m * n] = r_fColl[((j+1) * n + i - 1) + 8 * m * n];
 
-			b_f[index * 9] = b_fColl[index * 9];
+			b_f[index] = b_fColl[index];
 			b_f[index + 1 * m * n] = b_fColl[(j*n+i-1) + 1 * m * n];
 			b_f[index + 2 * m * n] = b_fColl[((j-1) * n + i) + 2 * m * n];
 			b_f[index + 3 * m * n] = b_fColl[(j*n + i + 1) + 3 * m * n];
@@ -464,14 +447,14 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 		j = m-1;
 		index = j*n+i;
 
-		r_f[index * 9] = r_fColl[index * 9];
+		r_f[index] = r_fColl[index];
 		r_f[index + 1 * m * n] = r_fColl[(j*n+i-1) + 1 * m * n];
 		r_f[index + 2 * m * n] = r_fColl[((j-1) * n + i) + 2 * m * n];
 		r_f[index + 3 * m * n] = r_fColl[(j*n + i + 1) + 3 * m * n];
 		r_f[index + 5 * m * n] = r_fColl[((j-1) * n + i - 1) + 5 * m * n];
 		r_f[index + 6 * m * n] = r_fColl[((j-1) * n + i + 1) + 6 * m * n];
 
-		b_f[index * 9] = b_fColl[index * 9];
+		b_f[index] = b_fColl[index];
 		b_f[index + 1 * m * n] = b_fColl[(j*n+i-1) + 1 * m * n];
 		b_f[index + 2 * m * n] = b_fColl[((j-1) * n + i) + 2 * m * n];
 		b_f[index + 3 * m * n] = b_fColl[(j*n + i + 1) + 3 * m * n];
@@ -482,14 +465,14 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 		j = 0;
 		index = j*n+i;
 
-		r_f[index * 9] = r_fColl[index * 9];
+		r_f[index] = r_fColl[index];
 		r_f[index + 1 * m * n] = r_fColl[(j*n+i-1) + 1 * m * n];
 		r_f[index + 3 * m * n] = r_fColl[(j*n + i + 1) + 3 * m * n];
 		r_f[index + 4 * m * n] = r_fColl[((j+1) * n + i) + 4 * m * n];
 		r_f[index + 7 * m * n] = r_fColl[((j+1) * n + i + 1) + 7 * m * n];
 		r_f[index + 8 * m * n] = r_fColl[((j+1) * n + i - 1) + 8 * m * n];
 
-		b_f[index * 9] = b_fColl[index * 9];
+		b_f[index] = b_fColl[index];
 		b_f[index + 1 * m * n] = b_fColl[(j*n+i-1) + 1 * m * n];
 		b_f[index + 3 * m * n] = b_fColl[(j*n + i + 1) + 3 * m * n];
 		b_f[index + 4 * m * n] = b_fColl[((j+1) * n + i) + 4 * m * n];
@@ -502,14 +485,14 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 		i = n-1;
 		index = j*n+i;
 
-		r_f[index * 9] = r_fColl[index * 9];
+		r_f[index] = r_fColl[index];
 		r_f[index + 1 * m * n] = r_fColl[(j*n+i-1) + 1 * m * n];
 		r_f[index + 2 * m * n] = r_fColl[((j-1) * n + i) + 2 * m * n];
 		r_f[index + 4 * m * n] = r_fColl[((j+1) * n + i) + 4 * m * n];
 		r_f[index + 5 * m * n] = r_fColl[((j-1) * n + i - 1) + 5 * m * n];
 		r_f[index + 8 * m * n] = r_fColl[((j+1) * n + i - 1) + 8 * m * n];
 
-		b_f[index * 9] = b_fColl[index * 9];
+		b_f[index] = b_fColl[index];
 		b_f[index + 1 * m * n] = b_fColl[(j*n+i-1) + 1 * m * n];
 		b_f[index + 2 * m * n] = b_fColl[((j-1) * n + i) + 2 * m * n];
 		b_f[index + 4 * m * n] = b_fColl[((j+1) * n + i) + 4 * m * n];
@@ -520,14 +503,14 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 		i = 0;
 		index = j*n+i;
 
-		r_f[index * 9] = r_fColl[index * 9];
+		r_f[index] = r_fColl[index];
 		r_f[index + 2 * m * n] = r_fColl[((j-1) * n + i) + 2 * m * n];
 		r_f[index + 3 * m * n] = r_fColl[(j*n + i + 1) + 3 * m * n];
 		r_f[index + 4 * m * n] = r_fColl[((j+1) * n + i) + 4 * m * n];
 		r_f[index + 6 * m * n] = r_fColl[((j-1) * n + i + 1) + 6 * m * n];
 		r_f[index + 7 * m * n] = r_fColl[((j+1) * n + i + 1) + 7 * m * n];
 
-		b_f[index * 9] = b_fColl[index * 9];
+		b_f[index] = b_fColl[index];
 		b_f[index + 2 * m * n] = b_fColl[((j-1) * n + i) + 2 * m * n];
 		b_f[index + 3 * m * n] = b_fColl[(j*n + i + 1) + 3 * m * n];
 		b_f[index + 4 * m * n] = b_fColl[((j+1) * n + i) + 4 * m * n];
@@ -539,12 +522,12 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 	i=n-1; j=m-1;
 	index = j*n+i;
 
-	r_f[index * 9] = r_fColl[index * 9];
+	r_f[index] = r_fColl[index];
 	r_f[index + 1 * m * n] = r_fColl[(j*n+i-1) + 1 * m * n];
 	r_f[index + 2 * m * n] = r_fColl[((j-1) * n + i) + 2 * m * n];
 	r_f[index + 5 * m * n] = r_fColl[((j-1) * n + i - 1) + 5 * m * n];
 
-	b_f[index * 9] = b_fColl[index * 9];
+	b_f[index] = b_fColl[index];
 	b_f[index + 1 * m * n] = b_fColl[(j*n+i-1) + 1 * m * n];
 	b_f[index + 2 * m * n] = b_fColl[((j-1) * n + i) + 2 * m * n];
 	b_f[index + 5 * m * n] = b_fColl[((j-1) * n + i - 1) + 5 * m * n];
@@ -553,12 +536,12 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 	i=0; j=m-1;
 	index = j*n+i;
 
-	r_f[index * 9] = r_fColl[index * 9];
+	r_f[index] = r_fColl[index];
 	r_f[index + 2 * m * n] = r_fColl[((j-1) * n + i) + 2 * m * n];
 	r_f[index + 3 * m * n] = r_fColl[(j*n + i + 1) + 3 * m * n];
 	r_f[index + 6 * m * n] = r_fColl[((j-1) * n + i + 1) + 6 * m * n];
 
-	b_f[index * 9] = b_fColl[index * 9];
+	b_f[index] = b_fColl[index];
 	b_f[index + 2 * m * n] = b_fColl[((j-1) * n + i) + 2 * m * n];
 	b_f[index + 3 * m * n] = b_fColl[(j*n + i + 1) + 3 * m * n];
 	b_f[index + 6 * m * n] = b_fColl[((j-1) * n + i + 1) + 6 * m * n];
@@ -567,12 +550,12 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 	i=n-1; j=0;
 	index = j*n+i;
 
-	r_f[index * 9] = r_fColl[index * 9];
+	r_f[index] = r_fColl[index];
 	r_f[index + 1 * m * n] = r_fColl[(j*n+i-1) + 1 * m * n];
 	r_f[index + 4 * m * n] = r_fColl[((j+1) * n + i) + 4 * m * n];
 	r_f[index + 8 * m * n] = r_fColl[((j+1) * n + i - 1) + 8 * m * n];
 
-	b_f[index * 9] = b_fColl[index * 9];
+	b_f[index] = b_fColl[index];
 	b_f[index + 1 * m * n] = b_fColl[(j*n+i-1) + 1 * m * n];
 	b_f[index + 4 * m * n] = b_fColl[((j+1) * n + i) + 4 * m * n];
 	b_f[index + 8 * m * n] = b_fColl[((j+1) * n + i - 1) + 8 * m * n];
@@ -581,12 +564,12 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 	i=0; j=0;
 	index = j*n+i;
 
-	r_f[index * 9] = r_fColl[index * 9];
+	r_f[index] = r_fColl[index];
 	r_f[index + 3 * m * n] = r_fColl[(j*n + i + 1) + 3 * m * n];
 	r_f[index + 4 * m * n] = r_fColl[((j+1) * n + i) + 4 * m * n];
 	r_f[index + 7 * m * n] = r_fColl[((j+1) * n + i + 1) + 7 * m * n];
 
-	b_f[index * 9] = b_fColl[index * 9];
+	b_f[index] = b_fColl[index];
 	b_f[index + 3 * m * n] = b_fColl[(j*n + i + 1) + 3 * m * n];
 	b_f[index + 4 * m * n] = b_fColl[((j+1) * n + i) + 4 * m * n];
 	b_f[index + 7 * m * n] = b_fColl[((j+1) * n + i + 1) + 7 * m * n];
