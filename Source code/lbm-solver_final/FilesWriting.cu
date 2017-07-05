@@ -69,17 +69,17 @@ void WriteResultsMultiPhase(char* OutputFile, int* fluid, FLOAT_TYPE* CoordX, FL
 		fprintf(fp1, "    <PointData Scalars=\"scalars\">\n");
 
 		//write U
-//		fprintf(fp1,
-//				"      <DataArray type=\"Float32\" Name=\"Velocity\" NumberOfComponents=\"3\" format=\"ascii\">\n");
-//		for (z = 0; z < h; z++) {
-//			for (y = 0; y < m; y++) {
-//				for (x = 0; x < n; x++) {
-//					fprintf(fp1, "%.10f %.10f %.10f\n", U[x + y * n + z * n * m],
-//							V[x + y * n + z * n * m], W[x + y * n + z * n * m]);
-//				}
-//			}
-//		}
-//		fprintf(fp1, "      </DataArray>\n");
+		fprintf(fp1,
+				"      <DataArray type=\"Float32\" Name=\"Velocity\" NumberOfComponents=\"3\" format=\"ascii\">\n");
+		for (z = 0; z < h; z++) {
+			for (y = 0; y < m; y++) {
+				for (x = 0; x < n; x++) {
+					fprintf(fp1, "%.10f %.10f %.10f\n", U[x + y * n + z * n * m],
+							V[x + y * n + z * n * m], W[x + y * n + z * n * m]);
+				}
+			}
+		}
+		fprintf(fp1, "      </DataArray>\n");
 		//write density
 		fprintf(fp1,
 				"      <DataArray type=\"Float32\" Name=\"Density\" NumberOfComponents=\"1\" format=\"ascii\">\n");

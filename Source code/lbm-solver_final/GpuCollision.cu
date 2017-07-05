@@ -143,7 +143,7 @@ __global__ void gpuCollBgkw2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 }
 
 __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
-		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, FLOAT_TYPE *test_d){
+		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d){
 
 	int ind = blockIdx.x * blockDim.x + threadIdx.x;
 	int ms = depth_d*length_d;
@@ -178,8 +178,7 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
-		test_d[ind * 2] = color_gradient_x;
-		test_d[ind * 2 + 1] = color_gradient_y;
+
 
 		color_gradient_norm = sqrt(color_gradient_x * color_gradient_x + color_gradient_y * color_gradient_y);
 		k_r=r_r/r;
@@ -199,16 +198,12 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 				// calculate perturbation terms
 				r_pert=0.5*r_A_d*color_gradient_norm*(w2D_d[k]*(prod_c_g * prod_c_g) / (color_gradient_norm * color_gradient_norm)-w_pert_d[k]);
 				b_pert=0.5*b_A_d*color_gradient_norm*(w2D_d[k]*(prod_c_g * prod_c_g) / (color_gradient_norm * color_gradient_norm)-w_pert_d[k]);
-
 			}
 			else{
 				// ther perturbation terms are null
 				r_pert=0;
 				b_pert=0;
 			}
-
-//			r_pert=0;
-//			b_pert=0;
 
 			index9 = ind + k * ms;
 			// calculate updated distribution function
@@ -220,28 +215,9 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 				b_CollPert = omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]) + (1-omega_temp)*b_f_d[index9]+b_pert;
 			}
 			//perform recolor step
-			r_fColl_d[index9]=k_r*(r_pert + b_pert)+k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
-			b_fColl_d[index9]=k_b*(r_pert + b_pert)-k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
-
-//			r_fColl_d[index9] = r_CollPert;
-//			b_fColl_d[index9] = b_CollPert;
-
-
-			//			r_fColl_d[index9]=feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]);
-			//			b_fColl_d[index9]=feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]);
+			r_fColl_d[index9]=k_r*(r_CollPert + b_CollPert)+k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
+			b_fColl_d[index9]=k_b*(r_CollPert + b_CollPert)-k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
 		}
-
-
-
-		//		fColl_d[ind     ] = omega_d * feqc2D(u,  0, v,  0, r, 4./9.)  + (1.0-omega_d) * f_d[ind     ];
-		//		fColl_d[ind+1*ms] = omega_d * feqc2D(u,  1, v,  0, r, 1./9.)  + (1.0-omega_d) * f_d[ind+1*ms];
-		//		fColl_d[ind+2*ms] = omega_d * feqc2D(u,  0, v,  1, r, 1./9.)  + (1.0-omega_d) * f_d[ind+2*ms];
-		//		fColl_d[ind+3*ms] = omega_d * feqc2D(u, -1, v,  0, r, 1./9.)  + (1.0-omega_d) * f_d[ind+3*ms];
-		//		fColl_d[ind+4*ms] = omega_d * feqc2D(u,  0, v, -1, r, 1./9.)  + (1.0-omega_d) * f_d[ind+4*ms];
-		//		fColl_d[ind+5*ms] = omega_d * feqc2D(u,  1, v,  1, r, 1./36.) + (1.0-omega_d) * f_d[ind+5*ms];
-		//		fColl_d[ind+6*ms] = omega_d * feqc2D(u, -1, v,  1, r, 1./36.) + (1.0-omega_d) * f_d[ind+6*ms];
-		//		fColl_d[ind+7*ms] = omega_d * feqc2D(u, -1, v, -1, r, 1./36.) + (1.0-omega_d) * f_d[ind+7*ms];
-		//		fColl_d[ind+8*ms] = omega_d * feqc2D(u,  1, v, -1, r, 1./36.) + (1.0-omega_d) * f_d[ind+8*ms];
 	}
 
 }

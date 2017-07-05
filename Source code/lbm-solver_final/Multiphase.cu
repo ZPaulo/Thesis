@@ -201,13 +201,13 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 
 			// p_in and p_out for the surface tension
 			chi=(r_rho[index]-b_rho[index])/rho[index];
-//			printf("chi "FLOAT_FORMAT" ",chi);
-//			printf("control "FLOAT_FORMAT" \n", control_param);
+			//			printf("chi "FLOAT_FORMAT" ",chi);
+			//			printf("control "FLOAT_FORMAT" \n", control_param);
 			if (chi >= control_param){
 				index_aux1++;
 				p_in += r_rho[index];
 			}
-			else if (chi < control_param){
+			else if (chi <= -control_param){
 				index_aux2++;
 				p_out+=b_rho[index];
 			}
@@ -256,10 +256,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_end + 8 * m * n] = b_f[index_start + 8 * m * n];
 
 		// macroscopic boundary conditions
-//		r_rho[index_end] = 0;
-//		b_rho[index_end] = b_density;
-//		u[index_end]   = 0;
-//		v[index_end]   = 0;
+		//		r_rho[index_end] = 0;
+		//		b_rho[index_end] = b_density;
+		//		u[index_end]   = 0;
+		//		v[index_end]   = 0;
 
 		//south boundary
 		r_f[index_start + 2 * m * n] = r_f[index_end + 2 * m * n];
@@ -270,10 +270,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
 		b_f[index_start + 6 * m * n] = b_f[index_end + 6 * m * n];
 
-//		r_rho[index_start] = 0;
-//		b_rho[index_start] = b_density;
-//		u[index_start]   = 0;
-//		v[index_start]   = 0;
+		//		r_rho[index_start] = 0;
+		//		b_rho[index_start] = b_density;
+		//		u[index_start]   = 0;
+		//		v[index_start]   = 0;
 	}
 
 
@@ -292,10 +292,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_end + 6 * m * n] = b_f[index_start + 6 * m * n];
 
 		//macroscopic boundary conditions
-//		r_rho[index_end] = 0;
-//		b_rho[index_end] = b_density;
-//		u[index_end]   = 0;
-//		v[index_end]   = 0;
+		//		r_rho[index_end] = 0;
+		//		b_rho[index_end] = b_density;
+		//		u[index_end]   = 0;
+		//		v[index_end]   = 0;
 
 		// west boundary
 		r_f[index_start + 1 * m * n] = r_f[index_end + 1 * m * n];
@@ -306,10 +306,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
 		b_f[index_start + 8 * m * n] = b_f[index_end + 8 * m * n];
 
-//		r_rho[index_start] = 0;
-//		b_rho[index_start] = b_density;
-//		u[index_start]   = 0;
-//		v[index_start]   = 0;
+		//		r_rho[index_start] = 0;
+		//		b_rho[index_start] = b_density;
+		//		u[index_start]   = 0;
+		//		v[index_start]   = 0;
 
 	}
 
@@ -332,11 +332,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[jn*n+ie] = sum_r;
 	//	b_rho[jn*n+ie] = sum_b;
 
-//	r_rho[jn*n+ie] = 0;
-//	b_rho[jn*n+ie] = b_density;
-//
-//	u[jn*n+ie]   = 0;
-//	v[jn*n+ie]   = 0;
+	//	r_rho[jn*n+ie] = 0;
+	//	b_rho[jn*n+ie] = b_density;
+	//
+	//	u[jn*n+ie]   = 0;
+	//	v[jn*n+ie]   = 0;
 
 	// north-west corner
 	r_f[(jn*n+iw) + 1 * m * n] = r_f[(jn*n+ie) + 1 * m * n];
@@ -357,11 +357,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[jn*n+iw] = sum_r;
 	//	b_rho[jn*n+iw] = sum_b;
 
-//	r_rho[jn*n+iw] = 0;
-//	b_rho[jn*n+iw] = b_density;
-//
-//	u[jn*n+iw]   = 0;
-//	v[jn*n+iw]   = 0;
+	//	r_rho[jn*n+iw] = 0;
+	//	b_rho[jn*n+iw] = b_density;
+	//
+	//	u[jn*n+iw]   = 0;
+	//	v[jn*n+iw]   = 0;
 
 	// south-east corner
 	r_f[(js*n+ie) + 2 * m * n] = r_f[(jn*n+ie) + 2 * m * n];
@@ -382,11 +382,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[js*n+ie] = sum_r;
 	//	b_rho[js*n+ie] = sum_b;
 
-//	r_rho[js*n+ie] = 0;
-//	b_rho[js*n+ie] = b_density;
-//
-//	u[js*n+ie]   = 0;
-//	v[js*n+ie]   = 0;
+	//	r_rho[js*n+ie] = 0;
+	//	b_rho[js*n+ie] = b_density;
+	//
+	//	u[js*n+ie]   = 0;
+	//	v[js*n+ie]   = 0;
 
 
 	// south-west corner
@@ -408,11 +408,11 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	//	r_rho[js*n+iw] = sum_r;
 	//	b_rho[js*n+iw] = sum_b;
 
-//	r_rho[js*n+iw] = 0;
-//	b_rho[js*n+iw] = b_density;
-//
-//	u[js*n+iw]   = 0;
-//	v[js*n+iw]  = 0;
+	//	r_rho[js*n+iw] = 0;
+	//	b_rho[js*n+iw] = b_density;
+	//
+	//	u[js*n+iw]   = 0;
+	//	v[js*n+iw]  = 0;
 }
 
 void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fColl, FLOAT_TYPE *b_fColl){
@@ -592,4 +592,43 @@ FLOAT_TYPE* convertArray(int n, int m, FLOAT_TYPE *arr){
 	}
 
 	return result;
+}
+
+void updateSurfaceTension(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE control_param,
+		FLOAT_TYPE st_predicted, FLOAT_TYPE *st_error, int iteration, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, int n, int m){
+
+	FLOAT_TYPE chi, p_in = 0.0, p_out = 0.0, st_laplace, r;
+	int index, index_aux1 = 0, index_aux2 = 0;
+	for(int j = 1; j < m-1; j++){
+		for(int i = 1; i < n-1; i++){
+			index = j * n + i;
+			r = r_rho[index] + b_rho[index];
+			// p_in and p_out for the surface tension
+			chi=(r_rho[index]-b_rho[index])/r;
+			if (chi >= control_param){
+				index_aux1++;
+				p_in += r_rho[index];
+			}
+			else if (chi <= -control_param){
+				index_aux2++;
+				p_out+=b_rho[index];
+			}
+		}
+	}
+
+	p_in=(3.0/5.0)*(1.0-r_alpha)*p_in/index_aux1;      // pressure average inside the bubble
+	p_out=(3.0/5.0)*(1.0-b_alpha)*p_out/index_aux2;   // pressure average outside the bubble
+	st_laplace=bubble_radius*(p_in-p_out);
+
+	st_error[iteration]=abs(st_predicted-st_laplace)/(st_predicted)*100.0;
+}
+
+FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted){
+
+	FLOAT_TYPE st_laplace;
+	p_in_mean=(3.0/5.0)*(1.0-r_alpha)*p_in_mean;      // pressure average inside the bubble
+	p_out_mean=(3.0/5.0)*(1.0-b_alpha)*p_out_mean;   // pressure average outside the bubble
+	st_laplace=bubble_radius*(p_in_mean-p_out_mean);
+
+	return abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
