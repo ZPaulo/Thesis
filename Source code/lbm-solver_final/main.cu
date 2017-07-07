@@ -54,13 +54,14 @@ int main(int argc, char* argv[]) {
 		//Read from file
 
 		args.r_density = 1.0;
-		args.gamma = 1.0;
+		args.gamma = 1;
 		args.b_alpha = 0.6;
 		args.r_viscosity = 1.0/6.0;
 		args.b_viscosity = 1.0/6.0;
 		args.beta = 0.99;
 		args.r_A = 0.0004;
 		args.b_A = 0.0004;
+		args.A = 0.0004;
 		args.control_param = 0.9;
 		args.del = 0.1;
 		args.g_limit = 0;

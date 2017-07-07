@@ -63,6 +63,12 @@ __constant__ FLOAT_TYPE r_phi_d[9];
 __constant__ FLOAT_TYPE w_pert_d[9];
 __constant__ FLOAT_TYPE g_limit_d;
 __constant__ FLOAT_TYPE c_norms_d[9];
+__constant__ FLOAT_TYPE r_density_d;
+__constant__ FLOAT_TYPE b_density_d;
+__constant__ FLOAT_TYPE r_alpha_d;
+__constant__ FLOAT_TYPE b_alpha_d;
+__constant__ FLOAT_TYPE bubble_radius_d;
+__constant__ FLOAT_TYPE st_predicted_d;
 
 
 __host__ void initConstants2D(Arguments *args,
@@ -162,6 +168,13 @@ __host__ void initConstants2D(Arguments *args,
 			c_norms[i] = sqrt(cx2D[i] * cx2D[i] + cy2D[i] * cy2D[i]);
 		}
 		cudaMemcpyToSymbol(c_norms_d, c_norms, 9 * sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_density_d, &args->r_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_density_d, &args->b_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_alpha_d, &args->r_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_alpha_d, &args->b_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
+		FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+		cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
 	}
 }
 
@@ -186,6 +199,45 @@ __host__ void initColorGradient(int *color_gradient_directions_d, int n, int m){
 	color_gradient_directions_d[n-1] = -1;
 	color_gradient_directions_d[(m-1)*n + n-1] = -1;
 	color_gradient_directions_d[(m-1)*n] = -1;
+}
+
+__global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d){
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	int ms = length_d * depth_d;
+
+	if(index < ms){
+		FLOAT_TYPE aux1, aux2;
+		if( sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5)*(y_d[index]-0.5)) <= bubble_radius_d){
+			aux1 = (1 - r_alpha_d) / 5.0;
+			aux2 = (1 - r_alpha_d) / 20.0;
+			r_rho_d[index] = r_density_d;
+			r_f_d[index + 0 * ms] = r_density_d * r_alpha_d;
+			r_f_d[index + 1 * ms] = r_density_d * aux1;
+			r_f_d[index + 2 * ms] = r_density_d * aux1;
+			r_f_d[index + 3 * ms] = r_density_d * aux1;
+			r_f_d[index + 4 * ms] = r_density_d * aux1;
+			r_f_d[index + 5 * ms] = r_density_d * aux2;
+			r_f_d[index + 6 * ms] = r_density_d * aux2;
+			r_f_d[index + 7 * ms] = r_density_d * aux2;
+			r_f_d[index + 8 * ms] = r_density_d * aux2;
+		}
+		else {
+			aux1 = (1 - b_alpha_d) / 5.0;
+			aux2 = (1 - b_alpha_d) / 20.0;
+			b_rho_d[index] = b_density_d;
+			b_f_d[index + 0 * ms] = b_density_d * b_alpha_d;
+			b_f_d[index + 1 * ms] = b_density_d * aux1;
+			b_f_d[index + 2 * ms] = b_density_d * aux1;
+			b_f_d[index + 3 * ms] = b_density_d * aux1;
+			b_f_d[index + 4 * ms] = b_density_d * aux1;
+			b_f_d[index + 5 * ms] = b_density_d * aux2;
+			b_f_d[index + 6 * ms] = b_density_d * aux2;
+			b_f_d[index + 7 * ms] = b_density_d * aux2;
+			b_f_d[index + 8 * ms] = b_density_d * aux2;
+		}
+		// initialise density
+		rho_d[index] = r_rho_d[index] + b_rho_d[index];
+	}
 }
 
 __host__ void initConstants3D(Arguments *args,
@@ -220,12 +272,9 @@ __host__ void initConstants3D(Arguments *args,
 			13 * s, 12 * s, 11 * s, 18 * s, 17 * s, 16 * s, 15 * s };
 
 	//					   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-	int cx3D[19] = { 0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0,
-			0 };
-	int cy3D[19] = { 0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1,
-			-1 };
-	int cz3D[19] = { 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1,
-			-1 };
+	int cx3D[19] = { 0, 1, -1, 0,  0, 0,  0, 1, -1,  1, -1, 1, -1,  1, -1, 0,  0,  0,  0 };
+	int cy3D[19] = { 0, 0,  0, 1, -1, 0,  0, 1,  1, -1, -1, 0,  0,  0,  0, 1, -1,  1, -1 };
+	int cz3D[19] = { 0, 0,  0, 0,  0, 1, -1, 0,  0,  0,  0, 1,  1, -1, -1, 1,  1, -1, -1 };
 	//   				   0   1   2   3   4   5   6     7      8     9    10    11     12     13
 	int c3D[19] = { 0, -1, 1, -1 * n, n, -m * n, +m * n, -1 * n - 1, -1 * n + 1,
 			n - 1, n + 1, -m * n - 1, -m * n + 1, +m * n - 1,
@@ -288,9 +337,9 @@ __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-																				* (maxInletCoordY_d - minInletCoordY_d);
+																												* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-																				* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																												* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
@@ -299,7 +348,7 @@ __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																			+ threadIdx.x;
+																											+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -492,7 +541,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		dz = bcZ[bci] - nodeZ[ind];
 		if (CurvedBCs == (BoundaryType) CURVED) {
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-																					/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																													/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
 		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);

@@ -85,6 +85,12 @@ extern __constant__ FLOAT_TYPE r_phi_d[9];
 extern __constant__ FLOAT_TYPE w_pert_d[9];
 extern __constant__ FLOAT_TYPE g_limit_d;
 extern __constant__ FLOAT_TYPE c_norms_d[9];
+extern __constant__ FLOAT_TYPE r_density_d;
+extern __constant__ FLOAT_TYPE b_density_d;
+extern __constant__ FLOAT_TYPE r_alpha_d;
+extern __constant__ FLOAT_TYPE b_alpha_d;
+extern __constant__ FLOAT_TYPE bubble_radius_d;
+extern __constant__ FLOAT_TYPE st_predicted_d;
 
 //#### 3D d3q19 ####//
 extern __constant__ int cx3D_d[19];                   ///< velocity x unit vector components

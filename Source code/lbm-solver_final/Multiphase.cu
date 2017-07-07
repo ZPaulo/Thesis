@@ -130,9 +130,192 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 			}
 		}
 	}
+}
+
+void mp3DColl(int n, int m, int h, FLOAT_TYPE *rho, FLOAT_TYPE *u,
+		FLOAT_TYPE *v, FLOAT_TYPE *w, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
+		FLOAT_TYPE *w_pert, FLOAT_TYPE *color_gradient,
+		FLOAT_TYPE beta, FLOAT_TYPE g_limit,  FLOAT_TYPE A, FLOAT_TYPE *r_fColl, FLOAT_TYPE *b_fColl,
+		FLOAT_TYPE *weight, int *cx, int *cy, int *cz, FLOAT_TYPE *f, FLOAT_TYPE r_nu, FLOAT_TYPE b_nu, FLOAT_TYPE r_alpha,
+		FLOAT_TYPE b_alpha, FLOAT_TYPE *chi, FLOAT_TYPE *phi, FLOAT_TYPE *psi, FLOAT_TYPE *teta, FLOAT_TYPE *cg_w){
+
+	FLOAT_TYPE cu1, cu2, f_CollPert;
+	FLOAT_TYPE cosin;
+	FLOAT_TYPE color_gradient_norm;
+	FLOAT_TYPE k_r, k_b, k_k;
+	FLOAT_TYPE norm_c;
+	FLOAT_TYPE prod_c_g;
+	FLOAT_TYPE pert;
+	FLOAT_TYPE f_eq;
+	int index, index9, temp_index;
+	FLOAT_TYPE grad_rho_x, grad_rho_y, grad_rho_z;
+	FLOAT_TYPE G[9];
+	FLOAT_TYPE H[9];
+	FLOAT_TYPE prod_u_grad_rho, aux1, mean_nu, omega_eff, mean_alpha, TC;
+
+	for(int k = 0; k < h; k++){
+		for (int j=0; j < m; j++){
+			for (int i=0;i < n; i++){
+				index = k*n*m + j*n + i;
+
+
+				color_gradient[index * 3] = 0;
+				color_gradient[index * 3 + 1] = 0;
+				color_gradient[index * 3 + 2] = 0;
+				grad_rho_x = 0.0;
+				grad_rho_y = 0.0;
+				grad_rho_z = 0.0;
+				for (int dir=0; dir < 19; dir++){
+
+					// calculate color gradient - 4th order
+
+					if (i!=0 && j!=0 && k != 0 && i!=(n-1) && j!=(m-1) && k != (h-1)){ // Interior points - In the boundary it is calculated by "mirroring" the density
+						temp_index = (k + cz[dir]) * n * m + (j + cy[dir]) * n + i + cx[dir];
+						grad_rho_x += rho[temp_index] * cx[dir] * cg_w[dir];
+						grad_rho_y += rho[temp_index] * cy[dir] * cg_w[dir];
+						grad_rho_z += rho[temp_index] * cz[dir] * cg_w[dir];
+						color_gradient[index * 3] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cx[dir] * cg_w[dir];
+						color_gradient[index * 3 + 1] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cy[dir] * cg_w[dir];
+						color_gradient[index * 3 + 2] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cz[dir] * cg_w[dir];
+					}
+					else if (j==(m-1) && i!=0 && i!=(n-1)) {// north boundary
+						temp_index = (k + cz[dir]) * n * m + (j - abs(cy[dir])) * n + i + cx[dir];
+						grad_rho_x += rho[temp_index] * cx[dir] * cg_w[dir];
+						grad_rho_y = 0;
+						grad_rho_z += rho[temp_index] * cz[dir] * cg_w[dir];
+						color_gradient[index * 3] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cx[dir] * cg_w[dir];
+						color_gradient[index * 3 + 1] = 0;
+						color_gradient[index * 3 + 2] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cz[dir] * cg_w[dir];
+					}
+					else if (j==0 && i!=0 && i!=(n-1)){  // south boundary
+						temp_index = (k + cz[dir]) * n * m + (j + abs(cy[dir])) * n + i + cx[dir];
+						grad_rho_x += rho[temp_index] * cx[dir] * cg_w[dir];
+						grad_rho_y = 0;
+						grad_rho_z += rho[temp_index] * cz[dir] * cg_w[dir];
+						color_gradient[index * 3] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cx[dir] * cg_w[dir];
+						color_gradient[index * 3 + 1] = 0;
+						color_gradient[index * 3 + 2] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cz[dir] * cg_w[dir];
+					}
+					else if (i==(n-1) && j!=0 && j!=(m-1)){  // east boundary
+						temp_index = (k + cz[dir]) * n * m + (j + cy[dir]) * n + i - abs(cx[dir]);
+						grad_rho_x = 0;
+						grad_rho_y += rho[temp_index] * cy[dir] * cg_w[dir];
+						grad_rho_z += rho[temp_index] * cz[dir] * cg_w[dir];
+						color_gradient[index * 3] = 0;
+						color_gradient[index * 3 + 1] +=  ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cy[dir] * cg_w[dir];
+						color_gradient[index * 3 + 2] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cz[dir] * cg_w[dir];
+					}
+					else if (i==0 && j!=0 && j!=(m-1)){ //  west boundary
+						temp_index = (k + cz[dir]) * n * m + (j + cy[dir]) * n + i + abs(cx[dir]);
+						grad_rho_x = 0;
+						grad_rho_y += rho[temp_index] * cy[dir] * cg_w[dir];
+						grad_rho_z += rho[temp_index] * cz[dir] * cg_w[dir];
+						color_gradient[index * 3] = 0;
+						color_gradient[index * 3 + 1] +=  ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cy[dir] * cg_w[dir];
+						color_gradient[index * 3 + 2] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cz[dir] * cg_w[dir];
+					}
+					else if (k==(h-1) && j!=0 && j!=(m-1)){ //  front boundary
+						temp_index = (k - abs(cz[dir])) * n * m + (j + cy[dir]) * n + i + abs(cx[dir]);
+						grad_rho_x += rho[temp_index] * cx[dir] * cg_w[dir];
+						grad_rho_y += rho[temp_index] * cy[dir] * cg_w[dir];
+						grad_rho_z = 0;
+						color_gradient[index * 3] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cx[dir] * cg_w[dir];
+						color_gradient[index * 3 + 1] +=  ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cy[dir] * cg_w[dir];
+						color_gradient[index * 3 + 2] = 0;
+					}
+					else if (k==0 && j!=0 && j!=(m-1)){ //  back boundary
+						temp_index = (k + abs(cz[dir])) * n * m + (j + cy[dir]) * n + i + abs(cx[dir]);
+						grad_rho_x += rho[temp_index] * cx[dir] * cg_w[dir];
+						grad_rho_y += rho[temp_index] * cy[dir] * cg_w[dir];
+						grad_rho_z = 0;
+						color_gradient[index * 3] += ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cx[dir] * cg_w[dir];
+						color_gradient[index * 3 + 1] +=  ((r_rho[temp_index] - b_rho[temp_index]) / rho[temp_index]) * cy[dir] * cg_w[dir];
+						color_gradient[index * 3 + 2] = 0;
+					}
+				}
 
 
 
+				G[0] = 2.0 * u[index] * grad_rho_x;
+				G[1] = u[index]*grad_rho_y + v[index]*grad_rho_x;
+				G[2] = u[index]*grad_rho_z + w[index]*grad_rho_x;
+				G[3] = G[1];
+				G[4] = 2.0*v[index]*grad_rho_y;
+				G[5] = v[index]*grad_rho_z + w[index]*grad_rho_y;
+				G[6] = G[2];
+				G[7] = G[5];
+				G[8] = 2.0*w[index]*grad_rho_z;
+
+				prod_u_grad_rho = u[index]*grad_rho_x + v[index]*grad_rho_y + w[index]*grad_rho_z;
+
+				cu1 = u[index]*u[index] + v[index]*v[index] + w[index] * w[index];
+
+				// invariable quantities
+				color_gradient_norm = sqrt(pow(color_gradient[index * 3],2) + pow(color_gradient[index * 3 + 1],2) + pow(color_gradient[index * 3 + 2],2));
+				k_r=r_rho[index]/rho[index];
+				k_b=b_rho[index]/rho[index];
+				k_k= beta * r_rho[index] * b_rho[index]/rho[index];
+
+				aux1 = r_rho[index]/(rho[index]*r_nu) + b_rho[index]/(rho[index]*b_nu);
+				mean_nu = 1.0/aux1;
+
+				omega_eff = 1.0/(3.0*mean_nu+0.5);
+
+				mean_alpha = r_alpha*r_rho[index]/rho[index] + b_alpha*b_rho[index]/rho[index];
+
+				for (int dir=0;dir<19;dir++){
+
+					if (color_gradient_norm > g_limit){
+						prod_c_g=cx[dir]*color_gradient[index * 3]+cy[dir]*color_gradient[index * 3 + 1] + cz[dir] * color_gradient[index * 3 + 2];
+						if (dir!=0){
+							norm_c= sqrt(pow(cx[dir],2)+pow(cy[dir],2) + pow(cz[dir],2));
+							cosin= prod_c_g / (color_gradient_norm*norm_c);
+						}
+						else
+							cosin=0.0;
+						// calculate perturbation terms
+
+						pert=0.5*A*color_gradient_norm*(weight[dir]*pow((prod_c_g/color_gradient_norm),2)-w_pert[dir]);
+
+					}
+					else{
+						// ther perturbation terms are null
+						pert = 0.0;
+					}
+					// Auxiliar tensor: diadic product of the speed velcity:
+					//[cx,cy,cx]*[cx cy cz]
+					H[0] = cx[dir]*cx[dir];
+					H[1] = cx[dir]*cy[dir];
+					H[2] = cx[dir]*cz[dir];
+					H[3] = H[1];
+					H[4] = cy[dir]*cy[dir];
+					H[5] = cy[dir]*cz[dir];
+					H[6] = H[2];
+					H[7] = H[5];
+					H[8] = cz[dir]*cz[dir];
+
+					//Tensor contraction
+					TC = 0;
+					for(int l = 0; l < 9; l++){
+						TC += G[l] * H[l];
+					}
+
+
+
+					cu2 = u[index]*cx[dir] + v[index]*cy[dir] + w[index]*cz[dir];
+					// calculate equilibrium distribution function
+					f_eq = mean_alpha*(chi[dir]*prod_u_grad_rho + psi[dir]*TC) + rho[index] * ( phi[dir] + teta[dir]*mean_alpha + weight[dir] * (3*cu2+4.5*cu2*cu2-1.5*cu1));
+
+					index9 = index + dir * n * m * h;
+					// calculate updated distribution function
+					f_CollPert = omega_eff*f_eq + (1-omega_eff)*f[index9] + pert;
+
+					r_fColl[index9] = k_r*f_CollPert + k_k*cosin*(phi[dir]+teta[dir]*mean_alpha);
+					b_fColl[index9] = k_b*f_CollPert + k_k*cosin*(phi[dir]+teta[dir]*mean_alpha);
+				}
+			}
+		}
+	}
 }
 
 void createBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
@@ -161,6 +344,42 @@ void createBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, 
 			}
 			// initialise density
 			rho[index] = r_rho[index]+b_rho[index];
+		}
+	}
+}
+
+void createBubble3D(FLOAT_TYPE *x, FLOAT_TYPE *y, FLOAT_TYPE *z, int n, int m, int h, FLOAT_TYPE radius, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
+		FLOAT_TYPE r_density, FLOAT_TYPE b_density, FLOAT_TYPE *phi, FLOAT_TYPE *rho, FLOAT_TYPE *f) {
+	int i, j, k, dir;
+	int index, index2;
+	for(k = 0; k < h; k++){
+		for (j=0; j < m; j++){
+			for(i = 0; i < n; i++){
+				index = k * m * n + j * n + i;
+
+				if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5),2) + pow((z[index]-0.5),2)) <= radius ){
+					r_rho[index] = r_density;
+					for (dir=0; dir < 19; dir++){
+						// initialise distribution function with small, non-zero values
+						index2 = index + dir * h*m*n;
+						r_f[index2] = r_rho[index] * phi[dir];
+					}
+				}
+				else {
+					b_rho[index]=b_density;
+					for (dir=0; dir < 19; dir++){
+						// initialise distribution function with small, non-zero values
+						index2 = index + dir * h*m*n;
+						b_f[index2]   = b_rho[index]*phi[dir];
+					}
+				}
+				for(dir = 0; dir < 19; dir++){
+					index2 = index + dir * h*m*n;
+					f[index2] = b_f[index2] + r_f[index2];
+				}
+				// initialise density
+				rho[index] = r_rho[index]+b_rho[index];
+			}
 		}
 	}
 }
@@ -201,8 +420,6 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 
 			// p_in and p_out for the surface tension
 			chi=(r_rho[index]-b_rho[index])/rho[index];
-			//			printf("chi "FLOAT_FORMAT" ",chi);
-			//			printf("control "FLOAT_FORMAT" \n", control_param);
 			if (chi >= control_param){
 				index_aux1++;
 				p_in += r_rho[index];
@@ -225,7 +442,6 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 	}
 
 	// Calculate surface tension
-	//printf("%f vs %f\n", p_in, p_out);
 	p_in=(3.0/5.0)*(1.0-r_alpha)*p_in/index_aux1;      // pressure average inside the bubble
 	p_out=(3.0/5.0)*(1.0-b_alpha)*p_out/index_aux2;   // pressure average outside the bubble
 	st_laplace=bubble_radius*(p_in-p_out);
@@ -233,8 +449,74 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 	st_error[iteration]=abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
 
-void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
-		FLOAT_TYPE b_density, FLOAT_TYPE *u, FLOAT_TYPE *v){
+void updateMacroMP3D(int n, int m, int h, FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE *w,FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *rho, FLOAT_TYPE control_param,
+		FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE *st_error, int iteration, FLOAT_TYPE st_predicted, int *cx, int *cy, int *cz, FLOAT_TYPE *f){
+
+	int index_aux1=0;
+	int index_aux2=0;
+	FLOAT_TYPE p_in=0.0;
+	FLOAT_TYPE p_out=0.0;
+	FLOAT_TYPE u_cum, v_cum, w_cum;
+	FLOAT_TYPE r_sum, b_sum;
+	FLOAT_TYPE chi;
+	int index, index9;
+	FLOAT_TYPE st_laplace;
+	// Density and Velocity
+	for(int k = 1; k < h - 1; k++){
+		for (int j=1; j < m - 1;j++){
+			for (int i=1; i < n - 1; i++){
+				// auxiliar variables
+				u_cum=0.0;
+				v_cum=0.0;
+				w_cum=0.0;
+				// densities
+				index = k * m * n + j * n + i;
+				r_sum = 0.0;
+				b_sum = 0.0;
+				for(int dir = 0; dir < 19; dir++){
+					r_sum += r_f[index + dir * m * n * h];
+					b_sum += b_f[index + dir * m * n * h];
+					f[index + dir * m * n * h] = r_f[index + dir * m * n * h] + b_f[index + dir * m * n * h];
+				}
+				r_rho[index] = r_sum;
+				b_rho[index]= b_sum;
+				rho[index] = r_rho[index]+b_rho[index];
+
+				// p_in and p_out for the surface tension
+				chi=(r_rho[index]-b_rho[index])/rho[index];
+				if (chi >= control_param){
+					index_aux1++;
+					p_in += r_rho[index];
+				}
+				else if (chi <= -control_param){
+					index_aux2++;
+					p_out+=b_rho[index];
+				}
+
+				// velocities
+				for (int dir=0; dir < 19; dir++){
+					index9 = index + dir * m * n * h;
+					u_cum += (r_f[index9]+b_f[index9])*cx[dir];
+					v_cum += (r_f[index9]+b_f[index9])*cy[dir];
+					w_cum += (r_f[index9]+b_f[index9])*cz[dir];
+				}
+				u[index]   = u_cum/rho[index];
+				v[index]  = v_cum/rho[index];
+				w[index]  = w_cum/rho[index];
+
+			}
+		}
+	}
+
+	// Calculate surface tension
+	p_in=(3.0/5.0)*(1.0-r_alpha)*p_in/index_aux1;      // pressure average inside the bubble
+	p_out=(3.0/5.0)*(1.0-b_alpha)*p_out/index_aux2;   // pressure average outside the bubble
+	st_laplace=bubble_radius*(p_in-p_out);
+
+	st_error[iteration]=abs(st_predicted-st_laplace)/(st_predicted)*100.0;
+}
+
+void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f){
 
 	int index_end, index_start;
 	int jn = m-1;
@@ -255,12 +537,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_end + 7 * m * n] = b_f[index_start + 7 * m * n];
 		b_f[index_end + 8 * m * n] = b_f[index_start + 8 * m * n];
 
-		// macroscopic boundary conditions
-		//		r_rho[index_end] = 0;
-		//		b_rho[index_end] = b_density;
-		//		u[index_end]   = 0;
-		//		v[index_end]   = 0;
-
 		//south boundary
 		r_f[index_start + 2 * m * n] = r_f[index_end + 2 * m * n];
 		r_f[index_start + 5 * m * n] = r_f[index_end + 5 * m * n];
@@ -269,11 +545,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_start + 2 * m * n] = b_f[index_end + 2 * m * n];
 		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
 		b_f[index_start + 6 * m * n] = b_f[index_end + 6 * m * n];
-
-		//		r_rho[index_start] = 0;
-		//		b_rho[index_start] = b_density;
-		//		u[index_start]   = 0;
-		//		v[index_start]   = 0;
 	}
 
 
@@ -291,12 +562,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_end + 7 * m * n] = b_f[index_start + 7 * m * n];
 		b_f[index_end + 6 * m * n] = b_f[index_start + 6 * m * n];
 
-		//macroscopic boundary conditions
-		//		r_rho[index_end] = 0;
-		//		b_rho[index_end] = b_density;
-		//		u[index_end]   = 0;
-		//		v[index_end]   = 0;
-
 		// west boundary
 		r_f[index_start + 1 * m * n] = r_f[index_end + 1 * m * n];
 		r_f[index_start + 5 * m * n] = r_f[index_end + 5 * m * n];
@@ -305,11 +570,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 		b_f[index_start + 1 * m * n] = b_f[index_end + 1 * m * n];
 		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
 		b_f[index_start + 8 * m * n] = b_f[index_end + 8 * m * n];
-
-		//		r_rho[index_start] = 0;
-		//		b_rho[index_start] = b_density;
-		//		u[index_start]   = 0;
-		//		v[index_start]   = 0;
 
 	}
 
@@ -322,22 +582,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(jn*n+ie) + 4 * m * n] = b_f[(js*n+ie) + 4 * m * n];
 	b_f[(jn*n+ie) + 7 * m * n] = b_f[(js*n+iw) + 7 * m * n];
 
-	//	FLOAT_TYPE sum_r = 0.0;
-	//	FLOAT_TYPE sum_b = 0.0;
-	//	for(int i = 0; i < 9; i++){
-	//		sum_r += r_f[(jn*n+ie)*9 + i];
-	//		sum_b += b_f[(jn*n+ie)*9 + i];
-	//	}
-	//
-	//	r_rho[jn*n+ie] = sum_r;
-	//	b_rho[jn*n+ie] = sum_b;
-
-	//	r_rho[jn*n+ie] = 0;
-	//	b_rho[jn*n+ie] = b_density;
-	//
-	//	u[jn*n+ie]   = 0;
-	//	v[jn*n+ie]   = 0;
-
 	// north-west corner
 	r_f[(jn*n+iw) + 1 * m * n] = r_f[(jn*n+ie) + 1 * m * n];
 	r_f[(jn*n+iw) + 4 * m * n] = r_f[(js*n+iw) + 4 * m * n];
@@ -346,22 +590,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(jn*n+iw) + 1 * m * n] = b_f[(jn*n+ie) + 1 * m * n];
 	b_f[(jn*n+iw) + 4 * m * n] = b_f[(js*n+iw) + 4 * m * n];
 	b_f[(jn*n+iw) + 8 * m * n] = b_f[(js*n+ie) + 8 * m * n];
-
-	//	sum_r = 0.0;
-	//	sum_b = 0.0;
-	//	for(int i = 0; i < 9; i++){
-	//		sum_r += r_f[(jn*n+iw)*9 + i];
-	//		sum_b += b_f[(jn*n+iw)*9 + i];
-	//	}
-	//
-	//	r_rho[jn*n+iw] = sum_r;
-	//	b_rho[jn*n+iw] = sum_b;
-
-	//	r_rho[jn*n+iw] = 0;
-	//	b_rho[jn*n+iw] = b_density;
-	//
-	//	u[jn*n+iw]   = 0;
-	//	v[jn*n+iw]   = 0;
 
 	// south-east corner
 	r_f[(js*n+ie) + 2 * m * n] = r_f[(jn*n+ie) + 2 * m * n];
@@ -372,22 +600,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(js*n+ie) + 3 * m * n] = b_f[(js*n+iw) + 3 * m * n];
 	b_f[(js*n+ie) + 6 * m * n] = b_f[(jn*n+iw) + 6 * m * n];
 
-	//	sum_r = 0.0;
-	//	sum_b = 0.0;
-	//	for(int i = 0; i < 9; i++){
-	//		sum_r += r_f[(js*n+ie)*9 + i];
-	//		sum_b += b_f[(js*n+ie)*9 + i];
-	//	}
-	//
-	//	r_rho[js*n+ie] = sum_r;
-	//	b_rho[js*n+ie] = sum_b;
-
-	//	r_rho[js*n+ie] = 0;
-	//	b_rho[js*n+ie] = b_density;
-	//
-	//	u[js*n+ie]   = 0;
-	//	v[js*n+ie]   = 0;
-
 
 	// south-west corner
 	r_f[(js*n+iw) + 2 * m * n] = r_f[(jn*n+iw) + 2 * m * n];
@@ -397,22 +609,116 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(js*n+iw) + 2 * m * n] = b_f[(jn*n+iw) + 2 * m * n];
 	b_f[(js*n+iw) + 1 * m * n] = b_f[(js*n+ie) + 1 * m * n];
 	b_f[(js*n+iw) + 5 * m * n] = b_f[(jn*n+ie) + 5 * m * n];
+}
 
-	//	sum_r = 0.0;
-	//	sum_b = 0.0;
-	//	for(int i = 0; i < 9; i++){
-	//		sum_r += r_f[(js*n+iw)*9 + i];
-	//		sum_b += b_f[(js*n+iw)*9 + i];
-	//	}
-	//
-	//	r_rho[js*n+iw] = sum_r;
-	//	b_rho[js*n+iw] = sum_b;
+void peridicBoundaries3D(int n, int m, int h, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho){
 
-	//	r_rho[js*n+iw] = 0;
-	//	b_rho[js*n+iw] = b_density;
-	//
-	//	u[js*n+iw]   = 0;
-	//	v[js*n+iw]  = 0;
+	int index_end, index_start;
+	int jn = m-1;
+	int js = 0;
+	int ie = n-1;
+	int iw = 0;
+	int kf = h-1;
+	int kb = 0;
+	int ms = m * n * h;
+	for(int k = 0; k < h - 1; k++){
+		for (int i=0; i < n; i++){
+			// north boundary
+			index_end = k * n * m + jn * n + i;
+			index_start = k * n * m + js * n + i;
+
+			r_f[index_end + 4 * ms] = r_f[index_start + 4 * ms];
+			r_f[index_end + 9 * ms] = r_f[index_start + 9 * ms];
+			r_f[index_end + 10 * ms] = r_f[index_start + 10 * ms];
+			r_f[index_end + 16 * ms] = r_f[index_start + 16 * ms];
+			r_f[index_end + 18 * ms] = r_f[index_start + 18 * ms];
+
+			b_f[index_end + 4 * ms] = b_f[index_start + 4 * ms];
+			b_f[index_end + 9 * ms] = b_f[index_start + 9 * ms];
+			b_f[index_end + 10 * ms] = b_f[index_start + 10 * ms];
+			b_f[index_end + 16 * ms] = b_f[index_start + 16 * ms];
+			r_f[index_end + 18 * ms] = r_f[index_start + 18 * ms];
+
+
+			//south boundary
+			r_f[index_start + 3 * ms] = r_f[index_end + 3 * ms];
+			r_f[index_start + 7 * ms] = r_f[index_end + 7 * ms];
+			r_f[index_start + 8 * ms] = r_f[index_end + 8 * ms];
+			r_f[index_start + 15 * ms] = r_f[index_end + 15 * ms];
+			r_f[index_start + 17 * ms] = r_f[index_end + 17 * ms];
+
+			b_f[index_start + 3 * ms] = b_f[index_end + 3 * ms];
+			b_f[index_start + 7 * ms] = b_f[index_end + 7 * ms];
+			b_f[index_start + 8 * ms] = b_f[index_end + 8 * ms];
+			b_f[index_start + 15 * ms] = b_f[index_end + 15 * ms];
+			b_f[index_start + 17 * ms] = b_f[index_end + 17 * ms];
+		}
+
+		for (int j=1; j < m-1; j++){
+			// east boundary
+			index_end = k * m * n + j*n + ie;
+			index_start = k * m * n + j*n + iw;
+
+			r_f[index_end + 2 * ms] = r_f[index_start + 2 * ms];
+			r_f[index_end + 8 * ms] = r_f[index_start + 8 * ms];
+			r_f[index_end + 10 * ms] = r_f[index_start + 10 * ms];
+			r_f[index_end + 12 * ms] = r_f[index_start + 12 * ms];
+			r_f[index_end + 14 * ms] = r_f[index_start + 14 * ms];
+
+			b_f[index_end + 2 * ms] = b_f[index_start + 2 * ms];
+			b_f[index_end + 8 * ms] = b_f[index_start + 8 * ms];
+			b_f[index_end + 10 * ms] = b_f[index_start + 10 * ms];
+			b_f[index_end + 12 * ms] = b_f[index_start + 12 * ms];
+			b_f[index_end + 14 * ms] = b_f[index_start + 14 * ms];
+
+			// west boundary
+			r_f[index_start + 1 * ms] = r_f[index_end + 1 * ms];
+			r_f[index_start + 7 * ms] = r_f[index_end + 7 * ms];
+			r_f[index_start + 9 * ms] = r_f[index_end + 9 * ms];
+			r_f[index_start + 11 * ms] = r_f[index_end + 11 * ms];
+			r_f[index_start + 13 * ms] = r_f[index_end + 13 * ms];
+
+			b_f[index_start + 1 * ms] = b_f[index_end + 1 * ms];
+			b_f[index_start + 7 * ms] = b_f[index_end + 7 * ms];
+			b_f[index_start + 9 * ms] = b_f[index_end + 9 * ms];
+			r_f[index_start + 11 * ms] = r_f[index_end + 11 * ms];
+			r_f[index_start + 13 * ms] = r_f[index_end + 13 * ms];
+
+		}
+	}
+
+	for(int j = 0; j < m; j++){
+		for(int i = 0; i < n; i++){
+			index_end = kf * m * n + j*n + i;
+			index_start = kb * m * n + j*n + i;
+
+			//Front boundary
+			r_f[index_end + 6 * ms] = r_f[index_start + 6 * ms];
+			r_f[index_end + 13 * ms] = r_f[index_start + 13 * ms];
+			r_f[index_end + 14 * ms] = r_f[index_start + 14 * ms];
+			r_f[index_end + 17 * ms] = r_f[index_start + 17 * ms];
+			r_f[index_end + 18 * ms] = r_f[index_start + 18 * ms];
+
+			b_f[index_end + 6 * ms] = b_f[index_start + 6 * ms];
+			b_f[index_end + 13 * ms] = b_f[index_start + 13 * ms];
+			b_f[index_end + 14 * ms] = b_f[index_start + 14 * ms];
+			b_f[index_end + 17 * ms] = b_f[index_start + 17 * ms];
+			b_f[index_end + 18 * ms] = b_f[index_start + 18 * ms];
+
+			// back boundary
+			r_f[index_start + 5 * ms] = r_f[index_end + 5 * ms];
+			r_f[index_start + 11 * ms] = r_f[index_end + 11 * ms];
+			r_f[index_start + 12 * ms] = r_f[index_end + 12 * ms];
+			r_f[index_start + 15 * ms] = r_f[index_end + 15 * ms];
+			r_f[index_start + 16 * ms] = r_f[index_end + 16 * ms];
+
+			b_f[index_start + 5 * ms] = b_f[index_end + 5 * ms];
+			b_f[index_start + 11 * ms] = b_f[index_end + 11 * ms];
+			b_f[index_start + 12 * ms] = b_f[index_end + 12 * ms];
+			r_f[index_start + 15 * ms] = r_f[index_end + 15 * ms];
+			r_f[index_start + 16 * ms] = r_f[index_end + 16 * ms];
+		}
+	}
 }
 
 void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fColl, FLOAT_TYPE *b_fColl){
@@ -576,6 +882,29 @@ void streamMP(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fCol
 
 }
 
+void streamMP3D(int n, int m, int h, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_fColl, FLOAT_TYPE *b_fColl, bool *stream){
+	// stream on interior first
+	int index,i,j,k;
+	int ms = m*n*h;
+	int c3D[19] = { 0, -1, 1, -1 * n, n, -m * n, +m * n, -1 * n - 1, -1 * n + 1,
+			n - 1, n + 1, -m * n - 1, -m * n + 1, +m * n - 1,
+			m * n + 1, -m * n - n, -m * n + n, m * n - n, m * n + n };
+
+	for(k = 1; k < h - 1; k++){
+		for (j=1;j < m-1;j++){
+			for (i=1; i < n-1; i++){
+				index = k * m * n + j*n+i;
+				r_f[index] = r_fColl[index];
+				b_f[index] = b_fColl[index];
+				for(int dir = 1; dir < 19; dir++){
+					r_f[index + dir * ms] = (stream[index+	(dir-1) * ms]	==	1)	?	r_fColl[index + dir * ms + c3D[dir]]:	r_f[index + dir * ms];
+					b_f[index + dir * ms] = (stream[index+	(dir-1) * ms]	==	1)	?	b_fColl[index + dir * ms + c3D[dir]]:	b_f[index + dir * ms];
+				}
+			}
+		}
+	}
+}
+
 void resetArrays(FLOAT_TYPE *color_gradient, int n, int m){
 	for(int i = 0; i < m * n *2; i++){
 		color_gradient[i] = 0.0;
@@ -628,7 +957,7 @@ FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, 
 	FLOAT_TYPE st_laplace;
 	p_in_mean=(3.0/5.0)*(1.0-r_alpha)*p_in_mean;      // pressure average inside the bubble
 	p_out_mean=(3.0/5.0)*(1.0-b_alpha)*p_out_mean;   // pressure average outside the bubble
-	st_laplace=bubble_radius*(p_in_mean-p_out_mean);
+	st_laplace=20*(p_in_mean-p_out_mean);
 
 	return abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
