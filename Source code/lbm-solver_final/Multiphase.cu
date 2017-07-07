@@ -26,6 +26,7 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 	FLOAT_TYPE r_pert, b_pert;
 	FLOAT_TYPE r_feq, b_feq;
 	FLOAT_TYPE fn05;
+	FLOAT_TYPE cg_w[9] = {0.0, 4.0/12.0, 4.0/12.0, 4.0/12.0, 4.0/12.0, 1.0/12.0, 1.0/12.0, 1.0/12.0, 1.0/12.0};
 	int index, index9, temp_index;
 	for (int j=0; j < m; j++){
 		for (int i=0;i < n; i++){
@@ -40,28 +41,28 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 
 				if (i!=0 && j!=0 && i!=(n-1) && j!=(m-1)){ // Interior points - In the boundary it is calculated by "mirroring" the density
 					temp_index = (j + cy[k]) * n + i + cx[k];
-					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k];
-					color_gradient[index * 2 + 1] += (r_rho[temp_index] - b_rho[temp_index]) * cy[k];
+					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k] * cg_w[k];
+					color_gradient[index * 2 + 1] += (r_rho[temp_index] - b_rho[temp_index]) * cy[k] * cg_w[k];
 				}
 				else if (j==(m-1) && i!=0 && i!=(n-1)) {// north boundary
 					temp_index = (j - abs(cy[k])) * n + i + cx[k];
-					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k];
+					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k] * cg_w[k];
 					color_gradient[index * 2 + 1] = 0;
 				}
 				else if (j==0 && i!=0 && i!=(n-1)){  // south boundary
 					temp_index = (j + abs(cy[k])) * n + i + cx[k];
-					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k];
+					color_gradient[index * 2] += (r_rho[temp_index] - b_rho[temp_index]) * cx[k] * cg_w[k];
 					color_gradient[index * 2 + 1] = 0;
 				}
 				else if (i==(n-1) && j!=0 && j!=(m-1)){  // east boundary
 					temp_index = (j + cy[k]) * n + i - abs(cx[k]);
 					color_gradient[index * 2] = 0;
-					color_gradient[index * 2 + 1] +=  (r_rho[temp_index] - b_rho[temp_index]) * cy[k];
+					color_gradient[index * 2 + 1] +=  (r_rho[temp_index] - b_rho[temp_index]) * cy[k] * cg_w[k];
 				}
 				else if (i==0 && j!=0 && j!=(m-1)){ //  west boundary
 					temp_index = (j + cy[k]) * n + i + abs(cx[k]);
 					color_gradient[index * 2] = 0;
-					color_gradient[index * 2 + 1] +=  (r_rho[temp_index] - b_rho[temp_index]) * cy[k];
+					color_gradient[index * 2 + 1] +=  (r_rho[temp_index] - b_rho[temp_index]) * cy[k] * cg_w[k];
 				}
 			}
 

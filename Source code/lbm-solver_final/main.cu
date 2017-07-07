@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 		//Read from file
 
 		args.r_density = 1.0;
-		args.gamma = 1;
+		args.gamma = 1.0;
 		args.b_alpha = 0.6;
 		args.r_viscosity = 1.0/6.0;
 		args.b_viscosity = 1.0/6.0;
