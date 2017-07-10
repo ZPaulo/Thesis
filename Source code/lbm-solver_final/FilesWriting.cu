@@ -342,7 +342,7 @@ void WriteChannelCrossSection3D(FLOAT_TYPE* CoordX, FLOAT_TYPE* CoordY, FLOAT_TY
 	printf("CrossSection to %s\n",sectionFileName);
 }
 
-void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h){
+void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h, int dir){
 
 	char outputFile[300];
 	sprintf(outputFile, "./TestValues/CUDA/%s.txt", fileName);
@@ -351,10 +351,12 @@ void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h){
 	int i, j, k;
 	//	for(i = 0; i < n*m*h;i++)
 	//		fprintf(fp1, "%.10f\n", arr[i]);
-	for(i=0; i<n; i++){
+	for (k = 0; k < h; k++) {
 		for (j = 0; j < m; j++) {
-			for (k = 0; k < h; k++) {
-				fprintf(fp1, "%.10f\n", arr[k+i*h+j*n*h]);
+			for(i=0; i<n; i++){
+				for(int l = 0; l < dir; l++){
+					fprintf(fp1, "%.10f\n", arr[(i+j*n+k*n*m) * dir + l]);
+				}
 			}
 		}
 	}

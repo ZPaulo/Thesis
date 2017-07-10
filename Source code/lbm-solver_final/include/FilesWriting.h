@@ -37,5 +37,5 @@ void WriteResultsMultiPhase(char* OutputFile, int* fluid, FLOAT_TYPE* CoordX, FL
 		FLOAT_TYPE* U, FLOAT_TYPE* V, FLOAT_TYPE* W, FLOAT_TYPE* Rho,FLOAT_TYPE* r_Rho, FLOAT_TYPE* b_Rho,
 		int* Fluid, int n, int m, int h, OutputFormat outputFormat);
 
-void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h = 1);
+void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h = 1, int dir = 1);
 #endif

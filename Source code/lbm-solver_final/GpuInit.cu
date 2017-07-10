@@ -45,6 +45,16 @@ __constant__ FLOAT_TYPE velMomMap3D_d[361];
 __constant__ FLOAT_TYPE momCollMtx3D_d[361];
 __constant__ FLOAT_TYPE wIn_d;
 
+//COLOR GRADIENT //
+__constant__ FLOAT_TYPE beta_d;
+__constant__ FLOAT_TYPE r_alpha_d;
+__constant__ FLOAT_TYPE b_alpha_d;
+__constant__ FLOAT_TYPE bubble_radius_d;
+__constant__ FLOAT_TYPE A_d;
+__constant__ FLOAT_TYPE r_density_d;
+__constant__ FLOAT_TYPE b_density_d;
+__constant__ FLOAT_TYPE st_predicted_d;
+
 //COLOR GRADIENT 2D//
 __constant__ FLOAT_TYPE a1_d;
 __constant__ FLOAT_TYPE a2_d;
@@ -55,7 +65,6 @@ __constant__ FLOAT_TYPE r_omega_d;
 __constant__ FLOAT_TYPE b_omega_d;
 __constant__ FLOAT_TYPE control_param_d;
 __constant__ FLOAT_TYPE del_d;
-__constant__ FLOAT_TYPE beta_d;
 __constant__ FLOAT_TYPE b_A_d;
 __constant__ FLOAT_TYPE r_A_d;
 __constant__ FLOAT_TYPE b_phi_d[9];
@@ -63,13 +72,18 @@ __constant__ FLOAT_TYPE r_phi_d[9];
 __constant__ FLOAT_TYPE w_pert_d[9];
 __constant__ FLOAT_TYPE g_limit_d;
 __constant__ FLOAT_TYPE c_norms_d[9];
-__constant__ FLOAT_TYPE r_density_d;
-__constant__ FLOAT_TYPE b_density_d;
-__constant__ FLOAT_TYPE r_alpha_d;
-__constant__ FLOAT_TYPE b_alpha_d;
-__constant__ FLOAT_TYPE bubble_radius_d;
-__constant__ FLOAT_TYPE st_predicted_d;
+__constant__ FLOAT_TYPE cg_w_d[9];
 
+//COLOR GRADIENT 3D//
+__constant__ FLOAT_TYPE r_viscosity_d;
+__constant__ FLOAT_TYPE b_viscosity_d;
+__constant__ FLOAT_TYPE c_norms3D_d[19];
+__constant__ FLOAT_TYPE w_pert3D_d[19];
+__constant__ FLOAT_TYPE phi3D_d[19];
+__constant__ FLOAT_TYPE teta3D_d[19];
+__constant__ FLOAT_TYPE chi3D_d[19];
+__constant__ FLOAT_TYPE psi3D_d[19];
+__constant__ FLOAT_TYPE cg_w3D_d[19];
 
 __host__ void initConstants2D(Arguments *args,
 		FLOAT_TYPE maxInletCoordY, FLOAT_TYPE minInletCoordY,
@@ -125,7 +139,6 @@ __host__ void initConstants2D(Arguments *args,
 	}
 
 	if (args->multiPhase){
-
 		FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
 		FLOAT_TYPE b_omega = 1.0/(3.0 * args->b_viscosity+0.5);
 		cudaMemcpyToSymbol(r_omega_d, &r_omega, sizeof(FLOAT_TYPE));
@@ -175,30 +188,68 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
 		FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
 		cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE cg_w[9] = {0., 4. / 12., 4. / 12., 4. / 12., 4. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.};
+		cudaMemcpyToSymbol(cg_w_d, cg_w, 9 * sizeof(FLOAT_TYPE));
 	}
 }
 
-__host__ void initColorGradient(int *color_gradient_directions_d, int n, int m){
+__host__ void initColorGradient(int *color_gradient_directions, int n, int m){
 	//NORTH is 1, SOUTH 2, EAST 3, WEST 4, 0 is okay
 	for(int j = 0; j < m;j++){
 		for(int i = 0; i < n; i++){
 
 			if(j == m-1  && i != 0 && i != n-1) //NORTH
-				color_gradient_directions_d[j * n + i] = 1;
+				color_gradient_directions[j * n + i] = 1;
 			else if(j == 0 && i != 0 && i != n-1 ) //SOUTH
-				color_gradient_directions_d[j * n + i] = 2;
+				color_gradient_directions[j * n + i] = 2;
 			else if(i == n - 1  && j != 0 && j != m-1 ) //EAST
-				color_gradient_directions_d[j * n + i] = 3;
+				color_gradient_directions[j * n + i] = 3;
 			else if(i == 0 && j != 0 && j != m-1 ) //WEST
-				color_gradient_directions_d[j * n + i] = 4;
+				color_gradient_directions[j * n + i] = 4;
 		}
 	}
 
 	//CORNERS
-	color_gradient_directions_d[0] = -1;
-	color_gradient_directions_d[n-1] = -1;
-	color_gradient_directions_d[(m-1)*n + n-1] = -1;
-	color_gradient_directions_d[(m-1)*n] = -1;
+	color_gradient_directions[0] = -1;
+	color_gradient_directions[n-1] = -1;
+	color_gradient_directions[(m-1)*n + n-1] = -1;
+	color_gradient_directions[(m-1)*n] = -1;
+}
+
+__host__ void initColorGradient3D(int *color_gradient_directions, int n, int m, int h){
+	//NORTH is 1, SOUTH 2, EAST 3, WEST 4, FRONT 5, BACK 6, 0 is okay
+	int jn = m-1;
+	int js = 0;
+	int ie = n-1;
+	int iw = 0;
+	int kf = h-1;
+	int kb = 0;
+	int ms = n * m;
+
+	for(int k = 0; k < h; k++){
+		for(int j = 0; j < m;j++){
+			for(int i = 0; i < n; i++){
+				if(j != m-1 && j != 0 && i != 0 && i != n-1 && k != 0 && k != h-1)
+					color_gradient_directions[k * ms + j * n + i] = 0;
+				else if(j == m-1 && i != 0 && i != n-1 && k != 0 && k != h-1) //NORTH
+					color_gradient_directions[k * ms + j * n + i] = 1;
+				else if(j == 0 && i != 0 && i != n-1 && k != 0 && k != h-1) //SOUTH
+					color_gradient_directions[k * ms + j * n + i] = 2;
+				else if(i == n - 1 && j != 0 && j != m-1 && k != 0 && k != h-1) //EAST
+					color_gradient_directions[k * ms + j * n + i] = 3;
+				else if(i == 0 && j != 0 && j != m-1 && k != 0 && k != h-1 ) //WEST
+					color_gradient_directions[k * ms + j * n + i] = 4;
+				else if(k == h-1 && j != 0 && j != m-1 && i != 0 && i != n-1) //FRONT
+					color_gradient_directions[k * ms + j * n + i] = 5;
+				else if(k == 0 && j != 0 && j != m-1 && i != 0 && i != n-1)  //BACK
+					color_gradient_directions[k * ms + j * n + i] = 6;
+				else { //edges and corners
+					color_gradient_directions[k * ms + j * n + i] = -1; // corners
+				}
+			}
+		}
+	}
 }
 
 __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d){
@@ -328,6 +379,63 @@ __host__ void initConstants3D(Arguments *args,
 		cudaMemcpyToSymbol(momCollMtx3D_d, momCollMtx3D,
 				361 * sizeof(FLOAT_TYPE));
 	}
+
+	if(args->multiPhase){
+
+		cudaMemcpyToSymbol(control_param_d, &args->control_param, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(beta_d, &args->beta, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(A_d, &args->A, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE w_pert3D[19] = {-2.0 / 9.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0,
+				1.0 / 54.0, 1.0 / 54.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0,
+				1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0};
+		cudaMemcpyToSymbol(w_pert3D_d, w_pert3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE phi3D[19] = {0., 1. / 12., 1. / 12., 1. / 12., 1. / 12.,
+				1. / 12., 1. / 12., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.,
+				1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.};
+		cudaMemcpyToSymbol(phi3D_d, phi3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE teta3D[19] = {1., -1. / 12., -1. / 12., -1. / 12., -1. / 12.,
+				-1. / 12., -1. / 12., -1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24.,
+				-1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24.};
+		cudaMemcpyToSymbol(teta3D_d, teta3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE chi3D[19] = {-5.0 / 2.0, -1. / 6., -1. / 6., -1. / 6., -1. / 6.,
+				-1. / 6., -1. / 6., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.,
+				1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.};
+		cudaMemcpyToSymbol(chi3D_d, chi3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE psi3D[19] = {0., 1. / 4., 1. / 4., 1. / 4., 1. / 4.,
+				1. / 4., 1. / 4., 1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8.,
+				1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8.};
+		cudaMemcpyToSymbol(psi3D_d, psi3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE cg_w3D[19] = {0., 1. / 6., 1. / 6., 1. / 6., 1. / 6.,
+				1. / 6., 1. / 6., 1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.,
+				1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.};
+		cudaMemcpyToSymbol(cg_w3D_d, cg_w3D, 19 * sizeof(FLOAT_TYPE));
+
+		cudaMemcpyToSymbol(g_limit_d, &args->g_limit, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE c_norms3D[19];
+		for(int i = 0; i < 19;i++){
+			c_norms3D[i] = sqrt(cx3D[i] * cx3D[i] + cy3D[i] * cy3D[i] + cz3D[i] * cz3D[i]);
+		}
+		cudaMemcpyToSymbol(c_norms3D_d, c_norms3D, 19 * sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_density_d, &args->r_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_density_d, &args->b_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_alpha_d, &args->r_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_alpha_d, &args->b_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
+		//FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+		//cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
+
+		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
+
+
+	}
 }
 
 __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
@@ -337,9 +445,9 @@ __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-																												* (maxInletCoordY_d - minInletCoordY_d);
+																																								* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-																												* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																																								* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
@@ -348,7 +456,7 @@ __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																											+ threadIdx.x;
+																																							+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -541,7 +649,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		dz = bcZ[bci] - nodeZ[ind];
 		if (CurvedBCs == (BoundaryType) CURVED) {
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-																													/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																																									/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
 		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);

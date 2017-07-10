@@ -159,7 +159,6 @@ void mp3DColl(int n, int m, int h, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 			for (int i=0;i < n; i++){
 				index = k*n*m + j*n + i;
 
-
 				color_gradient[index * 3] = 0;
 				color_gradient[index * 3 + 1] = 0;
 				color_gradient[index * 3 + 2] = 0;

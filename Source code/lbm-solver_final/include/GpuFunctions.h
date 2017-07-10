@@ -445,8 +445,11 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 __host__ int gpu_sum_int_h(int *C, int *D, int size);
 __global__ void gpu_sum256_int(int *A, int *B, int size);
 __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d);
-
 FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean);
+
+__global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
+		FLOAT_TYPE *v_d, FLOAT_TYPE *w_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d);
+__host__ void initColorGradient3D(int *color_gradient_directions, int n, int m, int h);
 
 // to be used in 2D inlet profile computation in gpuInitInletProfile3D
 //from: http://stackoverflow.com/questions/18455414/how-to-do-power-of-complex-number-in-cublas
