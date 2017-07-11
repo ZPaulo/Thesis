@@ -177,7 +177,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			b_phi[i] = (1.0 - args->b_alpha) / 20.0;
 
 
-		createBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho);
+		//createBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho);
+		createCoalescenceBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho);
 	}
 #endif
 	FLOAT_TYPE *rho_d = createGpuArrayFlt(m * n, ARRAY_FILL, args->rho);
@@ -223,7 +224,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	if(args->multiPhase){
 		initColorGradient(cg_directions, n, m);
 		CHECK(cudaMemcpy(cg_dir_d, cg_directions, SIZEINT(m*n), cudaMemcpyHostToDevice));
-		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d);
+		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, 1);
 	}
 #endif
 	int *mask = createHostArrayInt(m * n, ARRAY_ZERO);
@@ -570,6 +571,9 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		sprintf(finalFilename, "%sFinalData.vti", inFn->result);
 		break;
 	}
+
+	//validate coalescence case
+	printf("Final radius: "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
 	if(args->multiPhase){
 		WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
 				n, m, 1, args->outputFormat);

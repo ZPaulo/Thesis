@@ -173,7 +173,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	switch (cg_dir_d) {
 	case 0:
 		for(i = 1; i < 19; i++){
-			ind = index + cx3D_d[i] + cy3D_d[i] * length_d + cz3D_d[i] * ms;
+			ind = index + c3D_d[i];
 			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
 			aux2 = cg_w_d[i] * rho_d[ind];
 

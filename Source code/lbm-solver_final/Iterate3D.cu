@@ -302,6 +302,14 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	if (args->TypeOfResiduals == FdRelDiff) {
 		fprev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	}
+
+	if(args->multiPhase){
+		CHECK(cudaMemcpy(f_d,f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(r_rho_d,r_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(b_rho_d,b_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(rho_d,rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+	}
+
 	FLOAT_TYPE *temp19a_d, *temp19b_d;
 	if (args->TypeOfResiduals != MacroDiff) {
 		temp19a_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
@@ -345,10 +353,12 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 
 	bool *stream_d = createGpuArrayBool(18 * m * n * h, ARRAY_COPY, 0, stream);
 
-	//	CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-	//	CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-	//	CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-	//	CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+#if CUDA
+	CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+#endif
 
 	CHECK(cudaEventRecord(stop, 0));
 	CHECK(cudaEventSynchronize(stop));
@@ -446,15 +456,8 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						args->g_limit, args->A,r_fColl, b_fColl, weight, cx, cy, cz, f, args->r_viscosity,
 						args->b_viscosity, args->r_alpha, args->b_alpha, chi, phi, psi, teta, cg_w);
 #else
-				CHECK(cudaMemcpy(f_d,f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
-				CHECK(cudaMemcpy(r_rho_d,r_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
-				CHECK(cudaMemcpy(b_rho_d,b_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
-				CHECK(cudaMemcpy(rho_d,rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
 				gpuCollBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d);
-				CHECK(cudaMemcpy(r_fColl,r_fColl_d,SIZEFLT(m*n*h*19),cudaMemcpyDeviceToHost));
-				CHECK(cudaMemcpy(b_fColl,b_fColl_d,SIZEFLT(m*n*h*19),cudaMemcpyDeviceToHost));
 #endif
-
 			}
 			else{
 				gpuCollBgkw3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d,
@@ -483,7 +486,12 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaEventRecord(start, 0));
 
 		if(args->multiPhase){
+#if !CUDA
 			streamMP3D(n, m, h, r_f, b_f, r_fColl, b_fColl, stream);
+#else
+			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
+			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
+#endif
 		}
 		else{
 			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, f_d, fColl_d);
@@ -510,7 +518,14 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaEventRecord(start, 0));
 
 		if(args->multiPhase){
+#if !CUDA
 			peridicBoundaries3D(n, m, h,r_f, b_f, r_rho, b_rho);
+#else
+			gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, r_f_d,
+					bcCount);
+			gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, b_f_d,
+					bcCount);
+#endif
 		}
 		else{
 			gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
@@ -544,8 +559,13 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaEventRecord(start, 0));
 
 		if(args->multiPhase){
+#if !CUDA
 			updateMacroMP3D(n, m, h, u, v, w, r_rho, b_rho, r_f, b_f, rho, args->control_param,args->r_alpha, args->b_alpha,
 					args->bubble_radius,st_error, iter, st_predicted, cx, cy, cz, f);
+#else
+			gpuUpdateMacro3DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d,
+					bcBoundId_d, f_d, args->g,bcMask_d,args->UpdateInltOutl, r_f_d, b_f_d, r_rho_d, b_rho_d);
+#endif
 		}
 		else{
 			gpuUpdateMacro3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d,
@@ -565,8 +585,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 
 			if (args->TypeOfResiduals == L2) {
 				if(args->multiPhase){
+#if !CUDA
 					CHECK(cudaMemcpy(f_d,r_f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
 					CHECK(cudaMemcpy(fColl_d,r_fColl,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+#endif
 				}
 				r = computeResidual3D(f_d, fColl_d, temp19a_d, temp19b_d, m, n,
 						h);
@@ -574,7 +596,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			else {
 				if (args->TypeOfResiduals == FdRelDiff) {
 					if(args->multiPhase){
+#if !CUDA
 						CHECK(cudaMemcpy(f_d,r_f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+#endif
 					}
 
 					if (firstIter) {
@@ -591,10 +615,12 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 
 				} else {
 					if(args->multiPhase){
+#if !CUDA
 						CHECK(cudaMemcpy(u_d,u,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
 						CHECK(cudaMemcpy(v_d,v,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
 						CHECK(cudaMemcpy(w_d,w,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
 						CHECK(cudaMemcpy(rho_d,rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+#endif
 					}
 					bool h_divergence = false;
 					CHECK(cudaMalloc(&d_divergence,sizeof(bool)));
@@ -618,10 +644,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						break;
 					}
 					rhoMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
-					if (abs(uMaxDiff) < args->StopCondition[0]
-					                                        && abs(vMaxDiff) < args->StopCondition[1]
-					                                                                               && abs(wMaxDiff) < args->StopCondition[2]
-					                                                                                                                      && abs(rhoMaxDiff) < args->StopCondition[3]) {
+					if (abs(uMaxDiff) < args->StopCondition[0] &&
+							abs(vMaxDiff) < args->StopCondition[1] &&
+							abs(wMaxDiff) < args->StopCondition[2] &&
+							abs(rhoMaxDiff) < args->StopCondition[3]) {
 						printf("simulation converged!\n");
 						break;
 					}
@@ -681,14 +707,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			if (iter > args->autosaveAfter) {
 				printf("autosave\n\n");
 				//////////// COPY VARIABLES TO HOST ////////////////
-				CHECK(
-						cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-				CHECK(
-						cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-				CHECK(
-						cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-				CHECK(
-						cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 
 				switch (args->outputFormat) {
 				case CSV:
@@ -710,7 +732,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						u, v, w, rho, nodeType, n, m, h, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																								/ CLOCKS_PER_SEC;
+																																																				/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -734,12 +756,16 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 				args->iterations);
 	}
 	// Write final data
-	if(!args->multiPhase){
-		CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-		CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-		CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-		CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+#if CUDA
+	CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	if(args->multiPhase){
+		CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+		CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	}
+#endif
 
 	switch (args->outputFormat) {
 	case CSV:

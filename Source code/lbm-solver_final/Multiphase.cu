@@ -961,3 +961,56 @@ FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, 
 
 	return abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
+
+void createCoalescenceBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
+		FLOAT_TYPE r_density, FLOAT_TYPE b_density, FLOAT_TYPE *r_phi, FLOAT_TYPE *b_phi, FLOAT_TYPE *rho){
+
+	int i, j, k;
+	int index, index2;
+	for (j=0; j < m; j++){
+		for(i = 0; i < n; i++){
+			index = j * n + i;
+
+			if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5 + radius),2)) <= radius || sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5 - radius),2)) <= radius){
+				r_rho[index] = r_density;
+				for (k=0; k < 9; k++){
+					// initialise distribution function with small, non-zero values
+					index2 = i + j * n + k * m * n;
+					r_f[index2] = r_rho[index] * r_phi[k];
+				}
+			}
+			else {
+				b_rho[index]=b_density;
+				for (k=0; k < 9; k++){
+					// initialise distribution function with small, non-zero values
+					index2 = i + j * n + k * m * n;
+					b_f[index2]   = b_rho[index]*b_phi[k];
+				}
+			}
+			// initialise density
+			rho[index] = r_rho[index]+b_rho[index];
+		}
+	}
+}
+
+FLOAT_TYPE validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE radius){
+	int j;
+	if(m % 2 == 0)
+		j = m/2;
+	else
+		j = (m+1) / 2;
+
+	FLOAT_TYPE rho;
+	int aux = 0;
+	for(int i = 0; i < n; i++){
+		rho = r_rho[j * n + i] + b_rho[j * n + i];
+		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.9){
+			aux++;
+		}
+	}
+
+	printf("counter %d\n", aux);
+	return (abs(radius * sqrt(2.0) - ((FLOAT_TYPE)aux) / ( n * 2.0)) / (radius * sqrt(2.0))) * 100.0;
+
+
+}

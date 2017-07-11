@@ -1952,7 +1952,6 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		if (bcMask_d[bci] & BC3D_FLUID) {
 			if (bcMask_d[bci] & BC3D_CYCL_B) {
 				/*WEST*/if ((bcMask_d[bci] & BC3D_CYCL_2)) {
-					//	        		printf("i am here Per W\n");
 					f_d[ind + 1 * ms] = f_d[ind + 1 * ms + offsetX];
 					f_d[ind + 7 * ms] = f_d[ind + 7 * ms + offsetX];
 					f_d[ind + 9 * ms] = f_d[ind + 9 * ms + offsetX];
@@ -1960,7 +1959,6 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					f_d[ind + 13 * ms] = f_d[ind + 13 * ms + offsetX];
 				}
 				/*EAST*/if ((bcMask_d[bci] & BC3D_CYCL_1)) {
-					//		printf("i am here Per E\n");
 					f_d[ind + 2 * ms] = f_d[ind + 2 * ms - offsetX];
 					f_d[ind + 8 * ms] = f_d[ind + 8 * ms - offsetX];
 					f_d[ind + 10 * ms] = f_d[ind + 10 * ms - offsetX];
@@ -1969,7 +1967,6 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				}
 
 				/*SOUTH*/if ((bcMask_d[bci] & BC3D_CYCL_4)) {
-					//    		printf("i am here Per S\n");
 					f_d[ind + 3 * ms] = f_d[ind + 3 * ms + offsetY];
 					f_d[ind + 7 * ms] = f_d[ind + 7 * ms + offsetY];
 					f_d[ind + 8 * ms] = f_d[ind + 8 * ms + offsetY];
@@ -1977,7 +1974,6 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					f_d[ind + 17 * ms] = f_d[ind + 17 * ms + offsetY];
 				}
 				/*NORTH*/if ((bcMask_d[bci] & BC3D_CYCL_3)) {
-					//    		printf("i am here Per N\n");
 					f_d[ind + 4 * ms] = f_d[ind + 4 * ms - offsetY];
 					f_d[ind + 9 * ms] = f_d[ind + 9 * ms - offsetY];
 					f_d[ind + 10 * ms] = f_d[ind + 10 * ms - offsetY];
@@ -1985,7 +1981,6 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					f_d[ind + 18 * ms] = f_d[ind + 18 * ms - offsetY];
 				}
 				/*BOTTOM*/if ((bcMask_d[bci] & BC3D_CYCL_6)) {
-					//   		printf("i am here Per B\n");
 					f_d[ind + 5 * ms] = f_d[ind + 5 * ms + offsetZ];
 					f_d[ind + 11 * ms] = f_d[ind + 11 * ms + offsetZ];
 					f_d[ind + 12 * ms] = f_d[ind + 12 * ms + offsetZ];
@@ -1993,7 +1988,6 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					f_d[ind + 16 * ms] = f_d[ind + 16 * ms + offsetZ];
 				}
 				/*TOP*/if ((bcMask_d[bci] & BC3D_CYCL_5)) {
-					//        		printf("i am here Per T\n");
 					f_d[ind + 6 * ms] = f_d[ind + 6 * ms - offsetZ];
 					f_d[ind + 13 * ms] = f_d[ind + 13 * ms - offsetZ];
 					f_d[ind + 14 * ms] = f_d[ind + 14 * ms - offsetZ];
