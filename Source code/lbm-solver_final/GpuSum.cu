@@ -99,6 +99,41 @@ __global__ void gpu_sum256(FLOAT_TYPE *A, FLOAT_TYPE *B, int size) {
 	}
 }
 
+__global__ void gpu_sum256_int(int *A, int *B, int size) {
+	int tid = threadIdx.x;
+	int bid = blockIdx.y * gridDim.x + blockIdx.x;
+	int gid = bid * blockDim.x * 2 + tid;
+
+	extern __shared__ int temp1[];
+	temp1[tid] = (gid < size) ? A[gid] : 0;
+	temp1[tid] += (gid + blockDim.x < size) ? A[gid + blockDim.x] : 0;
+	__syncthreads();
+	if (tid < 128)
+		temp1[tid] += temp1[tid + 128];
+	__syncthreads();
+	if (tid < 64)
+		temp1[tid] += temp1[tid + 64];
+	__syncthreads();
+
+	if (tid < 32) {
+		temp1[tid] += temp1[tid + 32];
+		__syncthreads();
+		temp1[tid] += temp1[tid + 16];
+		__syncthreads();
+		temp1[tid] += temp1[tid + 8];
+		__syncthreads();
+		temp1[tid] += temp1[tid + 4];
+		__syncthreads();
+		temp1[tid] += temp1[tid + 2];
+		__syncthreads();
+		temp1[tid] += temp1[tid + 1];
+	}
+
+	if (tid == 0) {
+		B[bid] = temp1[0];
+	}
+}
+
 __global__ void gpu_max256(FLOAT_TYPE *A, FLOAT_TYPE *B, int size) {
 	int tid = threadIdx.x;
 	int bid = blockIdx.y * gridDim.x + blockIdx.x;
@@ -162,6 +197,32 @@ __host__ FLOAT_TYPE gpu_sum_h(FLOAT_TYPE *C, FLOAT_TYPE *D, int size) {
 	return result;
 }
 
+__host__ int gpu_sum_int_h(int *C, int *D, int size) {
+	dim3 grid_dim;
+
+	int remaining = size;
+	int shared_size = 256 * sizeof(int);
+	int req_blocks = 0;
+
+	while (remaining > 1) {
+		req_blocks = (remaining - 1) / 256 / 2 + 1;
+		grid_dim.x = static_cast<int>(ceil(sqrt(req_blocks)));
+		grid_dim.y = (req_blocks - 1) / grid_dim.x + 1;
+		gpu_sum256_int<<<grid_dim, 256, shared_size>>>(C, D, remaining);
+
+		//swap
+		int *temp = C;
+		C = D;
+		D = temp;
+
+		remaining = req_blocks;
+	}
+
+	int result = 0;
+	CHECK(cudaMemcpy(&result, C, sizeof(int), cudaMemcpyDeviceToHost));
+	return result;
+}
+
 __host__ FLOAT_TYPE gpu_max_h(FLOAT_TYPE *C, FLOAT_TYPE *D, int size) {
 	dim3 grid_dim;
 
@@ -206,4 +267,6 @@ __global__ void gpu_cond_copy_mask3D(FLOAT_TYPE *A, FLOAT_TYPE *B,
 		A[ind] = bcBoundId_d[ind] == value ? B[ind] : 0.0;
 	}
 }
+
+
 

@@ -45,9 +45,49 @@ __constant__ FLOAT_TYPE velMomMap3D_d[361];
 __constant__ FLOAT_TYPE momCollMtx3D_d[361];
 __constant__ FLOAT_TYPE wIn_d;
 
+//COLOR GRADIENT //
+__constant__ FLOAT_TYPE beta_d;
+__constant__ FLOAT_TYPE r_alpha_d;
+__constant__ FLOAT_TYPE b_alpha_d;
+__constant__ FLOAT_TYPE bubble_radius_d;
+__constant__ FLOAT_TYPE A_d;
+__constant__ FLOAT_TYPE r_density_d;
+__constant__ FLOAT_TYPE b_density_d;
+__constant__ FLOAT_TYPE st_predicted_d;
+
+//COLOR GRADIENT 2D//
+__constant__ FLOAT_TYPE a1_d;
+__constant__ FLOAT_TYPE a2_d;
+__constant__ FLOAT_TYPE a3_d;
+__constant__ FLOAT_TYPE a4_d;
+__constant__ FLOAT_TYPE a5_d;
+__constant__ FLOAT_TYPE r_omega_d;
+__constant__ FLOAT_TYPE b_omega_d;
+__constant__ FLOAT_TYPE control_param_d;
+__constant__ FLOAT_TYPE del_d;
+__constant__ FLOAT_TYPE b_A_d;
+__constant__ FLOAT_TYPE r_A_d;
+__constant__ FLOAT_TYPE b_phi_d[9];
+__constant__ FLOAT_TYPE r_phi_d[9];
+__constant__ FLOAT_TYPE w_pert_d[9];
+__constant__ FLOAT_TYPE g_limit_d;
+__constant__ FLOAT_TYPE c_norms_d[9];
+__constant__ FLOAT_TYPE cg_w_d[9];
+
+//COLOR GRADIENT 3D//
+__constant__ FLOAT_TYPE r_viscosity_d;
+__constant__ FLOAT_TYPE b_viscosity_d;
+__constant__ FLOAT_TYPE c_norms3D_d[19];
+__constant__ FLOAT_TYPE w_pert3D_d[19];
+__constant__ FLOAT_TYPE phi3D_d[19];
+__constant__ FLOAT_TYPE teta3D_d[19];
+__constant__ FLOAT_TYPE chi3D_d[19];
+__constant__ FLOAT_TYPE psi3D_d[19];
+__constant__ FLOAT_TYPE cg_w3D_d[19];
+
 __host__ void initConstants2D(Arguments *args,
-FLOAT_TYPE maxInletCoordY, FLOAT_TYPE minInletCoordY,
-FLOAT_TYPE delta, int m, int n) {
+		FLOAT_TYPE maxInletCoordY, FLOAT_TYPE minInletCoordY,
+		FLOAT_TYPE delta, int m, int n) {
 	//CONSTANT LATTICE QUANTITIES d2q9
 	int s = m * n;
 	FLOAT_TYPE w2D[9] = { 4. / 9., 1. / 9., 1. / 9., 1. / 9., 1. / 9., 1. / 36.,
@@ -97,12 +137,231 @@ FLOAT_TYPE delta, int m, int n) {
 		cudaMemcpyToSymbol(momCollMtx2D_d, momCollMtx2D,
 				81 * sizeof(FLOAT_TYPE));
 	}
+
+	if (args->multiPhase){
+		FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
+		FLOAT_TYPE b_omega = 1.0/(3.0 * args->b_viscosity+0.5);
+		cudaMemcpyToSymbol(r_omega_d, &r_omega, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_omega_d, &b_omega, sizeof(FLOAT_TYPE));
+		FLOAT_TYPE a1      =   2.0 * r_omega * b_omega/(r_omega+b_omega);
+		FLOAT_TYPE a2      =   2.0 * (r_omega - a1) / args->del;
+		FLOAT_TYPE a3      =   -a2 / (2.0 * args->del);
+		FLOAT_TYPE a4      =   2.0 * (a1 - b_omega) / args->del;
+		FLOAT_TYPE a5      =   a4 / (2.0 * args->del);
+		cudaMemcpyToSymbol(a1_d, &a1, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(a2_d, &a2, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(a3_d, &a3, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(a4_d, &a4, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(a5_d, &a5, sizeof(FLOAT_TYPE));
+
+
+
+		cudaMemcpyToSymbol(control_param_d, &args->control_param, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(del_d, &args->del, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(beta_d, &args->beta, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_A_d, &args->r_A, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_A_d, &args->b_A, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE aux1=(1-args->r_alpha)/5.0;
+		FLOAT_TYPE aux2=(1-args->r_alpha)/20.0;
+		FLOAT_TYPE r_phi[9] = {args->r_alpha, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
+		cudaMemcpyToSymbol(r_phi_d, r_phi, 9 * sizeof(FLOAT_TYPE));
+		aux1=(1-args->b_alpha)/5.0;
+		aux2=(1-args->b_alpha)/20.0;
+		FLOAT_TYPE b_phi[9] = {args->b_alpha, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
+		cudaMemcpyToSymbol(b_phi_d, b_phi, 9 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE w_pert[9] = {-4.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0,
+				5.0 / 108.0, 5.0 / 108.0, 5.0 / 108.0, 5.0 / 108.0};
+		cudaMemcpyToSymbol(w_pert_d, w_pert, 9 * sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(g_limit_d, &args->g_limit, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE c_norms[9];
+		for(int i = 0; i < 9;i++){
+			c_norms[i] = sqrt(cx2D[i] * cx2D[i] + cy2D[i] * cy2D[i]);
+		}
+		cudaMemcpyToSymbol(c_norms_d, c_norms, 9 * sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_density_d, &args->r_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_density_d, &args->b_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_alpha_d, &args->r_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_alpha_d, &args->b_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
+		FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+		cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE cg_w[9] = {0., 4. / 12., 4. / 12., 4. / 12., 4. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.};
+		cudaMemcpyToSymbol(cg_w_d, cg_w, 9 * sizeof(FLOAT_TYPE));
+	}
+}
+
+__host__ void initColorGradient(int *color_gradient_directions, int n, int m){
+	//NORTH is 1, SOUTH 2, EAST 3, WEST 4, 0 is okay
+	for(int j = 0; j < m;j++){
+		for(int i = 0; i < n; i++){
+
+			if(j == m-1  && i != 0 && i != n-1) //NORTH
+				color_gradient_directions[j * n + i] = 1;
+			else if(j == 0 && i != 0 && i != n-1 ) //SOUTH
+				color_gradient_directions[j * n + i] = 2;
+			else if(i == n - 1  && j != 0 && j != m-1 ) //EAST
+				color_gradient_directions[j * n + i] = 3;
+			else if(i == 0 && j != 0 && j != m-1 ) //WEST
+				color_gradient_directions[j * n + i] = 4;
+		}
+	}
+
+	//CORNERS
+	color_gradient_directions[0] = -1;
+	color_gradient_directions[n-1] = -1;
+	color_gradient_directions[(m-1)*n + n-1] = -1;
+	color_gradient_directions[(m-1)*n] = -1;
+}
+
+__host__ void initColorGradient3D(int *color_gradient_directions, int n, int m, int h){
+	//NORTH is 1, SOUTH 2, EAST 3, WEST 4, FRONT 5, BACK 6, 0 is okay
+	int jn = m-1;
+	int js = 0;
+	int ie = n-1;
+	int iw = 0;
+	int kf = h-1;
+	int kb = 0;
+	int ms = n * m;
+
+	for(int k = 0; k < h; k++){
+		for(int j = 0; j < m;j++){
+			for(int i = 0; i < n; i++){
+				if(j != m-1 && j != 0 && i != 0 && i != n-1 && k != 0 && k != h-1)
+					color_gradient_directions[k * ms + j * n + i] = 0;
+				else if(j == m-1 && i != 0 && i != n-1 && k != 0 && k != h-1) //NORTH
+					color_gradient_directions[k * ms + j * n + i] = 1;
+				else if(j == 0 && i != 0 && i != n-1 && k != 0 && k != h-1) //SOUTH
+					color_gradient_directions[k * ms + j * n + i] = 2;
+				else if(i == n - 1 && j != 0 && j != m-1 && k != 0 && k != h-1) //EAST
+					color_gradient_directions[k * ms + j * n + i] = 3;
+				else if(i == 0 && j != 0 && j != m-1 && k != 0 && k != h-1 ) //WEST
+					color_gradient_directions[k * ms + j * n + i] = 4;
+				else if(k == h-1 && j != 0 && j != m-1 && i != 0 && i != n-1) //FRONT
+					color_gradient_directions[k * ms + j * n + i] = 5;
+				else if(k == 0 && j != 0 && j != m-1 && i != 0 && i != n-1)  //BACK
+					color_gradient_directions[k * ms + j * n + i] = 6;
+				else { //edges and corners
+					color_gradient_directions[k * ms + j * n + i] = -1; // corners
+				}
+			}
+		}
+	}
+}
+
+__global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, int test_case){
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	int ms = length_d * depth_d;
+
+	if(index < ms){
+		FLOAT_TYPE aux1, aux2;
+		switch (test_case) {
+		case 1: //coalescence
+			if( sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5 + bubble_radius_d)*(y_d[index]-0.5 + bubble_radius_d)) <= bubble_radius_d ||
+					sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5 - bubble_radius_d)*(y_d[index]-0.5 - bubble_radius_d)) <= bubble_radius_d	){
+				aux1 = (1 - r_alpha_d) / 5.0;
+				aux2 = (1 - r_alpha_d) / 20.0;
+				r_rho_d[index] = r_density_d;
+				r_f_d[index + 0 * ms] = r_density_d * r_alpha_d;
+				r_f_d[index + 1 * ms] = r_density_d * aux1;
+				r_f_d[index + 2 * ms] = r_density_d * aux1;
+				r_f_d[index + 3 * ms] = r_density_d * aux1;
+				r_f_d[index + 4 * ms] = r_density_d * aux1;
+				r_f_d[index + 5 * ms] = r_density_d * aux2;
+				r_f_d[index + 6 * ms] = r_density_d * aux2;
+				r_f_d[index + 7 * ms] = r_density_d * aux2;
+				r_f_d[index + 8 * ms] = r_density_d * aux2;
+			}
+			else {
+				aux1 = (1 - b_alpha_d) / 5.0;
+				aux2 = (1 - b_alpha_d) / 20.0;
+				b_rho_d[index] = b_density_d;
+				b_f_d[index + 0 * ms] = b_density_d * b_alpha_d;
+				b_f_d[index + 1 * ms] = b_density_d * aux1;
+				b_f_d[index + 2 * ms] = b_density_d * aux1;
+				b_f_d[index + 3 * ms] = b_density_d * aux1;
+				b_f_d[index + 4 * ms] = b_density_d * aux1;
+				b_f_d[index + 5 * ms] = b_density_d * aux2;
+				b_f_d[index + 6 * ms] = b_density_d * aux2;
+				b_f_d[index + 7 * ms] = b_density_d * aux2;
+				b_f_d[index + 8 * ms] = b_density_d * aux2;
+			}
+			break;
+		case 2:
+			if( sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5)*(y_d[index]-0.5)) <= bubble_radius_d){
+				aux1 = (1 - r_alpha_d) / 5.0;
+				aux2 = (1 - r_alpha_d) / 20.0;
+				r_rho_d[index] = r_density_d;
+				r_f_d[index + 0 * ms] = r_density_d * r_alpha_d;
+				r_f_d[index + 1 * ms] = r_density_d * aux1;
+				r_f_d[index + 2 * ms] = r_density_d * aux1;
+				r_f_d[index + 3 * ms] = r_density_d * aux1;
+				r_f_d[index + 4 * ms] = r_density_d * aux1;
+				r_f_d[index + 5 * ms] = r_density_d * aux2;
+				r_f_d[index + 6 * ms] = r_density_d * aux2;
+				r_f_d[index + 7 * ms] = r_density_d * aux2;
+				r_f_d[index + 8 * ms] = r_density_d * aux2;
+			}
+			else {
+				aux1 = (1 - b_alpha_d) / 5.0;
+				aux2 = (1 - b_alpha_d) / 20.0;
+				b_rho_d[index] = b_density_d;
+				b_f_d[index + 0 * ms] = b_density_d * b_alpha_d;
+				b_f_d[index + 1 * ms] = b_density_d * aux1;
+				b_f_d[index + 2 * ms] = b_density_d * aux1;
+				b_f_d[index + 3 * ms] = b_density_d * aux1;
+				b_f_d[index + 4 * ms] = b_density_d * aux1;
+				b_f_d[index + 5 * ms] = b_density_d * aux2;
+				b_f_d[index + 6 * ms] = b_density_d * aux2;
+				b_f_d[index + 7 * ms] = b_density_d * aux2;
+				b_f_d[index + 8 * ms] = b_density_d * aux2;
+			}
+			break;
+		case 3: //square
+			if( x_d[index] < 0.75 && x_d[index] > 0.25 && y_d[index] < 0.75 && y_d[index] > 0.25){
+				aux1 = (1 - r_alpha_d) / 5.0;
+				aux2 = (1 - r_alpha_d) / 20.0;
+				r_rho_d[index] = r_density_d;
+				r_f_d[index + 0 * ms] = r_density_d * r_alpha_d;
+				r_f_d[index + 1 * ms] = r_density_d * aux1;
+				r_f_d[index + 2 * ms] = r_density_d * aux1;
+				r_f_d[index + 3 * ms] = r_density_d * aux1;
+				r_f_d[index + 4 * ms] = r_density_d * aux1;
+				r_f_d[index + 5 * ms] = r_density_d * aux2;
+				r_f_d[index + 6 * ms] = r_density_d * aux2;
+				r_f_d[index + 7 * ms] = r_density_d * aux2;
+				r_f_d[index + 8 * ms] = r_density_d * aux2;
+			}
+			else {
+				aux1 = (1 - b_alpha_d) / 5.0;
+				aux2 = (1 - b_alpha_d) / 20.0;
+				b_rho_d[index] = b_density_d;
+				b_f_d[index + 0 * ms] = b_density_d * b_alpha_d;
+				b_f_d[index + 1 * ms] = b_density_d * aux1;
+				b_f_d[index + 2 * ms] = b_density_d * aux1;
+				b_f_d[index + 3 * ms] = b_density_d * aux1;
+				b_f_d[index + 4 * ms] = b_density_d * aux1;
+				b_f_d[index + 5 * ms] = b_density_d * aux2;
+				b_f_d[index + 6 * ms] = b_density_d * aux2;
+				b_f_d[index + 7 * ms] = b_density_d * aux2;
+				b_f_d[index + 8 * ms] = b_density_d * aux2;
+			}
+			break;
+		default:
+			break;
+		}
+		// initialise density
+		rho_d[index] = r_rho_d[index] + b_rho_d[index];
+	}
 }
 
 __host__ void initConstants3D(Arguments *args,
-FLOAT_TYPE maxInletCoordY, FLOAT_TYPE minInletCoordY,
-FLOAT_TYPE maxInletCoordZ, FLOAT_TYPE minInletCoordZ,
-FLOAT_TYPE delta, int m, int n, int h) {
+		FLOAT_TYPE maxInletCoordY, FLOAT_TYPE minInletCoordY,
+		FLOAT_TYPE maxInletCoordZ, FLOAT_TYPE minInletCoordZ,
+		FLOAT_TYPE delta, int m, int n, int h) {
 	//CONSTANT LATTICE QUANTITIES d3q19
 	//     D3Q19 LATTICE CONFIGURATION
 
@@ -119,28 +378,25 @@ FLOAT_TYPE delta, int m, int n, int h) {
 
 	int s = m * n * h;
 	FLOAT_TYPE w[19] =
-			{ 1. / 3., 1. / 18., 1. / 18., 1. / 18., 1. / 18., 1. / 18., 1.
-					/ 18., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1.
-					/ 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1.
-					/ 36. };
+	{ 1. / 3., 1. / 18., 1. / 18., 1. / 18., 1. / 18., 1. / 18., 1.
+			/ 18., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1.
+			/ 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1.
+			/ 36. };
 
 	//  			      0   1   2   3   4   5   6    7    8   9  10  11   12   13   14   15    16   17   18
 	int opp3D[19] = { 0 * s, 2 * s, 1 * s, 4 * s, 3 * s, 6 * s, 5 * s, 10 * s, 9
 			* s, 8 * s, 7 * s, 14 * s,
-//    					12   13   14   15    16   17   18
+			//    					12   13   14   15    16   17   18
 			13 * s, 12 * s, 11 * s, 18 * s, 17 * s, 16 * s, 15 * s };
 
-//					   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-	int cx3D[19] = { 0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0,
-			0 };
-	int cy3D[19] = { 0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1,
-			-1 };
-	int cz3D[19] = { 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1,
-			-1 };
-//   				   0   1   2   3   4   5   6     7      8     9    10    11     12     13
+	//					   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+	int cx3D[19] = { 0, 1, -1, 0,  0, 0,  0, 1, -1,  1, -1, 1, -1,  1, -1, 0,  0,  0,  0 };
+	int cy3D[19] = { 0, 0,  0, 1, -1, 0,  0, 1,  1, -1, -1, 0,  0,  0,  0, 1, -1,  1, -1 };
+	int cz3D[19] = { 0, 0,  0, 0,  0, 1, -1, 0,  0,  0,  0, 1,  1, -1, -1, 1,  1, -1, -1 };
+	//   				   0   1   2   3   4   5   6     7      8     9    10    11     12     13
 	int c3D[19] = { 0, -1, 1, -1 * n, n, -m * n, +m * n, -1 * n - 1, -1 * n + 1,
 			n - 1, n + 1, -m * n - 1, -m * n + 1, +m * n - 1,
-//   	    			14      15       16    17     18
+			//   	    			14      15       16    17     18
 			m * n + 1, -m * n - n, -m * n + n, m * n - n, m * n + n };
 
 	// Calculate collision freq
@@ -190,27 +446,84 @@ FLOAT_TYPE delta, int m, int n, int h) {
 		cudaMemcpyToSymbol(momCollMtx3D_d, momCollMtx3D,
 				361 * sizeof(FLOAT_TYPE));
 	}
+
+	if(args->multiPhase){
+
+		cudaMemcpyToSymbol(control_param_d, &args->control_param, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(beta_d, &args->beta, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(A_d, &args->A, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE w_pert3D[19] = {-2.0 / 9.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0,
+				1.0 / 54.0, 1.0 / 54.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0,
+				1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0, 1.0 / 27.0};
+		cudaMemcpyToSymbol(w_pert3D_d, w_pert3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE phi3D[19] = {0., 1. / 12., 1. / 12., 1. / 12., 1. / 12.,
+				1. / 12., 1. / 12., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.,
+				1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.};
+		cudaMemcpyToSymbol(phi3D_d, phi3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE teta3D[19] = {1., -1. / 12., -1. / 12., -1. / 12., -1. / 12.,
+				-1. / 12., -1. / 12., -1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24.,
+				-1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24., -1. / 24.};
+		cudaMemcpyToSymbol(teta3D_d, teta3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE chi3D[19] = {-5.0 / 2.0, -1. / 6., -1. / 6., -1. / 6., -1. / 6.,
+				-1. / 6., -1. / 6., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.,
+				1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24., 1. / 24.};
+		cudaMemcpyToSymbol(chi3D_d, chi3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE psi3D[19] = {0., 1. / 4., 1. / 4., 1. / 4., 1. / 4.,
+				1. / 4., 1. / 4., 1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8.,
+				1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8., 1. / 8.};
+		cudaMemcpyToSymbol(psi3D_d, psi3D, 19 * sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE cg_w3D[19] = {0., 1. / 6., 1. / 6., 1. / 6., 1. / 6.,
+				1. / 6., 1. / 6., 1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.,
+				1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.};
+		cudaMemcpyToSymbol(cg_w3D_d, cg_w3D, 19 * sizeof(FLOAT_TYPE));
+
+		cudaMemcpyToSymbol(g_limit_d, &args->g_limit, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE c_norms3D[19];
+		for(int i = 0; i < 19;i++){
+			c_norms3D[i] = sqrt(cx3D[i] * cx3D[i] + cy3D[i] * cy3D[i] + cz3D[i] * cz3D[i]);
+		}
+		cudaMemcpyToSymbol(c_norms3D_d, c_norms3D, 19 * sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_density_d, &args->r_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_density_d, &args->b_density, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_alpha_d, &args->r_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_alpha_d, &args->b_alpha, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
+		//FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+		//cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
+
+		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
+
+
+	}
 }
 
 __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
-FLOAT_TYPE *y_d, int size) {
+		FLOAT_TYPE *y_d, int size) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	FLOAT_TYPE inletLenghth2 = 0.;
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-				* (maxInletCoordY_d - minInletCoordY_d);
+																																																		* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-				* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																																																		* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
 
 __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
-FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
+		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-			+ threadIdx.x;
+																																																	+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -222,9 +535,9 @@ FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 		rad = sqrtf((powf(y_d[idx], 2)) + (powf(z_d[idx], 2))); //transform to polar coord
 		Tta = atanf(z_d[idx] / y_d[idx]);					//radius and angle
 
-//        Computation of the velocity profile
+		//        Computation of the velocity profile
 		eta = rad / maxInletCoordZ_d;
-//		printf("checkComment: z, %f \n", z_d[idx]);				//checkComment
+		//		printf("checkComment: z, %f \n", z_d[idx]);				//checkComment
 		printf("checkComment: y, %f \n", y_d[idx]);				//checkComment
 		printf("checkComment: eta, %f \n", eta);				//checkComment
 
@@ -236,17 +549,17 @@ FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 				+ (c[3] / a1) * powf(eta, (2. * 4.)) * cos(2. * 4. * Tta)
 				+ (c[4] / a1) * powf(eta, (2. * 5.)) * cos(2. * 5. * Tta);
 		//        }
-//        printf("checkComment: eta, %f \n",maxInletCoordZ_d);//checkComment
-//        %We adjust the profile so not backflow is found
-//        U(U<0)=0;
+		//        printf("checkComment: eta, %f \n",maxInletCoordZ_d);//checkComment
+		//        %We adjust the profile so not backflow is found
+		//        U(U<0)=0;
 		U = (U < 0.0) ? 0.0 : U;
 		// TODO: steps 1 and 2
-//        1) We adjust the profile so no-slip velocity is imposed
-//        U(:,1)=0; U(:,end)=0; U(1,:)=0; U(end,:)=0;
-//        2) We adjust the profile to the U_B
-//        Umax = uIn_d*(2*maxInletCoordY_d)*(2*maxInletCoordZ_d)/trapz(y,trapz(z,U,2)); trapz is trapezoidal rule in matlab, check http://csweb.cs.wfu.edu/bigiron/LittleFE-CUDA-TrapezoidalRule/build/html/cudaAlg.html
-//        u0_d[idx] = Umax*U;
-//        Rough estimate in square ducts Umax = 2*uIn_d
+		//        1) We adjust the profile so no-slip velocity is imposed
+		//        U(:,1)=0; U(:,end)=0; U(1,:)=0; U(end,:)=0;
+		//        2) We adjust the profile to the U_B
+		//        Umax = uIn_d*(2*maxInletCoordY_d)*(2*maxInletCoordZ_d)/trapz(y,trapz(z,U,2)); trapz is trapezoidal rule in matlab, check http://csweb.cs.wfu.edu/bigiron/LittleFE-CUDA-TrapezoidalRule/build/html/cudaAlg.html
+		//        u0_d[idx] = Umax*U;
+		//        Rough estimate in square ducts Umax = 2*uIn_d
 		u0_d[idx] = 2 * uIn_d * U;
 		printf("checkComment: U, %f \n", U);					//checkComment
 
@@ -254,8 +567,8 @@ FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 }
 
 __host__ int initBoundaryConditions2D(int *bcNodeIdX, int *bcNodeIdY,
-FLOAT_TYPE *q, int *bcBoundId, int *fluid,
-FLOAT_TYPE *bcX, FLOAT_TYPE *bcY, FLOAT_TYPE *nodeX, FLOAT_TYPE *nodeY,
+		FLOAT_TYPE *q, int *bcBoundId, int *fluid,
+		FLOAT_TYPE *bcX, FLOAT_TYPE *bcY, FLOAT_TYPE *nodeX, FLOAT_TYPE *nodeY,
 		int *latticeId, int *stream, int *bcType, int *bcMask, int *bcIdx,
 		int *mask, FLOAT_TYPE delta, int m, int n, int size) {
 	int bci; //bound_dim
@@ -374,17 +687,17 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 
 	for (bci = 0; bci < numConns; ++bci) {
 		int ind = bcNodeIdX[bci] + bcNodeIdY[bci] * n + bcNodeIdZ[bci] * n * m; //node_dim
-//         printf("node_dim %d %d %d %d %d \n", bcNodeIdX[bci],bcNodeIdY[bci],bcNodeIdZ[bci], latticeId[bci], nodeType[ind]);
+		//         printf("node_dim %d %d %d %d %d \n", bcNodeIdX[bci],bcNodeIdY[bci],bcNodeIdZ[bci], latticeId[bci], nodeType[ind]);
 		int dir = latticeId[bci];
 		bcIdx[ind] = ind;
 		bcMask[ind] |= BC3D_MASK((unsigned long long )bcType[bci], dir);
-//        printf("nodetype: %d ind: %d\n",nodeType[ind], ind );
-//        printf("bcMask[ind] |= BC3D_MASK((unsigned long long)bcType[bci], dir); %#016lX\n", (bcMask[ind] |= BC3D_MASK((unsigned long long)bcType[bci], dir)) );
+		//        printf("nodetype: %d ind: %d\n",nodeType[ind], ind );
+		//        printf("bcMask[ind] |= BC3D_MASK((unsigned long long)bcType[bci], dir); %#016lX\n", (bcMask[ind] |= BC3D_MASK((unsigned long long)bcType[bci], dir)) );
 		bcMask[ind] |= (unsigned long long) BC3D_F(
 				(unsigned long long )nodeType[ind]);
 
 		if (!(bcMask[ind]
-				& (unsigned long long) BC3D_B((unsigned long long)BC3D_ALL))) {
+		             & (unsigned long long) BC3D_B((unsigned long long)BC3D_ALL))) {
 			bcMask[ind] |= (unsigned long long) BC3D_B(
 					(unsigned long long )bcType[bci]);
 		} else if ((bcMask[ind] & BC3D_B((unsigned long long)BC3D_ALL))
@@ -394,7 +707,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 					(unsigned long long)BC3D_ALL)); //delete previous
 			bcMask[ind] |= (unsigned long long) BC3D_WALL_B;
 			bcMask[ind] |= (unsigned long long) BC3D_CORNER;
-//             printf("corner %d\n", ind);
+			//             printf("corner %d\n", ind);
 		}
 
 		//[ind] |= BOUND3D_ID(bcBoundId[bci]); //BoundId must be between 0..255
@@ -403,9 +716,9 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		dz = bcZ[bci] - nodeZ[ind];
 		if (CurvedBCs == (BoundaryType) CURVED) {
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-					/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																																																			/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
-//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
+		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);
 		stream[ind + opp[dir] - ms] = 0; //no stream on opposite of the (wall) BC3D
 		//printf("ind:%d(%d,%d) str:%d\n", ind, bcNodeIdX[bci], bcNodeIdY[bci], ind + opp[dir] - ms);

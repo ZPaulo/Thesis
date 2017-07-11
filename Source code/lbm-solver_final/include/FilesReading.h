@@ -140,4 +140,6 @@ FLOAT_TYPE getMinInletCoordY(int *bc, int *dir, FLOAT_TYPE *bcy, FLOAT_TYPE delt
  */
 FLOAT_TYPE getMinInletCoordZ(int *bc, int *dir, FLOAT_TYPE *bcz, FLOAT_TYPE delta, int n,int problemtype);
 
+int readArray(const char *file,FLOAT_TYPE **array);
+int compareTestFiles(const char* f1, const char* f2);
 #endif

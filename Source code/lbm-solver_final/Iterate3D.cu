@@ -22,6 +22,10 @@
 #include "Check.h"
 #include "cuda.h"
 #include "GpuSum.h"
+#include "Multiphase.h"
+
+
+#define CUDA 1
 
 int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	// Time measurement: declaration, begin
@@ -62,7 +66,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	int numInletNodes;         // number of inlet nodes
 	FLOAT_TYPE uMaxDiff = -1, vMaxDiff = -1, wMaxDiff = -1, rhoMaxDiff = -1;
 	int *nodeIdX, *nodeIdY, *nodeIdZ, *nodeType, *bcNodeIdX, *bcNodeIdY,
-			*bcNodeIdZ, *latticeId, *bcType, *bcBoundId;
+	*bcNodeIdZ, *latticeId, *bcType, *bcBoundId;
 	FLOAT_TYPE *nodeX, *nodeY, *nodeZ, *bcX, *bcY, *bcZ;
 
 	FLOAT_TYPE taskTime[9];
@@ -113,8 +117,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	m = getLastValue(nodeIdY, numNodes);
 	n = getLastValue(nodeIdX, numNodes);
 	h = getLastValue(nodeIdZ, numNodes);
+
 	delta = getGridSpacing(nodeIdX, nodeIdY, nodeX, numNodes);
-//  printf("checkComment: delta, %f \n",delta);//checkComment
+	//  printf("checkComment: delta, %f \n",delta);//checkComment
 	numInletNodes = getNumInletNodes(bcType, latticeId, numConns,
 			args->TypeOfProblem);
 	maxInletCoordY = getMaxInletCoordY(bcType, latticeId, bcY, delta, numConns,
@@ -125,7 +130,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			args->TypeOfProblem);
 	minInletCoordZ = getMinInletCoordZ(bcType, latticeId, bcZ, delta, numConns,
 			args->TypeOfProblem);
-//  printf("checkComment: minZ, %f \n",minInletCoordZ);//checkComment
+
 
 	printf("Nx: n= %d \n", n); //checkComment
 	printf("Ny: m= %d \n", m); //checkComment
@@ -155,6 +160,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *dragSum = createHostArrayFlt(args->iterations, ARRAY_ZERO);
 	FLOAT_TYPE *liftSum = createHostArrayFlt(args->iterations, ARRAY_ZERO);
 	FLOAT_TYPE *latFSum = createHostArrayFlt(args->iterations, ARRAY_ZERO);
+
 
 	fprintf(logFile, "\n:::: Initializing ::::\n");
 	printf("\n:::: Initializing ::::\n");
@@ -195,8 +201,8 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		printf(
 				"Inlet profile is not currently available! Please initiate Inlet profile from file!\n");
 		return 0;
-//		gpuInitInletProfile3D<<<(int) (m * h / THREADS) + 1, tpb>>>(u1_d, v1_d,
-//				w1_d, coordY_d, coordZ_d, m * h);
+		//		gpuInitInletProfile3D<<<(int) (m * h / THREADS) + 1, tpb>>>(u1_d, v1_d,
+		//				w1_d, coordY_d, coordZ_d, m * h);
 	}
 	FLOAT_TYPE *u_prev_d, *v_prev_d, *w_prev_d, *rho_prev_d;
 	if (args->TypeOfResiduals == MacroDiff) {
@@ -205,9 +211,90 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		w_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 		rho_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 	}
-//	FLOAT_TYPE *drag_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO); Include them in gpuArrays when used
-//	FLOAT_TYPE *lift_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-//	FLOAT_TYPE *latF_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+
+
+	//Multiphase Color Gradient
+	FLOAT_TYPE *f = createHostArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *r_rho = createHostArrayFlt(m * n * h, ARRAY_ZERO);
+	FLOAT_TYPE *b_rho = createHostArrayFlt(m * n * h, ARRAY_ZERO);
+	FLOAT_TYPE *st_error = createHostArrayFlt(args->iterations, ARRAY_ZERO);
+	FLOAT_TYPE *color_gradient = createHostArrayFlt(m * n * h * 3, ARRAY_ZERO);
+	FLOAT_TYPE *r_f = createHostArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *b_f = createHostArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *r_fColl = createHostArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *b_fColl = createHostArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
+	FLOAT_TYPE	b_omega = 1.0/(3.0 * args->b_viscosity+0.5);
+	FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+	int *cg_directions = createHostArrayInt(n * m * h, ARRAY_ZERO);
+	//#if !CUDA
+	FLOAT_TYPE w_pert[19];
+	int cx[19] = { 0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0 };
+	int cy[19] = { 0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1 };
+	int cz[19] = { 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1 };
+	FLOAT_TYPE phi[19];
+	FLOAT_TYPE teta[19];
+	FLOAT_TYPE chi[19];
+	FLOAT_TYPE psi[19];
+	FLOAT_TYPE cg_w[19];
+	FLOAT_TYPE weight[19] =
+	{ 1. / 3., 1. / 18., 1. / 18., 1. / 18., 1. / 18., 1. / 18., 1.
+			/ 18., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1.
+			/ 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1. / 36., 1.
+			/ 36. };
+	if(args->multiPhase){
+		int i;
+		w_pert[0] = -2.0/ 9.0;
+		phi[0]=0;
+		teta[0] = 1;
+		chi[0] = -5.0/2.0;
+		psi[0] = 0;
+		cg_w[0] = 0.0;
+		for(i = 1; i < 7; i++){
+			w_pert[i] = 1.0 / 54.0;
+			phi[i] = 1.0 / 12.0;
+			teta[i] = -1.0 / 12.0;
+			chi[i] = -1.0 / 6.0;
+			psi[i] = 1.0 / 4.0;
+			cg_w[0] = 1.0 / 6.0;
+		}
+		for(i = 7; i < 19; i++){
+			w_pert[i] = 1.0 / 27.0;
+			phi[i] = 1.0 / 24.0;
+			teta[i] = -1.0 / 24.0;
+			chi[i] = 1.0 / 24.0;
+			psi[i] = 1.0 / 8.0;
+			cg_w[0] = 1.0 / 12.0;
+		}
+
+		createBubble3D(nodeX, nodeY,nodeZ, n, m, h,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, phi, rho, f);
+	}
+	//#endif
+
+	FLOAT_TYPE *r_rho_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+	FLOAT_TYPE *b_rho_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+	FLOAT_TYPE *r_f_d = createGpuArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *b_f_d = createGpuArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *r_fColl_d = createGpuArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	FLOAT_TYPE *b_fColl_d = createGpuArrayFlt(m * n * h * 19, ARRAY_ZERO);
+	int *cg_dir_d = createGpuArrayInt(m * n * h, ARRAY_ZERO);
+
+	//	FLOAT_TYPE *p_in_d = createGpuArrayFlt(n*m, ARRAY_ZERO);
+	//	FLOAT_TYPE *p_out_d = createGpuArrayFlt(n*m, ARRAY_ZERO);
+	//	FLOAT_TYPE p_in_mean;
+	//	FLOAT_TYPE p_out_mean;
+	//	FLOAT_TYPE ms = n * m;
+	//	int *num_in_d = createGpuArrayInt(n*m, ARRAY_ZERO);
+	//	int *num_out_d = createGpuArrayInt(n*m, ARRAY_ZERO);
+
+#if CUDA
+	if(args->multiPhase){
+		initColorGradient3D(cg_directions, n, m, h);
+		CHECK(cudaMemcpy(cg_dir_d, cg_directions, SIZEINT(m*n*h), cudaMemcpyHostToDevice));
+		//	initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d);
+	}
+#endif
+
 
 	FLOAT_TYPE *f_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
@@ -215,6 +302,14 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	if (args->TypeOfResiduals == FdRelDiff) {
 		fprev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	}
+
+	if(args->multiPhase){
+		CHECK(cudaMemcpy(f_d,f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(r_rho_d,r_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(b_rho_d,b_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(rho_d,rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+	}
+
 	FLOAT_TYPE *temp19a_d, *temp19b_d;
 	if (args->TypeOfResiduals != MacroDiff) {
 		temp19a_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
@@ -239,7 +334,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			stream, bcType, bcMask, bcIdx, mask, delta, m, n, h, numConns,
 			args->boundaryType);
 	unsigned long long *bcMask_d = createGpuArrayLongLong(m * n * h, ARRAY_COPY,
-				0, bcMask);
+			0, bcMask);
 	int *bcIdxCollapsed_d = createGpuArrayInt(bcCount, ARRAY_ZERO);
 	unsigned long long *bcMaskCollapsed_d = createGpuArrayLongLong(bcCount,
 			ARRAY_ZERO);
@@ -258,10 +353,13 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 
 	bool *stream_d = createGpuArrayBool(18 * m * n * h, ARRAY_COPY, 0, stream);
 
+#if CUDA
 	CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+#endif
+
 	CHECK(cudaEventRecord(stop, 0));
 	CHECK(cudaEventSynchronize(stop));
 	CHECK(cudaEventElapsedTime(&cudatime, start, stop));
@@ -274,20 +372,33 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	void *hostArrays[] = { nodeIdX, nodeIdY, nodeIdZ, nodeX, nodeY, nodeZ,
 			nodeType, bcNodeIdX, bcNodeIdY, bcNodeIdZ, latticeId, bcType, bcX,
 			bcY, bcZ, bcBoundId, u, v, w, rho, mask, bcMask, bcIdx, stream, q,
-			norm, dragSum, liftSum, latFSum };
+			norm, dragSum, liftSum, latFSum,
+			r_rho, b_rho, st_error, color_gradient, r_f,b_f, r_fColl, b_fColl, cg_directions, f};
+
 	void *gpuArrays[] =
-			{ coordX_d, coordY_d, coordZ_d, fluid_d, bcNodeIdX_d, bcNodeIdY_d,
-					bcNodeIdZ_d, latticeId_d, bcType_d, bcX_d, bcY_d, bcZ_d,
-					bcBoundId_d, u_d, v_d, w_d, rho_d, u1_d, v1_d, w1_d, f_d,
-					fColl_d, temp19a_d, temp19b_d, tempA_d, tempB_d,
-					bcBoundId_d, bcMaskCollapsed_d, bcIdx_d, bcIdxCollapsed_d,
-					stream_d, qCollapsed_d }; //drag_d, lift_d, latF_d,
+	{ coordX_d, coordY_d, coordZ_d, fluid_d, bcNodeIdX_d, bcNodeIdY_d,
+			bcNodeIdZ_d, latticeId_d, bcType_d, bcX_d, bcY_d, bcZ_d,
+			bcBoundId_d, u_d, v_d, w_d, rho_d, u1_d, v1_d, w1_d, f_d, fColl_d, tempA_d, tempB_d,
+			bcMaskCollapsed_d, bcIdx_d, bcIdxCollapsed_d,
+			stream_d, qCollapsed_d}; //drag_d, lift_d, latF_d,
+
+	void *mpGpuArrays[] = {
+			r_rho_d, b_rho_d, r_f_d, b_f_d, r_fColl_d, b_fColl_d, cg_dir_d
+	};
+
+	void *FDdifGpuArrays[] = {
+			fprev_d, f1_d
+	};
+
+	void *nonMacroDiffGpuArrays[] = {
+			temp19a_d, temp19b_d
+	};
 
 	fprintf(logFile, "\n:::: Initialization done! ::::\n");
 
 	printf("Initialization took %f seconds\n", taskTime[T_INIT]);
 
-// Write Initialized data
+	// Write Initialized data
 	switch (args->outputFormat) {
 	case CSV:
 		sprintf(outputFilename, "%sInitialData.csv", inFn->result);
@@ -300,14 +411,20 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		break;
 	}
 	tInstant1 = clock(); // Start measuring time
-	WriteResults3D(outputFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,
-			nodeType, n, m, h, args->outputFormat);
+	if(args->multiPhase){
+		WriteResultsMultiPhase(outputFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
+				n, m, h, args->outputFormat);
+	}
+	else{
+		WriteResults3D(outputFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,
+				nodeType, n, m, h, args->outputFormat);
+	}
 	tInstant2 = clock();
 	taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1) / CLOCKS_PER_SEC;
 
 	printf("\nInitialized data was written to %s\n", outputFilename);
 
-////////////////// ITERATION ///////////////////////
+	////////////////// ITERATION ///////////////////////
 
 	fprintf(logFile, "\n:::: Start Iterations ::::\n");
 	printf("\n:::: Start Iterations ::::\n");
@@ -333,23 +450,30 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		////////////// COLLISION ///////////////
 		switch (args->collisionModel) {
 		case BGKW:
-			gpuCollBgkw3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d,
-					fColl_d);
+			if(args->multiPhase){
+#if !CUDA
+				mp3DColl(n, m, h, rho, u, v, w, r_rho, b_rho, w_pert, color_gradient, args->beta,
+						args->g_limit, args->A,r_fColl, b_fColl, weight, cx, cy, cz, f, args->r_viscosity,
+						args->b_viscosity, args->r_alpha, args->b_alpha, chi, phi, psi, teta, cg_w);
+#else
+				gpuCollBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d);
+#endif
+			}
+			else{
+				gpuCollBgkw3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d,
+						fColl_d);
+			}
 			break;
 
 		case TRT:
 			printf("TRT not implemented in 3D go for MRT \n");
-//        gpuCollTrt<<<bpg1,tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d, fColl_d);
+			//        gpuCollTrt<<<bpg1,tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d, fColl_d);
 			break;
 
 		case MRT:
 			gpuCollMrt3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d,
 					fColl_d);
 			break;
-//gpuCollMrt3D_short<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d, f_d,
-//								fColl_d);
-//			break;
-
 		}
 
 		CHECK(cudaEventRecord(stop, 0));
@@ -361,7 +485,17 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaThreadSynchronize());
 		CHECK(cudaEventRecord(start, 0));
 
-		gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, f_d, fColl_d);
+		if(args->multiPhase){
+#if !CUDA
+			streamMP3D(n, m, h, r_f, b_f, r_fColl, b_fColl, stream);
+#else
+			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
+			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
+#endif
+		}
+		else{
+			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, f_d, fColl_d);
+		}
 
 		CHECK(cudaEventRecord(stop, 0));
 		CHECK(cudaEventSynchronize(stop));
@@ -383,27 +517,38 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaThreadSynchronize());
 		CHECK(cudaEventRecord(start, 0));
 
-		gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
-				u1_d, v1_d, w1_d, bcCount);
-		switch (args->bcwallmodel) {
-		case SIMPLE:
-			gpuBcSimpleWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
-					bcMaskCollapsed_d, f_d, fColl_d, qCollapsed_d, bcCount);
-
-			break;
-		case COMPLEX:
-			gpuBcComplexWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
-					bcMaskCollapsed_d, f_d, fColl_d, qCollapsed_d, bcCount);
-
-			break;
+		if(args->multiPhase){
+#if !CUDA
+			peridicBoundaries3D(n, m, h,r_f, b_f, r_rho, b_rho);
+#else
+			gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, r_f_d,
+					bcCount);
+			gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, b_f_d,
+					bcCount);
+#endif
 		}
-		gpuBcOutlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
-				u_d, v_d, w_d, rho_d, bcCount);
-		gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
-				bcCount);
-		gpuBcSymm3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
-				bcCount);
+		else{
+			gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
+					u1_d, v1_d, w1_d, bcCount);
+			switch (args->bcwallmodel) {
+			case SIMPLE:
+				gpuBcSimpleWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
+						bcMaskCollapsed_d, f_d, fColl_d, qCollapsed_d, bcCount);
 
+				break;
+			case COMPLEX:
+				gpuBcComplexWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
+						bcMaskCollapsed_d, f_d, fColl_d, qCollapsed_d, bcCount);
+
+				break;
+			}
+			gpuBcOutlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
+					u_d, v_d, w_d, rho_d, bcCount);
+			gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
+					bcCount);
+			gpuBcSymm3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, f_d,
+					bcCount);
+		}
 		CHECK(cudaEventRecord(stop, 0));
 		CHECK(cudaEventSynchronize(stop));
 		CHECK(cudaEventElapsedTime(&cudatime, start, stop));
@@ -413,9 +558,19 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaThreadSynchronize());
 		CHECK(cudaEventRecord(start, 0));
 
-		gpuUpdateMacro3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d,
-				bcBoundId_d, coordX_d, coordY_d, coordZ_d, f_d, args->g,bcMask_d,args->UpdateInltOutl);
-
+		if(args->multiPhase){
+#if !CUDA
+			updateMacroMP3D(n, m, h, u, v, w, r_rho, b_rho, r_f, b_f, rho, args->control_param,args->r_alpha, args->b_alpha,
+					args->bubble_radius,st_error, iter, st_predicted, cx, cy, cz, f);
+#else
+			gpuUpdateMacro3DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d,
+					bcBoundId_d, f_d, args->g,bcMask_d,args->UpdateInltOutl, r_f_d, b_f_d, r_rho_d, b_rho_d);
+#endif
+		}
+		else{
+			gpuUpdateMacro3D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, w_d,
+					bcBoundId_d, coordX_d, coordY_d, coordZ_d, f_d, args->g,bcMask_d,args->UpdateInltOutl);
+		}
 		tInstant2 = clock();
 		CHECK(cudaEventRecord(stop, 0));
 		CHECK(cudaEventSynchronize(stop));
@@ -423,16 +578,29 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		taskTime[T_MACR] += cudatime;
 
 		// COMPUTE RESIDUALS
+
 		if (AuxMacroDiff * args->ShowMacroDiff == iter + 1) {
 			CHECK(cudaThreadSynchronize());
 			CHECK(cudaEventRecord(start, 0));
 
 			if (args->TypeOfResiduals == L2) {
-
+				if(args->multiPhase){
+#if !CUDA
+					CHECK(cudaMemcpy(f_d,r_f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+					CHECK(cudaMemcpy(fColl_d,r_fColl,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+#endif
+				}
 				r = computeResidual3D(f_d, fColl_d, temp19a_d, temp19b_d, m, n,
 						h);
-			} else {
+			}
+			else {
 				if (args->TypeOfResiduals == FdRelDiff) {
+					if(args->multiPhase){
+#if !CUDA
+						CHECK(cudaMemcpy(f_d,r_f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+#endif
+					}
+
 					if (firstIter) {
 						firstIter = false;
 						f1_d = createGpuArrayFlt(19 * n * m * h, ARRAY_CPYD, 0,
@@ -446,10 +614,17 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 							f_d);
 
 				} else {
+					if(args->multiPhase){
+#if !CUDA
+						CHECK(cudaMemcpy(u_d,u,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+						CHECK(cudaMemcpy(v_d,v,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+						CHECK(cudaMemcpy(w_d,w,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+						CHECK(cudaMemcpy(rho_d,rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
+#endif
+					}
 					bool h_divergence = false;
 					CHECK(cudaMalloc(&d_divergence,sizeof(bool)));
-					CHECK(
-							cudaMemcpy(d_divergence,&h_divergence,sizeof(bool),cudaMemcpyHostToDevice));
+					CHECK(cudaMemcpy(d_divergence,&h_divergence,sizeof(bool),cudaMemcpyHostToDevice));
 					gpu_abs_sub<<<bpg1, tpb>>>(u_d, u_prev_d, tempA_d,
 							n * m * h, d_divergence);
 					uMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
@@ -469,10 +644,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						break;
 					}
 					rhoMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
-					if (abs(uMaxDiff) < args->StopCondition[0]
-							&& abs(vMaxDiff) < args->StopCondition[1]
-							&& abs(wMaxDiff) < args->StopCondition[2]
-							&& abs(rhoMaxDiff) < args->StopCondition[3]) {
+					if (abs(uMaxDiff) < args->StopCondition[0] &&
+							abs(vMaxDiff) < args->StopCondition[1] &&
+							abs(wMaxDiff) < args->StopCondition[2] &&
+							abs(rhoMaxDiff) < args->StopCondition[3]) {
 						printf("simulation converged!\n");
 						break;
 					}
@@ -514,13 +689,13 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 					"Iterating... %d/%d (%3.1f %%) Max macro diffs: u= %.10f v= %.10f w= %.10f rho= %.10f \r",
 					iter + 1, args->iterations,
 					(FLOAT_TYPE) (iter + 1) * 100
-							/ (FLOAT_TYPE) (args->iterations), uMaxDiff,
+					/ (FLOAT_TYPE) (args->iterations), uMaxDiff,
 					vMaxDiff, wMaxDiff, rhoMaxDiff);
 		} else {
 			printf("Iterating... %d/%d (%3.1f %%)  residual="FLOAT_FORMAT" \r",
 					iter + 1, args->iterations,
 					(FLOAT_TYPE) (iter + 1) * 100
-							/ (FLOAT_TYPE) (args->iterations), r);
+					/ (FLOAT_TYPE) (args->iterations), r);
 		}
 
 		iter++; // update loop variable
@@ -532,14 +707,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			if (iter > args->autosaveAfter) {
 				printf("autosave\n\n");
 				//////////// COPY VARIABLES TO HOST ////////////////
-				CHECK(
-						cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-				CHECK(
-						cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-				CHECK(
-						cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
-				CHECK(
-						cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 
 				switch (args->outputFormat) {
 				case CSV:
@@ -561,7 +732,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						u, v, w, rho, nodeType, n, m, h, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-						/ CLOCKS_PER_SEC;
+																																																				/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -584,11 +755,17 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		writeResiduals(residualsFilename, norm, dragSum, liftSum, m * n * h,
 				args->iterations);
 	}
-// Write final data
+	// Write final data
+#if CUDA
 	CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(w, w_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(rho, rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	if(args->multiPhase){
+		CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+		CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n*h), cudaMemcpyDeviceToHost));
+	}
+#endif
 
 	switch (args->outputFormat) {
 	case CSV:
@@ -601,25 +778,39 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		sprintf(finalFilename, "%sFinalData.vti", inFn->result);
 		break;
 	}
-
-	WriteResults3D(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,
-			nodeType, n, m, h, args->outputFormat);
+	if(args->multiPhase){
+		WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
+				n, m, h, args->outputFormat);
+	}
+	else{
+		WriteResults3D(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,
+				nodeType, n, m, h, args->outputFormat);
+	}
 
 	WriteLidDrivenCavityMidLines3D(nodeX, nodeY, nodeZ, u, w, n, m, h, args->u);
 	WriteChannelCrossSection3D(nodeX, nodeY, nodeZ, u, v, w, n, m, h, args->u);
 
-// Write information for user
+	// Write information for user
 	printf("\n\nLog was written to %s\n", logFilename);
 	printf("Last autosave result can be found at %s\n", autosaveFilename);
 	printf("residuals were written to %s\n", residualsFilename);
 	printf("Profiling results were written to %s\n", timeFilename);
+	//	compareTestFiles("./TestValues/CUDA/cg2d.txt", "./TestValues/CUDA/cg3d.txt");
 	printf("Final results were written to %s\n", finalFilename);
 
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
-
 	freeAllHost(hostArrays, sizeof(hostArrays) / sizeof(hostArrays[0]));
 	freeAllGpu(gpuArrays, sizeof(gpuArrays) / sizeof(gpuArrays[0]));
+	if(args->multiPhase){
+		freeAllGpu(mpGpuArrays, sizeof(mpGpuArrays) / sizeof(mpGpuArrays[0]));
+	}
+	if (args->TypeOfResiduals == FdRelDiff) {
+		freeAllGpu(FDdifGpuArrays, sizeof(FDdifGpuArrays) / sizeof(FDdifGpuArrays[0]));
+	}
+	if (args->TypeOfResiduals != MacroDiff) {
+		freeAllGpu(nonMacroDiffGpuArrays, sizeof(nonMacroDiffGpuArrays) / sizeof(nonMacroDiffGpuArrays[0]));
+	}
 
 	return 0;
 }
