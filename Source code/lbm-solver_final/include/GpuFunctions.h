@@ -454,6 +454,8 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* w_d, int* bcBoundId_d,
 		FLOAT_TYPE* f_d, FLOAT_TYPE g, unsigned long long *bcMask_d,int updateInltOutl, FLOAT_TYPE* r_f_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* r_rho_d,
 		FLOAT_TYPE* b_rho_d);
+__global__ void initCGBubble3D(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d,
+		FLOAT_TYPE *b_f_d, FLOAT_TYPE *f_d, int test_case);
 // to be used in 2D inlet profile computation in gpuInitInletProfile3D
 //from: http://stackoverflow.com/questions/18455414/how-to-do-power-of-complex-number-in-cublas
 //__host__ __device__ FLOAT_TYPE  carg(const cuDoubleComplex& z) {return (FLOAT_TYPE )atan2(cuCimag(z), cuCreal(z));} // polar angle
