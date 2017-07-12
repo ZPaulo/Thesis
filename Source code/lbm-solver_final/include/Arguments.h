@@ -127,6 +127,8 @@ typedef struct arg
     FLOAT_TYPE g_limit;
     //Bubble case
     FLOAT_TYPE bubble_radius;
+    //COUETTE case
+    FLOAT_TYPE kappa;
 
 } Arguments;
 

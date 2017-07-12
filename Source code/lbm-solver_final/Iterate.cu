@@ -18,7 +18,7 @@
 #include "Multiphase.h"
 #include "GpuSum.h"
 
-#define CUDA 1
+#define CUDA 0
 
 int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	// Time measurement: declaration, begin
@@ -177,8 +177,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			b_phi[i] = (1.0 - args->b_alpha) / 20.0;
 
 
-		//createBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho);
-		createCoalescenceBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho);
+		createBubble(nodeX, nodeY,n,m,args->bubble_radius, r_f, b_f,r_rho,b_rho, args->r_density, args->b_density, r_phi, b_phi, rho, 2);
 	}
 #endif
 	FLOAT_TYPE *rho_d = createGpuArrayFlt(m * n, ARRAY_FILL, args->rho);
@@ -317,18 +316,6 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	int iter = 0;
 	while (iter < args->iterations) {
 
-
-		//		if(args->multiPhase){
-		//			CHECK(cudaMemcpy(r_rho_d, r_rho, SIZEFLT(m * n), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(b_rho_d, b_rho, SIZEFLT(m * n), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(r_f_d, r_f, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(b_f_d, b_f, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(r_fColl_d, r_fColl, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(b_fColl_d, b_fColl, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(u_d, u, SIZEFLT(m * n), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(v_d, v, SIZEFLT(m * n), cudaMemcpyHostToDevice));
-		//			CHECK(cudaMemcpy(rho_d, rho, SIZEFLT(m * n), cudaMemcpyHostToDevice));
-		//		}
 		CHECK(cudaThreadSynchronize());
 		CHECK(cudaEventRecord(start, 0)); // Start measuring time
 		switch (args->collisionModel) {
@@ -401,7 +388,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 		if(args->multiPhase){
 #if !CUDA
-			peridicBoundaries(n, m, r_f, b_f);
+			peridicBoundaries(n, m, r_f, b_f,u,v,r_rho,b_rho, rho, 2);
 #else
 			gpuBcPeriodic2D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, r_f_d, b_f_d,bcCount, cg_dir_d);
 #endif
@@ -431,7 +418,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		if(args->multiPhase){
 #if !CUDA
 			updateMacroMP(n,m,u,v,r_rho, b_rho, r_f, b_f, rho, args->control_param,args->r_alpha, args->b_alpha,
-					args->bubble_radius,st_error, iter,st_predicted);
+					args->bubble_radius,st_error, iter,st_predicted,2);
 #else
 			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, r_f_d, b_f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d);
 

@@ -319,33 +319,97 @@ void mp3DColl(int n, int m, int h, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 }
 
 void createBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
-		FLOAT_TYPE r_density, FLOAT_TYPE b_density, FLOAT_TYPE *r_phi, FLOAT_TYPE *b_phi, FLOAT_TYPE *rho) {
+		FLOAT_TYPE r_density, FLOAT_TYPE b_density, FLOAT_TYPE *r_phi, FLOAT_TYPE *b_phi, FLOAT_TYPE *rho, int test_case) {
 	int i, j, k;
 	int index, index2;
-	for (j=0; j < m; j++){
-		for(i = 0; i < n; i++){
-			index = j * n + i;
+	FLOAT_TYPE r_temp = 0.0, b_temp = 0.0;
+	switch (test_case) {
+	case 1:
+		for (j=0; j < m; j++){
+			for(i = 0; i < n; i++){
+				index = j * n + i;
 
-			if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5),2)) <= radius ){
-				r_rho[index] = r_density;
-				for (k=0; k < 9; k++){
-					// initialise distribution function with small, non-zero values
-					index2 = i + j * n + k * m * n;
-					r_f[index2] = r_rho[index] * r_phi[k];
+				if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5),2)) <= radius ){
+					r_rho[index] = r_density;
+					for (k=0; k < 9; k++){
+						// initialise distribution function with small, non-zero values
+						index2 = i + j * n + k * m * n;
+						r_f[index2] = r_rho[index] * r_phi[k];
+					}
 				}
-			}
-			else {
-				b_rho[index]=b_density;
-				for (k=0; k < 9; k++){
-					// initialise distribution function with small, non-zero values
-					index2 = i + j * n + k * m * n;
-					b_f[index2]   = b_rho[index]*b_phi[k];
+				else {
+					b_rho[index]=b_density;
+					for (k=0; k < 9; k++){
+						// initialise distribution function with small, non-zero values
+						index2 = i + j * n + k * m * n;
+						b_f[index2]   = b_rho[index]*b_phi[k];
+					}
 				}
+				// initialise density
+				rho[index] = r_rho[index]+b_rho[index];
 			}
-			// initialise density
-			rho[index] = r_rho[index]+b_rho[index];
 		}
+		break;
+	case 2:
+		for (j=0; j < m; j++){
+			for(i = 0; i < n; i++){
+				index = j * n + i;
+				r_temp = b_temp = 0.0;
+				if( y[index] < 0.5 ){
+					//r_rho[index] = r_density;
+					for (k=0; k < 9; k++){
+						// initialise distribution function with small, non-zero values
+						index2 = i + j * n + k * m * n;
+						r_f[index2] = r_density * r_phi[k];
+						r_temp += r_f[index2];
+					}
+				}
+				else {
+					//b_rho[index]=b_density;
+					for (k=0; k < 9; k++){
+						// initialise distribution function with small, non-zero values
+						index2 = i + j * n + k * m * n;
+						b_f[index2]   = b_density*b_phi[k];
+						b_temp += b_f[index2];
+					}
+				}
+				r_rho[index] = r_temp;
+				b_rho[index] = b_temp;
+				// initialise density
+				rho[index] = r_rho[index]+b_rho[index];
+			}
+		}
+		break;
+	case 3:
+		for (j=0; j < m; j++){
+			for(i = 0; i < n; i++){
+				index = j * n + i;
+
+				if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5 + radius),2)) <= radius || sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5 - radius),2)) <= radius){
+					r_rho[index] = r_density;
+					for (k=0; k < 9; k++){
+						// initialise distribution function with small, non-zero values
+						index2 = i + j * n + k * m * n;
+						r_f[index2] = r_rho[index] * r_phi[k];
+					}
+				}
+				else {
+					b_rho[index]=b_density;
+					for (k=0; k < 9; k++){
+						// initialise distribution function with small, non-zero values
+						index2 = i + j * n + k * m * n;
+						b_f[index2]   = b_rho[index]*b_phi[k];
+					}
+				}
+				// initialise density
+				rho[index] = r_rho[index]+b_rho[index];
+			}
+		}
+		break;
+	default:
+		break;
 	}
+
 }
 
 void createBubble3D(FLOAT_TYPE *x, FLOAT_TYPE *y, FLOAT_TYPE *z, int n, int m, int h, FLOAT_TYPE radius, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
@@ -385,7 +449,7 @@ void createBubble3D(FLOAT_TYPE *x, FLOAT_TYPE *y, FLOAT_TYPE *z, int n, int m, i
 }
 
 void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *rho, FLOAT_TYPE control_param,
-		FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE *st_error, int iteration, FLOAT_TYPE st_predicted){
+		FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE *st_error, int iteration, FLOAT_TYPE st_predicted, int test_case){
 
 	int index_aux1=0;
 	int index_aux2=0;
@@ -398,9 +462,23 @@ void updateMacroMP(int n, int m, FLOAT_TYPE *u, FLOAT_TYPE *v,FLOAT_TYPE *r_rho,
 	int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
 	int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
 	FLOAT_TYPE st_laplace;
-	// Density and Velocity
-	for (int j=1; j < m - 1;j++){
-		for (int i=1; i < n - 1; i++){
+	int start_index, end_index;
+	switch(test_case){
+	case 1:
+		start_index = 0;
+		end_index = m;
+		break;
+	case 2:
+		start_index = 1;
+		end_index = m-1;
+		break;
+	default:
+		start_index = 0;
+		end_index = m;
+		break;
+	}
+	for (int j=start_index; j < end_index;j++){
+		for (int i=0; i < n; i++){
 			// auxiliar variables
 			u_cum=0.0;
 			v_cum=0.0;
@@ -516,38 +594,92 @@ void updateMacroMP3D(int n, int m, int h, FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TY
 	st_error[iteration]=abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
 
-void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f){
+void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE *rho, int test_case){
 
-	int index_end, index_start;
+	int index_end, index_start, corner_index;
 	int jn = m-1;
 	int js = 0;
 	int ie = n-1;
 	int iw = 0;
+	FLOAT_TYPE r_temp, b_temp, u_temp = 0.0001, v_temp = 0.0;
 
-	for (int i=1; i < n-1; i++){
-		// north boundary
-		index_end = jn * n + i;
-		index_start = js * n + i;
+	switch(test_case){
+	case 1:
+		for (int i=1; i < n-1; i++){
+			// north boundary
+			index_end = jn * n + i;
+			index_start = js * n + i;
 
-		r_f[index_end + 4 * m * n] = r_f[index_start + 4 * m * n];
-		r_f[index_end + 7 * m * n] = r_f[index_start + 7 * m * n];
-		r_f[index_end + 8 * m * n] = r_f[index_start + 8 * m * n];
+			r_f[index_end + 4 * m * n] = r_f[index_start + 4 * m * n];
+			r_f[index_end + 7 * m * n] = r_f[index_start + 7 * m * n];
+			r_f[index_end + 8 * m * n] = r_f[index_start + 8 * m * n];
 
-		b_f[index_end + 4 * m * n] = b_f[index_start + 4 * m * n];
-		b_f[index_end + 7 * m * n] = b_f[index_start + 7 * m * n];
-		b_f[index_end + 8 * m * n] = b_f[index_start + 8 * m * n];
+			b_f[index_end + 4 * m * n] = b_f[index_start + 4 * m * n];
+			b_f[index_end + 7 * m * n] = b_f[index_start + 7 * m * n];
+			b_f[index_end + 8 * m * n] = b_f[index_start + 8 * m * n];
 
-		//south boundary
-		r_f[index_start + 2 * m * n] = r_f[index_end + 2 * m * n];
-		r_f[index_start + 5 * m * n] = r_f[index_end + 5 * m * n];
-		r_f[index_start + 6 * m * n] = r_f[index_end + 6 * m * n];
+			//south boundary
+			r_f[index_start + 2 * m * n] = r_f[index_end + 2 * m * n];
+			r_f[index_start + 5 * m * n] = r_f[index_end + 5 * m * n];
+			r_f[index_start + 6 * m * n] = r_f[index_end + 6 * m * n];
 
-		b_f[index_start + 2 * m * n] = b_f[index_end + 2 * m * n];
-		b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
-		b_f[index_start + 6 * m * n] = b_f[index_end + 6 * m * n];
+			b_f[index_start + 2 * m * n] = b_f[index_end + 2 * m * n];
+			b_f[index_start + 5 * m * n] = b_f[index_end + 5 * m * n];
+			b_f[index_start + 6 * m * n] = b_f[index_end + 6 * m * n];
+		}
+		break;
+	case 2:
+		for (int i=1; i < n-1; i++){
+			// north boundary
+			index_end = jn * n + i;
+			index_start = js * n + i;
+
+			u_temp = 0.0001;
+			r_temp = (1. / (1. + v_temp)) * (r_f[index_end] + r_f[index_end + 1 * m * n] + r_f[index_end + 3 * m * n]
+			                                                                                   + 2 * (r_f[index_end + 2 * m * n] + r_f[index_end + 6 * m * n] + r_f[index_end + 5 * m * n]) );
+			b_temp = (1. / (1. + v_temp)) * (b_f[index_end] + b_f[index_end + 1 * m * n] + b_f[index_end + 3 * m * n]
+			                                                                                   + 2 * (b_f[index_end + 2 * m * n] + b_f[index_end + 6 * m * n] + b_f[index_end + 5 * m * n]) );
+
+			r_f[index_end + 4 * m * n] = r_f[index_end + 2 * m * n] - (2. / 3.) * r_temp*v_temp;
+			r_f[index_end + 7 * m * n] = r_f[index_end + 5 * m * n] + 0.5 * (r_f[index_end + 1 * m * n] - r_f[index_end + 3 * m * n]) - (1. / 6.) * (r_temp*v_temp) - 0.5 * (r_temp*u_temp);
+			r_f[index_end + 8 * m * n] = r_f[index_end + 6 * m * n] + 0.5 * (r_f[index_end + 3 * m * n] - r_f[index_end + 1 * m * n]) - (1. / 6.) * (r_temp*v_temp) - 0.5 * (r_temp*u_temp);
+
+			b_f[index_end + 4 * m * n] = b_f[index_end + 2 * m * n] - (2. / 3.) * b_temp*v_temp;
+			b_f[index_end + 7 * m * n] = b_f[index_end + 5 * m * n] + 0.5 * (b_f[index_end + 1 * m * n] - b_f[index_end + 3 * m * n]) - (1. / 6.) * (b_temp*v_temp) - 0.5 * (b_temp*u_temp);
+			b_f[index_end + 8 * m * n] = b_f[index_end + 6 * m * n] + 0.5 * (b_f[index_end + 3 * m * n] - b_f[index_end + 1 * m * n]) - (1. / 6.) * (b_temp*v_temp) - 0.5 * (b_temp*u_temp);
+
+			r_rho[index_end] = r_temp;
+			b_rho[index_end] = b_temp;
+			rho[index_end] = r_temp + b_temp;
+			u[index_end] = u_temp;
+			u[index_end] = v_temp;
+
+			//south boundary
+			u_temp = 0.0;
+
+			r_temp = (1. / (1. - v_temp)) * (r_f[index_start] + r_f[index_start + 1 * m * n] + r_f[index_start + 3 * m * n]
+			                                                                                       + 2 * (r_f[index_start + 4 * m * n] + r_f[index_start + 7 * m * n] + r_f[index_start + 8 * m * n]));
+			b_temp = (1. / (1. - v_temp)) * (b_f[index_start] + b_f[index_start + 1 * m * n] + b_f[index_start + 3 * m * n]
+			                                                                                       + 2 * (b_f[index_start + 4 * m * n] + b_f[index_start + 7 * m * n] + b_f[index_start + 8 * m * n]));
+
+			r_f[index_start + 2 * m * n] = r_f[index_start + 4 * m * n] + (2. / 3.) * r_temp*v_temp;
+			r_f[index_start + 5 * m * n] = r_f[index_start + 7 * m * n] - 0.5 * (r_f[index_start + 1 * m * n] - r_f[index_start + 3 * m * n]) + (1. / 6.) * (r_temp*v_temp) + 0.5 * (r_temp*u_temp);
+			r_f[index_start + 6 * m * n] = r_f[index_start + 8 * m * n] + 0.5 * (r_f[index_start + 1 * m * n] - r_f[index_start + 3 * m * n]) + (1. / 6.) * (r_temp*v_temp) - 0.5 * (r_temp*u_temp);
+
+			b_f[index_start + 2 * m * n] = b_f[index_start + 4 * m * n] + (2. / 3.) * b_temp*v_temp;
+			b_f[index_start + 5 * m * n] = b_f[index_start + 7 * m * n] - 0.5 * (b_f[index_start + 1 * m * n] - b_f[index_start + 3 * m * n]) + (1. / 6.) * (b_temp*v_temp) + 0.5 * (b_temp*u_temp);
+			b_f[index_start + 6 * m * n] = b_f[index_start + 8 * m * n] + 0.5 * (b_f[index_start + 1 * m * n] - b_f[index_start + 3 * m * n]) + (1. / 6.) * (b_temp*v_temp) - 0.5 * (b_temp*u_temp);
+
+			r_rho[index_start] = r_temp;
+			b_rho[index_start] = b_temp;
+			rho[index_start] = r_temp + b_temp;
+			u[index_start] = u_temp;
+			u[index_start] = v_temp;
+		}
+		break;
+	default:
+		break;
 	}
-
-
 
 	for (int j=1; j < m-1; j++){
 		// east boundary
@@ -573,42 +705,132 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f){
 
 	}
 
-	// north-east corner
-	r_f[(jn*n+ie) + 3 * m * n] = r_f[(jn*n+iw) + 3 * m * n];
-	r_f[(jn*n+ie) + 4 * m * n] = r_f[(js*n+ie) + 4 * m * n];
-	r_f[(jn*n+ie) + 7 * m * n] = r_f[(js*n+iw) + 7 * m * n];
+	switch(test_case){
+	case 1:
+		// north-east corner
+		r_f[(jn*n+ie) + 3 * m * n] = r_f[(jn*n+iw) + 3 * m * n];
+		r_f[(jn*n+ie) + 4 * m * n] = r_f[(js*n+ie) + 4 * m * n];
+		r_f[(jn*n+ie) + 7 * m * n] = r_f[(js*n+iw) + 7 * m * n];
 
-	b_f[(jn*n+ie) + 3 * m * n] = b_f[(jn*n+iw) + 3 * m * n];
-	b_f[(jn*n+ie) + 4 * m * n] = b_f[(js*n+ie) + 4 * m * n];
-	b_f[(jn*n+ie) + 7 * m * n] = b_f[(js*n+iw) + 7 * m * n];
+		b_f[(jn*n+ie) + 3 * m * n] = b_f[(jn*n+iw) + 3 * m * n];
+		b_f[(jn*n+ie) + 4 * m * n] = b_f[(js*n+ie) + 4 * m * n];
+		b_f[(jn*n+ie) + 7 * m * n] = b_f[(js*n+iw) + 7 * m * n];
 
-	// north-west corner
-	r_f[(jn*n+iw) + 1 * m * n] = r_f[(jn*n+ie) + 1 * m * n];
-	r_f[(jn*n+iw) + 4 * m * n] = r_f[(js*n+iw) + 4 * m * n];
-	r_f[(jn*n+iw) + 8 * m * n] = r_f[(js*n+ie) + 8 * m * n];
+		// north-west corner
+		r_f[(jn*n+iw) + 1 * m * n] = r_f[(jn*n+ie) + 1 * m * n];
+		r_f[(jn*n+iw) + 4 * m * n] = r_f[(js*n+iw) + 4 * m * n];
+		r_f[(jn*n+iw) + 8 * m * n] = r_f[(js*n+ie) + 8 * m * n];
 
-	b_f[(jn*n+iw) + 1 * m * n] = b_f[(jn*n+ie) + 1 * m * n];
-	b_f[(jn*n+iw) + 4 * m * n] = b_f[(js*n+iw) + 4 * m * n];
-	b_f[(jn*n+iw) + 8 * m * n] = b_f[(js*n+ie) + 8 * m * n];
+		b_f[(jn*n+iw) + 1 * m * n] = b_f[(jn*n+ie) + 1 * m * n];
+		b_f[(jn*n+iw) + 4 * m * n] = b_f[(js*n+iw) + 4 * m * n];
+		b_f[(jn*n+iw) + 8 * m * n] = b_f[(js*n+ie) + 8 * m * n];
 
-	// south-east corner
-	r_f[(js*n+ie) + 2 * m * n] = r_f[(jn*n+ie) + 2 * m * n];
-	r_f[(js*n+ie) + 3 * m * n] = r_f[(js*n+iw) + 3 * m * n];
-	r_f[(js*n+ie) + 6 * m * n] = r_f[(jn*n+iw) + 6 * m * n];
+		// south-east corner
+		r_f[(js*n+ie) + 2 * m * n] = r_f[(jn*n+ie) + 2 * m * n];
+		r_f[(js*n+ie) + 3 * m * n] = r_f[(js*n+iw) + 3 * m * n];
+		r_f[(js*n+ie) + 6 * m * n] = r_f[(jn*n+iw) + 6 * m * n];
 
-	b_f[(js*n+ie) + 2 * m * n] = b_f[(jn*n+ie) + 2 * m * n];
-	b_f[(js*n+ie) + 3 * m * n] = b_f[(js*n+iw) + 3 * m * n];
-	b_f[(js*n+ie) + 6 * m * n] = b_f[(jn*n+iw) + 6 * m * n];
+		b_f[(js*n+ie) + 2 * m * n] = b_f[(jn*n+ie) + 2 * m * n];
+		b_f[(js*n+ie) + 3 * m * n] = b_f[(js*n+iw) + 3 * m * n];
+		b_f[(js*n+ie) + 6 * m * n] = b_f[(jn*n+iw) + 6 * m * n];
 
 
-	// south-west corner
-	r_f[(js*n+iw) + 2 * m * n] = r_f[(jn*n+iw) + 2 * m * n];
-	r_f[(js*n+iw) + 1 * m * n] = r_f[(js*n+ie) + 1 * m * n];
-	r_f[(js*n+iw) + 5 * m * n] = r_f[(jn*n+ie) + 5 * m * n];
+		// south-west corner
+		r_f[(js*n+iw) + 2 * m * n] = r_f[(jn*n+iw) + 2 * m * n];
+		r_f[(js*n+iw) + 1 * m * n] = r_f[(js*n+ie) + 1 * m * n];
+		r_f[(js*n+iw) + 5 * m * n] = r_f[(jn*n+ie) + 5 * m * n];
 
-	b_f[(js*n+iw) + 2 * m * n] = b_f[(jn*n+iw) + 2 * m * n];
-	b_f[(js*n+iw) + 1 * m * n] = b_f[(js*n+ie) + 1 * m * n];
-	b_f[(js*n+iw) + 5 * m * n] = b_f[(jn*n+ie) + 5 * m * n];
+		b_f[(js*n+iw) + 2 * m * n] = b_f[(jn*n+iw) + 2 * m * n];
+		b_f[(js*n+iw) + 1 * m * n] = b_f[(js*n+ie) + 1 * m * n];
+		b_f[(js*n+iw) + 5 * m * n] = b_f[(jn*n+ie) + 5 * m * n];
+		break;
+	case 2:
+		// north-east corner
+		corner_index = jn*n+ie;
+		r_f[(corner_index) + 3 * m * n] = r_f[(corner_index) + 1 * m * n];
+		r_f[(corner_index) + 4 * m * n] = r_f[(corner_index) + 2 * m * n];
+		r_f[(corner_index) + 7 * m * n] = r_f[(corner_index) + 5 * m * n];
+
+		b_f[(corner_index) + 3 * m * n] = b_f[(corner_index) + 1 * m * n];
+		b_f[(corner_index) + 4 * m * n] = b_f[(corner_index) + 2 * m * n];
+		b_f[(corner_index) + 7 * m * n] = b_f[(corner_index) + 5 * m * n];
+
+		r_temp = b_temp = 0.0;
+		for(int dir = 0; dir < 9; dir++){
+			r_temp += r_f[corner_index + dir * m * n];
+			b_temp += b_f[corner_index + dir * m * n];
+		}
+		r_rho[corner_index] = r_temp;
+		b_rho[corner_index] = b_temp;
+		u[corner_index] = 0.0;
+		v[corner_index] = 0.0;
+
+		// north-west corner
+		corner_index = jn*n+iw;
+		r_f[(corner_index) + 1 * m * n] = r_f[corner_index + 3 * m * n];
+		r_f[(corner_index) + 4 * m * n] = r_f[corner_index + 2 * m * n];
+		r_f[(corner_index) + 8 * m * n] = r_f[corner_index + 6 * m * n];
+
+		b_f[(corner_index) + 1 * m * n] = b_f[corner_index + 3 * m * n];
+		b_f[(corner_index) + 4 * m * n] = b_f[corner_index + 2 * m * n];
+		b_f[(corner_index) + 8 * m * n] = b_f[corner_index + 6 * m * n];
+
+		r_temp = b_temp = 0.0;
+		for(int dir = 0; dir < 9; dir++){
+			r_temp += r_f[corner_index + dir * m * n];
+			b_temp += b_f[corner_index + dir * m * n];
+		}
+		r_rho[corner_index] = r_temp;
+		b_rho[corner_index] = b_temp;
+		u[corner_index] = 0.0;
+		v[corner_index] = 0.0;
+
+
+		// south-east corner
+		corner_index = js*n+ie;
+		r_f[corner_index + 2 * m * n] = r_f[corner_index + 4 * m * n];
+		r_f[corner_index + 3 * m * n] = r_f[corner_index + 1 * m * n];
+		r_f[corner_index + 6 * m * n] = r_f[corner_index + 8 * m * n];
+
+		b_f[corner_index + 2 * m * n] = b_f[corner_index + 4 * m * n];
+		b_f[corner_index + 3 * m * n] = b_f[corner_index + 1 * m * n];
+		b_f[corner_index + 6 * m * n] = b_f[corner_index + 8 * m * n];
+
+		r_temp = b_temp = 0.0;
+		for(int dir = 0; dir < 9; dir++){
+			r_temp += r_f[corner_index + dir * m * n];
+			b_temp += b_f[corner_index + dir * m * n];
+		}
+		r_rho[corner_index] = r_temp;
+		b_rho[corner_index] = b_temp;
+		u[corner_index] = 0.0;
+		v[corner_index] = 0.0;
+
+
+		// south-west corner
+		corner_index = js*n+iw;
+		r_f[corner_index + 1 * m * n] = r_f[corner_index + 3 * m * n];
+		r_f[corner_index + 2 * m * n] = r_f[corner_index + 4 * m * n];
+		r_f[corner_index + 5 * m * n] = r_f[corner_index + 7 * m * n];
+
+		b_f[corner_index + 1 * m * n] = b_f[corner_index + 3 * m * n];
+		b_f[corner_index + 2 * m * n] = b_f[corner_index + 4 * m * n];
+		b_f[corner_index + 5 * m * n] = b_f[corner_index + 7 * m * n];
+
+		r_temp = b_temp = 0.0;
+		for(int dir = 0; dir < 9; dir++){
+			r_temp += r_f[corner_index + dir * m * n];
+			b_temp += b_f[corner_index + dir * m * n];
+		}
+		r_rho[corner_index] = r_temp;
+		b_rho[corner_index] = b_temp;
+		u[corner_index] = 0.0;
+		v[corner_index] = 0.0;
+
+		break;
+	default:
+		break;
+	}
 }
 
 void peridicBoundaries3D(int n, int m, int h, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho){
@@ -960,37 +1182,6 @@ FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, 
 	st_laplace=20*(p_in_mean-p_out_mean);
 
 	return abs(st_predicted-st_laplace)/(st_predicted)*100.0;
-}
-
-void createCoalescenceBubble(FLOAT_TYPE *x, FLOAT_TYPE *y,int n, int m, FLOAT_TYPE radius, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho,
-		FLOAT_TYPE r_density, FLOAT_TYPE b_density, FLOAT_TYPE *r_phi, FLOAT_TYPE *b_phi, FLOAT_TYPE *rho){
-
-	int i, j, k;
-	int index, index2;
-	for (j=0; j < m; j++){
-		for(i = 0; i < n; i++){
-			index = j * n + i;
-
-			if( sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5 + radius),2)) <= radius || sqrt( pow((x[index]-0.5), 2) + pow((y[index]-0.5 - radius),2)) <= radius){
-				r_rho[index] = r_density;
-				for (k=0; k < 9; k++){
-					// initialise distribution function with small, non-zero values
-					index2 = i + j * n + k * m * n;
-					r_f[index2] = r_rho[index] * r_phi[k];
-				}
-			}
-			else {
-				b_rho[index]=b_density;
-				for (k=0; k < 9; k++){
-					// initialise distribution function with small, non-zero values
-					index2 = i + j * n + k * m * n;
-					b_f[index2]   = b_rho[index]*b_phi[k];
-				}
-			}
-			// initialise density
-			rho[index] = r_rho[index]+b_rho[index];
-		}
-	}
 }
 
 FLOAT_TYPE validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE radius){
