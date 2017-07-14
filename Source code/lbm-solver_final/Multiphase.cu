@@ -8,7 +8,7 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 		FLOAT_TYPE *r_phi, FLOAT_TYPE *b_phi, FLOAT_TYPE *w_pert, FLOAT_TYPE *color_gradient,
 		FLOAT_TYPE r_omega, FLOAT_TYPE b_omega, FLOAT_TYPE control_param, FLOAT_TYPE del,
 		FLOAT_TYPE beta, FLOAT_TYPE g_limit,  FLOAT_TYPE r_A,  FLOAT_TYPE b_A, FLOAT_TYPE *r_fPert, FLOAT_TYPE *b_fPert,
-		FLOAT_TYPE *weight, int *cx, int *cy){
+		FLOAT_TYPE *weight, int *cx, int *cy, FLOAT_TYPE r_nu, FLOAT_TYPE b_nu){
 
 	FLOAT_TYPE cu1, cu2, r_CollPert, b_CollPert;
 	FLOAT_TYPE cosin;
@@ -25,7 +25,7 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 	FLOAT_TYPE prod_c_g;
 	FLOAT_TYPE r_pert, b_pert;
 	FLOAT_TYPE r_feq, b_feq;
-	FLOAT_TYPE fn05;
+	FLOAT_TYPE fn05, aux1, mean_nu, omega_eff;
 	FLOAT_TYPE cg_w[9] = {0.0, 4.0/12.0, 4.0/12.0, 4.0/12.0, 4.0/12.0, 1.0/12.0, 1.0/12.0, 1.0/12.0, 1.0/12.0};
 	int index, index9, temp_index;
 	for (int j=0; j < m; j++){
@@ -66,31 +66,37 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 				}
 			}
 
-			// relaxation parameter to choose a proper omega at the interface
-			if (r_omega != b_omega){
-				chi=(r_rho[index] - b_rho[index])/rho[index];
-				if(chi >= -control_param && chi <= control_param){
-					if (chi > del)
-						r_omega_temp=r_omega;
-					else if (chi <= del && chi > 0)
-						r_omega_temp=a1 + a2 * chi + a3 * chi * chi;
-					else if (chi <= 0 && chi >= -del)
-						r_omega_temp=a1 + a4 * chi + a5 * chi * chi;
-					else if (chi < -del)
-						r_omega_temp=b_omega;
+			aux1 = r_rho[index]/(rho[index]*r_nu) + b_rho[index]/(rho[index]*b_nu);
+			mean_nu = 1.0/aux1;
+			omega_eff = 1.0/(3.0*mean_nu+0.5);
+			r_omega_temp=omega_eff;
+			b_omega_temp=omega_eff;
 
-					b_omega_temp = r_omega_temp;
-				}
-				else{
-					r_omega_temp = r_omega;
-					b_omega_temp = b_omega;
-				}
-			}
-			else
-			{
-				r_omega_temp=r_omega;
-				b_omega_temp=r_omega_temp;
-			}
+			// relaxation parameter to choose a proper omega at the interface
+//			if (r_omega != b_omega){
+//				chi=(r_rho[index] - b_rho[index])/rho[index];
+//				if(chi >= -control_param && chi <= control_param){
+//					if (chi > del)
+//						r_omega_temp=r_omega;
+//					else if (chi <= del && chi > 0)
+//						r_omega_temp=a1 + a2 * chi + a3 * chi * chi;
+//					else if (chi <= 0 && chi >= -del)
+//						r_omega_temp=a1 + a4 * chi + a5 * chi * chi;
+//					else if (chi < -del)
+//						r_omega_temp=b_omega;
+//
+//					b_omega_temp = r_omega_temp;
+//				}
+//				else{
+//					r_omega_temp = r_omega;
+//					b_omega_temp = b_omega;
+//				}
+//			}
+//			else
+//			{
+//				r_omega_temp=r_omega;
+//				b_omega_temp=r_omega_temp;
+//			}
 //			printf("romega "FLOAT_FORMAT" bomega"FLOAT_FORMAT" \n", r_omega_temp, b_omega_temp);
 			cu1 = u[index]*u[index] + v[index]*v[index];
 

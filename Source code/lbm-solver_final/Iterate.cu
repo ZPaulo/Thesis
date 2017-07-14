@@ -329,7 +329,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 #if !CUDA
 				mp2DColl(n, m, rho, u, v, r_f, b_f, r_rho, b_rho, r_phi, b_phi, w_pert, color_gradient,
 						r_omega, b_omega, args->control_param, args->del, args->beta,
-						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy);
+						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
 #else
 				//				CHECK(cudaMemcpy(r_rho_d, r_rho, SIZEFLT(m*n), cudaMemcpyHostToDevice));
 				//				CHECK(cudaMemcpy(b_rho_d, b_rho, SIZEFLT(m*n), cudaMemcpyHostToDevice));
