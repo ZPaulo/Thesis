@@ -305,7 +305,7 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 	int ind = blockIdx.x * blockDim.x + threadIdx.x;
 	int ms = depth_d*length_d;
 	int index9;
-	FLOAT_TYPE r_r, b_r, r, u, v, chi, omega_temp, color_gradient_x, color_gradient_y;
+	FLOAT_TYPE r_r, b_r, r, u, v, chi, r_omega_temp, b_omega_temp, color_gradient_x, color_gradient_y;
 	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin;
 	FLOAT_TYPE prod_c_g, r_pert, b_pert;
 	FLOAT_TYPE r_CollPert, b_CollPert;
@@ -321,17 +321,23 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 			chi=(r_r - b_r)/r;
 			if(chi >= -control_param_d && chi <= control_param_d){
 				if (chi > del_d)
-					omega_temp=r_omega_d;
+					r_omega_temp=r_omega_d;
 				else if (chi <= del_d && chi > 0)
-					omega_temp=a1_d + a2_d * chi + a3_d * chi * chi;
+					r_omega_temp=a1_d + a2_d * chi + a3_d * chi * chi;
 				else if (chi <= 0 && chi >= -del_d)
-					omega_temp=a1_d + a4_d * chi + a5_d * chi * chi;
+					r_omega_temp=a1_d + a4_d * chi + a5_d * chi * chi;
 				else if (chi < -del_d)
-					omega_temp=b_omega_d;
+					r_omega_temp=b_omega_d;
+				b_omega_temp = r_omega_temp;
+			}
+			else{
+				r_omega_temp = r_omega_d;
+				b_omega_temp = b_omega_d;
 			}
 		}
-		else
-			omega_temp=r_omega_d;
+		else{
+			r_omega_temp = b_omega_temp = r_omega_d;
+		}
 		calculateColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &color_gradient_x, &color_gradient_y);
 		//		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		//		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
@@ -363,13 +369,9 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 			index9 = ind + k * ms;
 			// calculate updated distribution function
-			if(fluid_d[ind] == 1){
-				r_CollPert = omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]) + (1-omega_temp)*r_f_d[index9]+r_pert;
-				b_CollPert = omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]) + (1-omega_temp)*b_f_d[index9]+b_pert;
-			} else{
-				r_CollPert = omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]) + (1-omega_temp)*r_f_d[index9]+r_pert;
-				b_CollPert = omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]) + (1-omega_temp)*b_f_d[index9]+b_pert;
-			}
+				r_CollPert = r_omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]) + (1-r_omega_temp)*r_f_d[index9]+r_pert;
+				b_CollPert = b_omega_temp*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]) + (1-b_omega_temp)*b_f_d[index9]+b_pert;
+
 			//perform recolor step
 			r_fColl_d[index9]=k_r*(r_CollPert + b_CollPert)+k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
 			b_fColl_d[index9]=k_b*(r_CollPert + b_CollPert)-k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);

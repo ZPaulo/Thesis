@@ -435,12 +435,13 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 __global__ void gpuStreaming2DCG(int* fluid_d, int* stream_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* r_fColl_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* b_fColl_d);
 
 __global__ void gpuBcPeriodic2D(int *bcIdx_d, int *bcMask_d,
-		FLOAT_TYPE* r_f_d,FLOAT_TYPE* b_f_d, int size, int *orientation_d);
+		FLOAT_TYPE* r_f_d,FLOAT_TYPE* b_f_d, int size, int *orientation_d, int test_case, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d,
+		FLOAT_TYPE *u_d, FLOAT_TYPE *v_d);
 
 __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* b_f_d,
 		FLOAT_TYPE* r_rho_d, FLOAT_TYPE* b_rho_d, FLOAT_TYPE *p_in_d, FLOAT_TYPE *p_out_d,
-		int *num_in_d, int *num_out_d);
+		int *num_in_d, int *num_out_d, int *cg_direction, int test_case);
 
 __host__ int gpu_sum_int_h(int *C, int *D, int size);
 __global__ void gpu_sum256_int(int *A, int *B, int size);

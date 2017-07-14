@@ -38,4 +38,6 @@ void WriteResultsMultiPhase(char* OutputFile, int* fluid, FLOAT_TYPE* CoordX, FL
 		int* Fluid, int n, int m, int h, OutputFormat outputFormat);
 
 void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h = 1, int dir = 1);
+
+void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *computed, FLOAT_TYPE *y, int m, int n);
 #endif

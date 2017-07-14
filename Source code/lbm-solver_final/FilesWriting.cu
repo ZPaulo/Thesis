@@ -95,13 +95,6 @@ void WriteResultsMultiPhase(char* OutputFile, int* fluid, FLOAT_TYPE* CoordX, FL
 		//write red density
 		fprintf(fp1,
 				"      <DataArray type=\"Float32\" Name=\"Red Density\" NumberOfComponents=\"1\" format=\"ascii\">\n");
-		//		for(y = 0; y < m; y++) {
-		//			for(x = 0; x < n; x++){
-		//				for (z = 0; z < h; z++) {
-		//					fprintf(fp1, "%.10f\n", r_Rho[z + x * h + y * h * m]);
-		//				}
-		//			}
-		//		}
 		for (z = 0; z < h; z++) {
 			for (y = 0; y < m; y++) {
 				for (x = 0; x < n; x++) {
@@ -360,5 +353,27 @@ void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h, int dir){
 			}
 		}
 	}
+	fclose(fp1);
+}
+
+void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *computed, FLOAT_TYPE *y, int m, int n){
+	char outputFile[300];
+	sprintf(outputFile, "./Results/%s.txt", fileName);
+	FILE * fp1;                 // file pointer to output file
+	fp1 = fopen(outputFile, "w"); // open file
+	int i;
+	//	if(m % 2 == 0)
+	//		j = m/2;
+	//	else
+	//		j = (m+1) / 2;
+	if(n % 2 == 0)
+		i = n/2;
+	else
+		i = (n+1) / 2;
+
+	for (int j = 0; j < m; j++) {
+		fprintf(fp1, "%.10f %.10f %.4f\n", computed[j * n + i], analytical[j], y[j * n + i]);
+	}
+
 	fclose(fp1);
 }
