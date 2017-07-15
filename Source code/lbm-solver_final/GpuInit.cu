@@ -291,7 +291,7 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 			}
 			break;
 		case 2: // coulette
-			if(y_d[index] < 0.5){
+			if(y_d[index] > 0.5){
 				aux1 = (1 - r_alpha_d) / 5.0;
 				aux2 = (1 - r_alpha_d) / 20.0;
 				r_rho_d[index] = r_density_d;
@@ -356,6 +356,39 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 		case 4: //coalescence
 			if( sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5 + bubble_radius_d)*(y_d[index]-0.5 + bubble_radius_d)) <= bubble_radius_d ||
 					sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5 - bubble_radius_d)*(y_d[index]-0.5 - bubble_radius_d)) <= bubble_radius_d	){
+				aux1 = (1 - r_alpha_d) / 5.0;
+				aux2 = (1 - r_alpha_d) / 20.0;
+				r_rho_d[index] = r_density_d;
+				r_f_d[index + 0 * ms] = r_density_d * r_alpha_d;
+				r_f_d[index + 1 * ms] = r_density_d * aux1;
+				r_f_d[index + 2 * ms] = r_density_d * aux1;
+				r_f_d[index + 3 * ms] = r_density_d * aux1;
+				r_f_d[index + 4 * ms] = r_density_d * aux1;
+				r_f_d[index + 5 * ms] = r_density_d * aux2;
+				r_f_d[index + 6 * ms] = r_density_d * aux2;
+				r_f_d[index + 7 * ms] = r_density_d * aux2;
+				r_f_d[index + 8 * ms] = r_density_d * aux2;
+			}
+			else {
+				aux1 = (1 - b_alpha_d) / 5.0;
+				aux2 = (1 - b_alpha_d) / 20.0;
+				b_rho_d[index] = b_density_d;
+				b_f_d[index + 0 * ms] = b_density_d * b_alpha_d;
+				b_f_d[index + 1 * ms] = b_density_d * aux1;
+				b_f_d[index + 2 * ms] = b_density_d * aux1;
+				b_f_d[index + 3 * ms] = b_density_d * aux1;
+				b_f_d[index + 4 * ms] = b_density_d * aux1;
+				b_f_d[index + 5 * ms] = b_density_d * aux2;
+				b_f_d[index + 6 * ms] = b_density_d * aux2;
+				b_f_d[index + 7 * ms] = b_density_d * aux2;
+				b_f_d[index + 8 * ms] = b_density_d * aux2;
+			}
+			break;
+		case 5: //oscilating
+			index_x = index % length_d;
+			index_y = (index - index_x) / length_d;
+			if( ( ((index_x - 0.5 * length_d) / (0.125 * length_d)) * ((index_x - 0.5 * length_d) / (0.125 * length_d)) +
+					((index_y - 0.5 * depth_d) / (0.1875 * depth_d)) * ((index_y - 0.5 * depth_d) / (0.1875 * depth_d)) <= 1 )){
 				aux1 = (1 - r_alpha_d) / 5.0;
 				aux2 = (1 - r_alpha_d) / 20.0;
 				r_rho_d[index] = r_density_d;
@@ -608,9 +641,9 @@ __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-																																																																* (maxInletCoordY_d - minInletCoordY_d);
+																																																																		* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-																																																																* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																																																																		* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
@@ -619,7 +652,7 @@ __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																																															+ threadIdx.x;
+																																																																	+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -812,7 +845,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		dz = bcZ[bci] - nodeZ[ind];
 		if (CurvedBCs == (BoundaryType) CURVED) {
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-																																																																	/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																																																																			/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
 		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);

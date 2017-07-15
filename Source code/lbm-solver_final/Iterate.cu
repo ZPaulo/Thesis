@@ -188,7 +188,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *p_out_d = createGpuArrayFlt(n*m, ARRAY_ZERO);
 	int *num_in_d = createGpuArrayInt(n*m, ARRAY_ZERO);
 	int *num_out_d = createGpuArrayInt(n*m, ARRAY_ZERO);
-
+	FLOAT_TYPE *oscilating_y = createHostArrayFlt(args->iterations, ARRAY_NONE);
 	FLOAT_TYPE *u0_d, *v0_d;
 
 	if (args->inletProfile == NO_INLET) {
@@ -214,6 +214,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 
 #if CUDA
+	int temp_osci_index;
 	FLOAT_TYPE p_in_mean;
 	FLOAT_TYPE p_out_mean;
 	FLOAT_TYPE ms = n * m;
@@ -433,13 +434,23 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 #else
 			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, r_f_d, b_f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d, cg_dir_d, args->test_case);
 
-			//			CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
-			//			CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
+			CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
+			CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
 			//			updateSurfaceTension(r_rho,b_rho,args->control_param, st_predicted, st_error, iter,args->r_alpha, args->b_alpha, args->bubble_radius, n ,m);
 			//gpu reduction is faster than serial surface tension
-			p_in_mean = gpu_sum_h(p_in_d, p_in_d, ms) / gpu_sum_int_h(num_in_d, num_in_d, ms);
-			p_out_mean = gpu_sum_h(p_out_d, p_out_d, ms) / gpu_sum_int_h(num_out_d, num_out_d, ms);
-			st_error[iter] = calculateSurfaceTension(p_in_mean, p_out_mean,args->r_alpha, args->b_alpha, args->bubble_radius, st_predicted);
+			switch(args->test_case){
+			case 1:
+				p_in_mean = gpu_sum_h(p_in_d, p_in_d, ms) / gpu_sum_int_h(num_in_d, num_in_d, ms);
+				p_out_mean = gpu_sum_h(p_out_d, p_out_d, ms) / gpu_sum_int_h(num_out_d, num_out_d, ms);
+				st_error[iter] = calculateSurfaceTension(p_in_mean, p_out_mean,args->r_alpha, args->b_alpha, args->bubble_radius, st_predicted);
+				break;
+			case 5:
+				oscilating_y[iter] = getMaxYOscilating(r_rho, b_rho, n, m, nodeY);
+				break;
+			default:
+				break;
+			}
+
 #endif
 		}
 		else gpuUpdateMacro2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, bcMask_d,
@@ -528,7 +539,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																										/ CLOCKS_PER_SEC;
+																																																																																																																																																												/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -589,6 +600,10 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		case 4:
 			//validate coalescence case
 			printf("Error %: "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
+			break;
+		case 5:
+			writeOscilatingSolution("Oscilating_frequency", oscilating_y, args->iterations);
+			printf("Error %: "FLOAT_FORMAT"\n", validateOscilating(r_rho, b_rho, n, m, oscilating_y, args->iterations,st_predicted, args->r_density, args->b_density));
 			break;
 		default:
 			printf("Suface tension error: "FLOAT_FORMAT"\n", st_error[iter-1]);

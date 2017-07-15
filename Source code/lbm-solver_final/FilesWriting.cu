@@ -377,3 +377,15 @@ void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *co
 
 	fclose(fp1);
 }
+
+void writeOscilatingSolution(char* fileName, FLOAT_TYPE *extremes, int size){
+	char outputFile[300];
+	sprintf(outputFile, "./Results/%s.txt", fileName);
+	FILE * fp1;                 // file pointer to output file
+	fp1 = fopen(outputFile, "w"); // open file
+	for (int i = 0; i < size; i++) {
+		fprintf(fp1, "%d %.10f\n", i, extremes[i]);
+	}
+
+	fclose(fp1);
+}

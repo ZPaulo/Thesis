@@ -50,3 +50,8 @@ void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE
 FLOAT_TYPE deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE initial_area);
 
 void initInletVelocity(FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE u_veloc, FLOAT_TYPE v_veloc, int n, int m);
+
+FLOAT_TYPE getMaxYOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *nodeY);
+
+FLOAT_TYPE validateOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *extremes, int size,
+		FLOAT_TYPE ST_predicted, FLOAT_TYPE r_density, FLOAT_TYPE b_density);

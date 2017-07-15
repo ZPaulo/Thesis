@@ -1150,7 +1150,7 @@ FLOAT_TYPE deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int
 	for(int i = 0; i < n; i++){
 		rho = r_rho[j * n + i] + b_rho[j * n + i];
 		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.0){
-			aux += 1.0 * (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+			aux += (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
 		}
 	}
 
@@ -1169,4 +1169,83 @@ void initInletVelocity(FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE u_veloc, FLOAT_T
 		v[(m-1) * n + i] = v_veloc;
 	}
 
+}
+
+FLOAT_TYPE getMaxYOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *nodeY){
+
+	int i, j_start, j;
+	if(n % 2 == 0)
+		i = n/2;
+	else
+		i = (n+1) / 2;
+
+	if(m % 2 == 0)
+		j_start = m/2;
+	else
+		j_start = (m+1) / 2;
+
+	FLOAT_TYPE rho;
+	for(j = j_start; j < m; j++){
+
+		rho = r_rho[j * n + i] + b_rho[j * n + i];
+		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho < 0.0){
+			break;
+		}
+	}
+	FLOAT_TYPE phi1, phi2;
+	phi1 = (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+	rho = r_rho[(j-1) * n + i] + b_rho[(j-1) * n + i];
+	phi2 = (r_rho[(j-1) * n + i] - b_rho[(j-1) * n + i]) / rho;
+
+	FLOAT_TYPE aux_m = (phi1 - phi2) / (nodeY[j * n + i] - nodeY[(j - 1) * n + i]);
+	FLOAT_TYPE aux_b =  phi1 - aux_m * nodeY[j * n + i];
+	return -aux_b / aux_m;
+}
+
+FLOAT_TYPE validateOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *extremes, int size,
+		FLOAT_TYPE ST_predicted, FLOAT_TYPE r_density, FLOAT_TYPE b_density){
+	int j;
+	if(m % 2 == 0)
+		j = m/2;
+	else
+		j = (m+1) / 2;
+
+	FLOAT_TYPE rho;
+	FLOAT_TYPE aux = 0.0;
+	for(int i = 0; i < n; i++){
+		rho = r_rho[j * n + i] + b_rho[j * n + i];
+		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.0){
+			aux += (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+		}
+	}
+
+	aux /= 2.0;
+	printf("\n\nMax and Min values\n\n");
+	int max_iter[6];
+	int min_iter[6];
+	int max_counter = 0, min_counter = 0;
+	bool sign = false;
+	for(int i = 500; i < size-1; i++){
+		if(sign){
+			if((extremes[i+1] - extremes[i-1]) / 2.0 < 0.0){
+				printf("Max found at %d\n", i);
+				max_iter[max_counter] = i;
+				max_counter++;
+				sign = false;
+			}
+		}
+		else{
+			if((extremes[i+1] - extremes[i-1]) / 2.0 > 0.0){
+				printf("Min found at %d\n", i);
+				min_iter[min_counter] = i;
+				min_counter++;
+				sign = true;
+			}
+		}
+	}
+
+	FLOAT_TYPE theoretical_omega = sqrt(6.0 * ST_predicted / ( (r_density + b_density) *aux*aux*aux ) );
+	FLOAT_TYPE numerical_omega = M_PI / (min_iter[1] - max_iter[0]);
+	printf("Theoretical "FLOAT_FORMAT" vs Numerical "FLOAT_FORMAT"\n", theoretical_omega, numerical_omega);
+	return (abs(theoretical_omega - numerical_omega) / theoretical_omega )* 100.0;
 }
