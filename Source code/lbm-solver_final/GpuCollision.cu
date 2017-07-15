@@ -306,7 +306,7 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 	int ms = depth_d*length_d;
 	int index9;
 	FLOAT_TYPE r_r, b_r, r, u, v, chi, r_omega_temp, b_omega_temp, color_gradient_x, color_gradient_y;
-	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin;
+	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, aux1, mean_nu, omega_eff;
 	FLOAT_TYPE prod_c_g, r_pert, b_pert;
 	FLOAT_TYPE r_CollPert, b_CollPert;
 	if (ind < ms)
@@ -317,27 +317,34 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 		b_r = b_rho_d[ind];
 		r = rho_d[ind];
 
-		if (r_omega_d != b_omega_d){
-			chi=(r_r - b_r)/r;
-			if(chi >= -control_param_d && chi <= control_param_d){
-				if (chi > del_d)
-					r_omega_temp=r_omega_d;
-				else if (chi <= del_d && chi > 0)
-					r_omega_temp=a1_d + a2_d * chi + a3_d * chi * chi;
-				else if (chi <= 0 && chi >= -del_d)
-					r_omega_temp=a1_d + a4_d * chi + a5_d * chi * chi;
-				else if (chi < -del_d)
-					r_omega_temp=b_omega_d;
-				b_omega_temp = r_omega_temp;
-			}
-			else{
-				r_omega_temp = r_omega_d;
-				b_omega_temp = b_omega_d;
-			}
-		}
-		else{
-			r_omega_temp = b_omega_temp = r_omega_d;
-		}
+//		if (r_omega_d != b_omega_d){
+//			chi=(r_r - b_r)/r;
+//			if(chi >= -control_param_d && chi <= control_param_d){
+//				if (chi > del_d)
+//					r_omega_temp=r_omega_d;
+//				else if (chi <= del_d && chi > 0)
+//					r_omega_temp=a1_d + a2_d * chi + a3_d * chi * chi;
+//				else if (chi <= 0 && chi >= -del_d)
+//					r_omega_temp=a1_d + a4_d * chi + a5_d * chi * chi;
+//				else if (chi < -del_d)
+//					r_omega_temp=b_omega_d;
+//				b_omega_temp = r_omega_temp;
+//			}
+//			else{
+//				r_omega_temp = r_omega_d;
+//				b_omega_temp = b_omega_d;
+//			}
+//		}
+//		else{
+//			r_omega_temp = b_omega_temp = r_omega_d;
+//		}
+
+		aux1 = r_r / (r * r_viscosity_d) + b_r /(r * b_viscosity_d);
+		mean_nu = 1.0/aux1;
+		omega_eff = 1.0/(3.0*mean_nu+0.5);
+		r_omega_temp=omega_eff;
+		b_omega_temp=omega_eff;
+
 		calculateColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &color_gradient_x, &color_gradient_y);
 		//		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		//		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);

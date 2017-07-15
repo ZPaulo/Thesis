@@ -191,6 +191,8 @@ __host__ void initConstants2D(Arguments *args,
 
 		FLOAT_TYPE cg_w[9] = {0., 4. / 12., 4. / 12., 4. / 12., 4. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.};
 		cudaMemcpyToSymbol(cg_w_d, cg_w, 9 * sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
 	}
 }
 
@@ -256,6 +258,7 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 
 	if(index < ms){
 		FLOAT_TYPE aux1, aux2;
+		int index_x, index_y;
 		switch (test_case) {
 		case 1: //steady bubble
 			if( sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5)*(y_d[index]-0.5)) <= bubble_radius_d){
@@ -318,7 +321,10 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 			}
 			break;
 		case 3: //square
-			if( x_d[index] < 0.75 && x_d[index] > 0.25 && y_d[index] < 0.75 && y_d[index] > 0.25){
+			index_x = index % length_d;
+			index_y = (index - index_x) / length_d;
+
+			if( index_x < 0.75 * length_d && index_x > 0.25 * length_d && index_y < 0.75 * depth_d && index_y > 0.25 * depth_d){
 				aux1 = (1 - r_alpha_d) / 5.0;
 				aux2 = (1 - r_alpha_d) / 20.0;
 				r_rho_d[index] = r_density_d;

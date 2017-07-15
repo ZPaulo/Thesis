@@ -56,8 +56,8 @@ int main(int argc, char* argv[]) {
 		args.r_density = 1.0;
 		args.gamma = 1.0;
 		args.kappa = 2.0;
-		args.b_alpha = 4.0/9.0;
-		args.r_viscosity = 0.5;
+		args.b_alpha = 0.5;
+		args.r_viscosity = 4.0/9.0;
 		args.b_viscosity = args.r_viscosity / args.kappa * args.gamma;
 		args.beta = 0.8;
 		args.r_A = 0.0;

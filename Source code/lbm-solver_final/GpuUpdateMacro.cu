@@ -57,7 +57,8 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		num_in_d[ind] = 0;
 		num_out_d[ind] = 0;
 
-		if (fluid_d[ind] == 1 || test_case != 2 || (cg_direction[ind] == 3 || cg_direction[ind] == 4)) {
+		if (cg_direction[ind] == 0 || test_case != 2 || (cg_direction[ind] == 3 || cg_direction[ind] == 4)) {
+
 			r_r = b_r = u = v = 0.0;
 			r_r = r_f_d[ind] +
 					r_f_d[ind + ms] +
@@ -123,7 +124,7 @@ __global__ void gpuUpdateMacro3D(int *fluid_d, FLOAT_TYPE* rho_d,
 {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																					+ threadIdx.x;
+																							+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	FLOAT_TYPE r, rU, rV, rW;
@@ -201,7 +202,7 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																					+ threadIdx.x;
+																							+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	FLOAT_TYPE r_r, b_r, r, rU, rV, rW;

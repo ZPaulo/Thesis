@@ -18,7 +18,7 @@
 #include "Multiphase.h"
 #include "GpuSum.h"
 
-#define CUDA 0
+#define CUDA 1
 
 int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	// Time measurement: declaration, begin
@@ -249,6 +249,17 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 	int *stream_d = createGpuArrayInt(8 * m * n, ARRAY_COPY, 0, stream);
 
+
+
+	if(args->multiPhase && args->test_case == 2) //only for couette
+	{
+		initInletVelocity(u, v, args->u, args->v, n, m);
+#if CUDA
+		CHECK(cudaMemcpy(u_d, u, SIZEFLT(m*n), cudaMemcpyHostToDevice));
+		CHECK(cudaMemcpy(v_d, v, SIZEFLT(m*n), cudaMemcpyHostToDevice));
+#endif
+	}
+
 #if CUDA
 	CHECK(cudaMemcpy(u, u_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
 	CHECK(cudaMemcpy(v, v_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
@@ -327,17 +338,11 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 				//Collision
 
 #if !CUDA
+
 				mp2DColl(n, m, rho, u, v, r_f, b_f, r_rho, b_rho, r_phi, b_phi, w_pert, color_gradient,
 						r_omega, b_omega, args->control_param, args->del, args->beta,
 						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
 #else
-				//				CHECK(cudaMemcpy(r_rho_d, r_rho, SIZEFLT(m*n), cudaMemcpyHostToDevice));
-				//				CHECK(cudaMemcpy(b_rho_d, b_rho, SIZEFLT(m*n), cudaMemcpyHostToDevice));
-				//				CHECK(cudaMemcpy(rho_d, rho, SIZEFLT(m*n), cudaMemcpyHostToDevice));
-				//				CHECK(cudaMemcpy(u_d, u, SIZEFLT(m*n), cudaMemcpyHostToDevice));
-				//				CHECK(cudaMemcpy(v_d, v, SIZEFLT(m*n), cudaMemcpyHostToDevice));
-				//				CHECK(cudaMemcpy(r_f_d, r_f, SIZEFLT(m*n*9), cudaMemcpyHostToDevice));
-				//				CHECK(cudaMemcpy(b_f_d, b_f, SIZEFLT(m*n*9), cudaMemcpyHostToDevice));
 				gpuCollBgkwGC2D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, r_f_d, b_f_d, r_fColl_d, b_fColl_d, cg_dir_d);
 
 #endif
@@ -369,7 +374,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 #else
 			//			gpuStreaming2D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
 			//			gpuStreaming2D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
-			gpuStreaming2DCG<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d, b_f_d, b_fColl_d);
+			gpuStreaming2DCG<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d, b_f_d, b_fColl_d, cg_dir_d);
 #endif
 		}
 		else{
@@ -523,7 +528,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																												/ CLOCKS_PER_SEC;
+																																																																																																																																																										/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -565,11 +570,9 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		break;
 	}
 
-	//validate coalescence case
-	printf("Final radius: "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
+
 	if(args->multiPhase){
-		WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
-				n, m, 1, args->outputFormat);
+
 		FLOAT_TYPE *analytical = createHostArrayFlt(m, ARRAY_ZERO);
 		switch (args->test_case) {
 		case 1:
@@ -580,9 +583,19 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			analyticalCouette(args->kappa, nodeY, m, n, analytical);
 			writeCouetteSolution("Profile_Couette", analytical, u, nodeY, m, n);
 			break;
+		case 3:
+			printf("Error %: "FLOAT_FORMAT"\n", deformingBubbleValid(r_rho, b_rho, n, m, (m / 2.0) * (n / 2.0)));
+			break;
+		case 4:
+			//validate coalescence case
+			printf("Error %: "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
+			break;
 		default:
+			printf("Suface tension error: "FLOAT_FORMAT"\n", st_error[iter-1]);
 			break;
 		}
+		WriteResultsMultiPhase(finalFilename, nodeType, nodeX, nodeY, nodeZ, u, v, w, rho,r_rho,b_rho, nodeType,
+				n, m, 1, args->outputFormat);
 
 		free(analytical);
 	}

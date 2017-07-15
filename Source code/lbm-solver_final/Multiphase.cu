@@ -73,31 +73,31 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 			b_omega_temp=omega_eff;
 
 			// relaxation parameter to choose a proper omega at the interface
-//			if (r_omega != b_omega){
-//				chi=(r_rho[index] - b_rho[index])/rho[index];
-//				if(chi >= -control_param && chi <= control_param){
-//					if (chi > del)
-//						r_omega_temp=r_omega;
-//					else if (chi <= del && chi > 0)
-//						r_omega_temp=a1 + a2 * chi + a3 * chi * chi;
-//					else if (chi <= 0 && chi >= -del)
-//						r_omega_temp=a1 + a4 * chi + a5 * chi * chi;
-//					else if (chi < -del)
-//						r_omega_temp=b_omega;
-//
-//					b_omega_temp = r_omega_temp;
-//				}
-//				else{
-//					r_omega_temp = r_omega;
-//					b_omega_temp = b_omega;
-//				}
-//			}
-//			else
-//			{
-//				r_omega_temp=r_omega;
-//				b_omega_temp=r_omega_temp;
-//			}
-//			printf("romega "FLOAT_FORMAT" bomega"FLOAT_FORMAT" \n", r_omega_temp, b_omega_temp);
+			//			if (r_omega != b_omega){
+			//				chi=(r_rho[index] - b_rho[index])/rho[index];
+			//				if(chi >= -control_param && chi <= control_param){
+			//					if (chi > del)
+			//						r_omega_temp=r_omega;
+			//					else if (chi <= del && chi > 0)
+			//						r_omega_temp=a1 + a2 * chi + a3 * chi * chi;
+			//					else if (chi <= 0 && chi >= -del)
+			//						r_omega_temp=a1 + a4 * chi + a5 * chi * chi;
+			//					else if (chi < -del)
+			//						r_omega_temp=b_omega;
+			//
+			//					b_omega_temp = r_omega_temp;
+			//				}
+			//				else{
+			//					r_omega_temp = r_omega;
+			//					b_omega_temp = b_omega;
+			//				}
+			//			}
+			//			else
+			//			{
+			//				r_omega_temp=r_omega;
+			//				b_omega_temp=r_omega_temp;
+			//			}
+			//			printf("romega "FLOAT_FORMAT" bomega"FLOAT_FORMAT" \n", r_omega_temp, b_omega_temp);
 			cu1 = u[index]*u[index] + v[index]*v[index];
 
 			// invariable quantities
@@ -611,7 +611,7 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	int js = 0;
 	int ie = n-1;
 	int iw = 0;
-	FLOAT_TYPE r_temp, b_temp, u_temp = 0.00001, v_temp = 0.0;
+	FLOAT_TYPE r_temp, b_temp, u_temp, v_temp;
 
 
 	if(test_case == 2){
@@ -620,7 +620,8 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 			index_end = jn * n + i;
 			index_start = js * n + i;
 
-			u_temp = 0.00001;
+			u_temp = u[index_end];
+			v_temp = v[index_end];
 			r_temp = (1. / (1. + v_temp)) * (r_f[index_end] + r_f[index_end + 1 * m * n] + r_f[index_end + 3 * m * n]
 			                                                                                   + 2 * (r_f[index_end + 2 * m * n] + r_f[index_end + 6 * m * n] + r_f[index_end + 5 * m * n]) );
 			b_temp = (1. / (1. + v_temp)) * (b_f[index_end] + b_f[index_end + 1 * m * n] + b_f[index_end + 3 * m * n]
@@ -637,11 +638,10 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 			r_rho[index_end] = r_temp;
 			b_rho[index_end] = b_temp;
 			rho[index_end] = r_temp + b_temp;
-			u[index_end] = u_temp;
-			v[index_end] = v_temp;
 
 			//south boundary
-			u_temp = 0.0;
+			u_temp = u[index_start];
+			v_temp = v[index_start];
 
 			r_temp = (1. / (1. - v_temp)) * (r_f[index_start] + r_f[index_start + 1 * m * n] + r_f[index_start + 3 * m * n]
 			                                                                                       + 2 * (r_f[index_start + 4 * m * n] + r_f[index_start + 7 * m * n] + r_f[index_start + 8 * m * n]));
@@ -659,8 +659,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 			r_rho[index_start] = r_temp;
 			b_rho[index_start] = b_temp;
 			rho[index_start] = r_temp + b_temp;
-			u[index_start] = u_temp;
-			v[index_start] = v_temp;
 		}
 	}
 	else{
@@ -720,10 +718,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(jn*n+ie) + 3 * m * n] = b_f[(jn*n+iw) + 3 * m * n];
 	b_f[(jn*n+ie) + 4 * m * n] = b_f[(jn*n+iw) + 4 * m * n];
 	b_f[(jn*n+ie) + 7 * m * n] = b_f[(jn*n+iw) + 7 * m * n];
-	if(test_case == 2){
-		u[jn*n+ie] = 0.00001;
-		v[jn*n+ie] = 0.0;
-	}
 
 	// north-west corner
 	r_f[(jn*n+iw) + 1 * m * n] = r_f[(jn*n+ie) + 1 * m * n];
@@ -734,10 +728,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(jn*n+iw) + 4 * m * n] = b_f[(jn*n+ie) + 4 * m * n];
 	b_f[(jn*n+iw) + 8 * m * n] = b_f[(jn*n+ie) + 8 * m * n];
 
-	if(test_case == 2){
-		u[jn*n+iw] = 0.00001;
-		v[jn*n+iw] = 0.0;
-	}
 	// south-east corner
 	r_f[(js*n+ie) + 2 * m * n] = r_f[(js*n+iw) + 2 * m * n];
 	r_f[(js*n+ie) + 3 * m * n] = r_f[(js*n+iw) + 3 * m * n];
@@ -747,10 +737,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(js*n+ie) + 3 * m * n] = b_f[(js*n+iw) + 3 * m * n];
 	b_f[(js*n+ie) + 6 * m * n] = b_f[(js*n+iw) + 6 * m * n];
 
-	if(test_case == 2){
-		u[js*n+ie] = 0.0;
-		v[js*n+ie] = 0.0;
-	}
 	// south-west corner
 	r_f[(js*n+iw) + 2 * m * n] = r_f[(js*n+ie) + 2 * m * n];
 	r_f[(js*n+iw) + 1 * m * n] = r_f[(js*n+ie) + 1 * m * n];
@@ -759,11 +745,6 @@ void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYP
 	b_f[(js*n+iw) + 2 * m * n] = b_f[(js*n+ie) + 2 * m * n];
 	b_f[(js*n+iw) + 1 * m * n] = b_f[(js*n+ie) + 1 * m * n];
 	b_f[(js*n+iw) + 5 * m * n] = b_f[(js*n+ie) + 5 * m * n];
-
-	if(test_case == 2){
-		u[js*n+iw] = 0.0;
-		v[js*n+iw] = 0.0;
-	}
 }
 
 void peridicBoundaries3D(int n, int m, int h, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho){
@@ -1125,18 +1106,16 @@ FLOAT_TYPE validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, 
 		j = (m+1) / 2;
 
 	FLOAT_TYPE rho;
-	int aux = 0;
+	FLOAT_TYPE aux = 0.0;
 	for(int i = 0; i < n; i++){
 		rho = r_rho[j * n + i] + b_rho[j * n + i];
-		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.9){
-			aux++;
+		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.0){
+			aux += 1 * (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
 		}
 	}
 
-	printf("counter %d\n", aux);
+	//	printf("counter %d\n", aux);
 	return (abs(radius * sqrt(2.0) - ((FLOAT_TYPE)aux) / ( n * 2.0)) / (radius * sqrt(2.0))) * 100.0;
-
-
 }
 
 void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE *analytical){
@@ -1157,6 +1136,37 @@ void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE
 	for(int j = 0; j < j_start; j++){
 		analytical[j] = (2.0 * kappa * y[j*n + i] / (kappa + 1.0)) * 0.00001;
 	}
+}
 
+FLOAT_TYPE deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE initial_area){
+	int j;
+	if(m % 2 == 0)
+		j = m/2;
+	else
+		j = (m+1) / 2;
+
+	FLOAT_TYPE rho;
+	FLOAT_TYPE aux = 0.0;
+	for(int i = 0; i < n; i++){
+		rho = r_rho[j * n + i] + b_rho[j * n + i];
+		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.0){
+			aux += 1.0 * (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+		}
+	}
+
+	aux /= 2.0;
+	printf("Radius error % = "FLOAT_FORMAT" \n", (abs(aux - (n / (2.0 * sqrt(M_PI)))) / aux) * 100.0);
+	return (abs(initial_area - (M_PI * aux * aux)) / initial_area) * 100.0;
+}
+
+void initInletVelocity(FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE u_veloc, FLOAT_TYPE v_veloc, int n, int m){
+
+	for(int i = 0; i < n; i++){
+		u[i] = 0.0;
+		v[i] = 0.0;
+
+		u[(m-1) * n + i] = u_veloc;
+		v[(m-1) * n + i] = v_veloc;
+	}
 
 }

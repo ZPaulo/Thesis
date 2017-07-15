@@ -432,7 +432,7 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d,
 		int *color_gradient_directions_d);
 
-__global__ void gpuStreaming2DCG(int* fluid_d, int* stream_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* r_fColl_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* b_fColl_d);
+__global__ void gpuStreaming2DCG(int* fluid_d, int* stream_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* r_fColl_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* b_fColl_d, int *cg_dir_d);
 
 __global__ void gpuBcPeriodic2D(int *bcIdx_d, int *bcMask_d,
 		FLOAT_TYPE* r_f_d,FLOAT_TYPE* b_f_d, int size, int *orientation_d, int test_case, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d,
