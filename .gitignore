@@ -4,5 +4,5 @@ Source\ code/lbm-solver_final/Mesh/*
 *.o
 *.gz
 */STARCDfiles/*
-Source\ code/latticegen2_W8/*.dat
+*/xtecplot.dat
 */TestValues/*
