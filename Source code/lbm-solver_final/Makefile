@@ -1,4 +1,4 @@
-FLOAT_TYPE=USE_DOUBLE
+FLOAT_TYPE=USE_SINGLE
 
 
 CFLAGS=-arch=sm_20 -rdc=true

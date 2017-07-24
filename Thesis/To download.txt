@@ -5,3 +5,18 @@ Y. B. Bao, J. Meskas. Lattice Boltzmann Method for Fluid Simulations. 2011.
 S. Succi. The Lattice Boltzmann Equation: For Fluid Dynamics and Beyond.
 Oxford, 2001.
 
+https://link.springer.com/article/10.1007%2Fs11242-014-0329-0
+
+X. Li, Y. Zhang, X. Wang, and W. Ge, GPU-based numerical
+simulation of multi-phase flow in porous media using multiple-
+relaxation-time lattice Boltzmann method
+
+Xiaoyi He Qisu Zou. On pressure and velocity boundary conditions for
+the lattice boltzmann bgk model. Physics of Fluids, 9, 1997 - cite inlet
+
+T. Reis, T.N. Phillips, Lattice Boltzmann model for simulating immiscible two-phase flows - cite color gradient
+
+Gennaro Abbruzzese. Development of a 2d lattice boltzmann code.
+Master’s thesis, Cranfield University, 2013.
+
+https://cs.calvin.edu/courses/cs/374/CUDA/CUDA-Thread-Indexing-Cheatsheet.pdf

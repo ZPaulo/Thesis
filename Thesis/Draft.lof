@@ -1,0 +1,19 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces 2D LBM model using 9 particles. (D2Q9)\relax }}{6}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces 3D LBM model using 19 particles. (D3Q19)\relax }}{6}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Moore's law over 120 years\relax }}{8}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces A graphical representation of Amdahl's law\relax }}{9}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Streaming step following a 2DQ9 model.\relax }}{17}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Thread arrangement in CUDA platform.\relax }}{24}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Memory arrangement in CUDA compliant GPU.\relax }}{25}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces A simplified flowchart of the solver's activity\relax }}{30}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime for Cavity\_128 and Cavity\_256\relax }}{32}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Code profiling for the run-times of Cavity\_128 with MacroDiff residuals\relax }}{33}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Overall time comparison using three different threads per block configuration\relax }}{34}
+\addvspace {10\p@ }

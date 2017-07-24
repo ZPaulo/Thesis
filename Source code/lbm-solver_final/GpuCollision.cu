@@ -275,6 +275,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	(*gr_z) = grz;
 }
 
+
 __global__ void gpuCollBgkw2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 		FLOAT_TYPE *v_d, FLOAT_TYPE *f_d, FLOAT_TYPE *fColl_d)
 {
@@ -499,7 +500,6 @@ __global__ void gpuCollBgkw3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 		v = v_d[ind];
 		w = w_d[ind];
 		r = rho_d[ind];
-
 		fColl_d[ ind + 0 *ms ] = omega_d * feqc3D(u, cx3D_d[ 0 ], v, cy3D_d[ 0 ], w, cz3D_d[ 0 ], r, w3D_d[ 0 ]) + (1.0-omega_d) * f_d[ind+ 0 *ms];
 		fColl_d[ ind + 1 *ms ] = omega_d * feqc3D(u, cx3D_d[ 1 ], v, cy3D_d[ 1 ], w, cz3D_d[ 1 ], r, w3D_d[ 1 ]) + (1.0-omega_d) * f_d[ind+ 1 *ms];
 		fColl_d[ ind + 2 *ms ] = omega_d * feqc3D(u, cx3D_d[ 2 ], v, cy3D_d[ 2 ], w, cz3D_d[ 2 ], r, w3D_d[ 2 ]) + (1.0-omega_d) * f_d[ind+ 2 *ms];

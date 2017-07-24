@@ -1,0 +1,63 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: Draft.aux
+The style file: plain.bst
+Database file #1: AllBib.bib
+Warning--string name "springer" is undefined
+--line 4 of file AllBib.bib
+Warning--entry type for "koleszar_thesis" isn't style-file defined
+--line 55 of file AllBib.bib
+Warning--entry type for "maciej_thesis" isn't style-file defined
+--line 62 of file AllBib.bib
+Warning--entry type for "jozsa_thesis" isn't style-file defined
+--line 69 of file AllBib.bib
+Warning--entry type for "szoke_thesis" isn't style-file defined
+--line 76 of file AllBib.bib
+Warning--I didn't find a database entry for "antonioThesis"
+Warning--to sort, need author or key in moore
+Warning--to sort, need author or key in amdahl
+Warning--empty booktitle in aircraft_cfd
+Warning--empty publisher in lbm_springer
+Warning--empty booktitle in america_cup
+You've used 23 entries,
+            2118 wiz_defined-function locations,
+            627 strings with 7577 characters,
+and the built_in function-call counts, 6511 in all, are:
+= -- 606
+> -- 301
+< -- 1
++ -- 123
+- -- 98
+* -- 402
+:= -- 1085
+add.period$ -- 65
+call.type$ -- 23
+change.case$ -- 115
+chr.to.int$ -- 0
+cite$ -- 28
+duplicate$ -- 238
+empty$ -- 561
+format.name$ -- 98
+if$ -- 1371
+int.to.chr$ -- 0
+int.to.str$ -- 23
+missing$ -- 18
+newline$ -- 114
+num.names$ -- 42
+pop$ -- 167
+preamble$ -- 1
+purify$ -- 95
+quote$ -- 0
+skip$ -- 176
+stack$ -- 0
+substring$ -- 326
+swap$ -- 34
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 86
+warning$ -- 5
+while$ -- 55
+width$ -- 25
+write$ -- 228
+(There were 11 warnings)

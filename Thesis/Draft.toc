@@ -1,0 +1,51 @@
+\contentsline {chapter}{Abstract}{v}
+\contentsline {chapter}{Table of Contents}{vii}
+\contentsline {chapter}{List of Figures}{ix}
+\contentsline {chapter}{List of Tables}{xi}
+\contentsline {chapter}{List of Abbreviations}{xiii}
+\contentsline {chapter}{Acknowledgements}{xv}
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {chapter}{\numberline {2}Literature review}{3}
+\contentsline {section}{\numberline {2.1}Computational Fluid Dynamics}{3}
+\contentsline {subsection}{\numberline {2.1.1}Macroscopic scale}{4}
+\contentsline {subsection}{\numberline {2.1.2}Microscopic scale}{5}
+\contentsline {section}{\numberline {2.2}Lattice Boltzmann Method}{5}
+\contentsline {subsection}{\numberline {2.2.1}Multiphase flow}{6}
+\contentsline {section}{\numberline {2.3}High Performance Computing}{7}
+\contentsline {subsection}{\numberline {2.3.1}Distributed memory}{9}
+\contentsline {subsection}{\numberline {2.3.2}Shared memory}{10}
+\contentsline {subsection}{\numberline {2.3.3}GPGPU}{11}
+\contentsline {section}{\numberline {2.4}Previous parallelisation works}{12}
+\contentsline {chapter}{\numberline {3}Methodology}{15}
+\contentsline {section}{\numberline {3.1}Lattice Boltzmann Method}{15}
+\contentsline {subsection}{\numberline {3.1.1}Discretization}{16}
+\contentsline {subsection}{\numberline {3.1.2}Collision}{16}
+\contentsline {subsection}{\numberline {3.1.3}Streaming}{17}
+\contentsline {subsection}{\numberline {3.1.4}Boundary update}{17}
+\contentsline {subsubsection}{Wall}{18}
+\contentsline {subsubsection}{Periodic boundary conditions}{18}
+\contentsline {subsubsection}{Inlet}{18}
+\contentsline {subsection}{\numberline {3.1.5}Macro-variables update}{19}
+\contentsline {section}{\numberline {3.2}Color Gradient Model}{19}
+\contentsline {subsection}{\numberline {3.2.1}Single-phase collision operator}{20}
+\contentsline {subsection}{\numberline {3.2.2}Perturbation operator}{21}
+\contentsline {subsection}{\numberline {3.2.3}Recoloring operator}{21}
+\contentsline {subsection}{\numberline {3.2.4}Streaming and Boundary conditions}{22}
+\contentsline {subsection}{\numberline {3.2.5}Macro-variables update}{22}
+\contentsline {section}{\numberline {3.3}Meshes}{22}
+\contentsline {subsection}{\numberline {3.3.1}Used meshes}{23}
+\contentsline {section}{\numberline {3.4}CUDA programming}{23}
+\contentsline {subsection}{\numberline {3.4.1}Thread arrangement}{23}
+\contentsline {subsection}{\numberline {3.4.2}Memory structures}{24}
+\contentsline {subsubsection}{Registers}{26}
+\contentsline {subsubsection}{Shared memory}{26}
+\contentsline {subsubsection}{Constant memory}{27}
+\contentsline {subsubsection}{Global memory}{27}
+\contentsline {subsection}{\numberline {3.4.3}Warps}{27}
+\contentsline {chapter}{\numberline {4}Results and Discussion}{29}
+\contentsline {section}{\numberline {4.1}In-house LBM solver}{29}
+\contentsline {subsection}{\numberline {4.1.1}Code organisation}{29}
+\contentsline {subsection}{\numberline {4.1.2}Data representation}{31}
+\contentsline {subsection}{\numberline {4.1.3}Performance}{31}
+\contentsline {subsection}{\numberline {4.1.4}Validation}{34}
+\contentsline {chapter}{\numberline {5}Conclusions}{37}

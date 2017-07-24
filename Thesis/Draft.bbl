@@ -1,0 +1,129 @@
+\begin{thebibliography}{10}
+
+\bibitem{amdahl}
+Amdahl's law.
+\newblock https://www.techopedia.com/definition/17035/amdahls-law.
+\newblock Accessed: 16-05-2017.
+
+\bibitem{moore}
+Moore's law.
+\newblock http://www.mooreslaw.org.
+\newblock Accessed: 28-04-2017.
+
+\bibitem{wind_flow_cfd}
+B.~Blocken, A.~van~der Hout, J.~Dekker, and O.~Weiler.
+\newblock Cfd simulation of wind flow over natural complex terrain: Case study
+  with validation by field measurements for ria de ferrol, galicia, spain.
+\newblock {\em Journal of Wind Engineering and Industrial Aerodynamics},
+  147:43--57, 2015.
+
+\bibitem{multiphase}
+Christopher~E. Brennen.
+\newblock {\em Fundamentals of Multiphase Flows}.
+\newblock Cambridge University Press, 2005.
+
+\bibitem{chenDoolenMP}
+Shiyi Chen and Gary~D Doolen.
+\newblock Lattice boltzmann method for fluid flows.
+\newblock {\em Annual review of fluid mechanics}, 30(1):329--364, 1998.
+
+\bibitem{aircraft_cfd}
+R.~Czyba, M.~Hecel, K.~Jablonski, M.~Lemanowicz, and K.~Platek.
+\newblock Application of computer aided tools and methods for unmanned cargo
+  aircraft design.
+\newblock pages 1068--1073, 2015.
+
+\bibitem{race_car_wing}
+S.~Desai, E.~Leylek, C.-M.B. Lo, P.~Doddegowda, A.~Bychkovsky, and A.R. George.
+\newblock Experimental and cfd comparative case studies of aerodynamics of race
+  car wings, underbodies with wheels, and motorcycle flows.
+\newblock {\em SAE Technical Papers}, 2008.
+
+\bibitem{cfd_present}
+Joel Ducoste.
+\newblock An overview of computational fluid dynamics.
+\newblock Ghent University, 2008.
+
+\bibitem{gasautomata}
+U.~Frisch, B.~Hasslacher, and Y.~Pomeau.
+\newblock Lattice-gas automata for the navier-stokes equation.
+\newblock {\em Phys. Rev. Lett.}, 56:1505--1508, Apr 1986.
+
+\bibitem{gunstensen}
+Andrew~K Gunstensen, Daniel~H Rothman, St{\'e}phane Zaleski, and Gianluigi
+  Zanetti.
+\newblock Lattice boltzmann model of immiscible fluids.
+\newblock {\em Physical Review A}, 43(8):4320, 1991.
+
+\bibitem{cuda_by_example}
+E.~Kandrot J.~Sanders.
+\newblock {\em CUDA by Example: An Introduction to Generalpurpose GPU
+  Programming}.
+\newblock Addison-Wesley Professional, 2010.
+
+\bibitem{jozsa_thesis}
+Tamás~I. Józsa.
+\newblock Parallelization of lattice boltzmann method using cuda platform,
+  2014.
+
+\bibitem{maciej_thesis}
+Maciej Kubat.
+\newblock Development of physics or hpc optimisation of a parallel 2d lattice
+  boltzmann solver using gpus cuda, 2016.
+
+\bibitem{pourous}
+N.S. Martys and H.~Chen.
+\newblock Simulation of multicomponent fluids in complex three-dimensional
+  geometries by the lattice boltzmann method.
+\newblock {\em Physical Review E - Statistical Physics, Plasmas, Fluids, and
+  Related Interdisciplinary Topics}, 53(1 SUPPL. B):743--750, 1996.
+
+\bibitem{lbm_springer}
+A.~A. Mohamad.
+\newblock {\em Lattice Boltzmann Method}.
+\newblock 2011.
+
+\bibitem{irenehpc}
+Irene Moulitsas.
+\newblock “high performance computing” lecture slides, 2016.
+\newblock Cranfield University.
+
+\bibitem{partic_erosion_cfd}
+D.A. Pandya, B.H. Dennis, and R.D. Russell.
+\newblock A computational fluid dynamics based artificial neural network model
+  to predict solid particle erosion.
+\newblock {\em Wear}, 378-379:198--210, 2017.
+
+\bibitem{combust_cfd}
+A.~Penkner and P.~Jeschke.
+\newblock Analytic rayleigh pressure loss model for high-swirl combustion in a
+  rotating combustion chamber.
+\newblock {\em CEAS Aeronautical Journal}, 6(4):613--625, 2015.
+
+\bibitem{weather_pred}
+S.~Reichrath and T.W. Davies.
+\newblock Using cfd to model the internal climate of greenhouses: Past, present
+  and future.
+\newblock {\em Agronomie}, 22(1):3--19, 2002.
+
+\bibitem{america_cup}
+B.S. Rosen, J.P. Laiosa, and W.H. Davis~Jr.
+\newblock Cfd design studies for america's cup 2000.
+\newblock 2000.
+
+\bibitem{gasBubble}
+K.~Sankaranarayanan, X.~Shan, I.G. Kevrekidis, and S.~Sundaresan.
+\newblock Analysis of drag and virtual mass forces in bubbly suspensions using
+  an implicit formulation of the lattice boltzmann method.
+\newblock {\em Journal of Fluid Mechanics}, 452:61--96, 2002.
+
+\bibitem{szoke_thesis}
+Máté~Tibor Szőke.
+\newblock Efficient implementation of a 2d lattice boltzmann solver using
+  modern parallelisation techniques, 2014.
+
+\bibitem{koleszar_thesis}
+Ádám Koleszár.
+\newblock Optimisation of 2d lattice boltzmann method using cuda, 2015.
+
+\end{thebibliography}

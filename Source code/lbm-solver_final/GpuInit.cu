@@ -44,6 +44,7 @@ __constant__ FLOAT_TYPE maxInletCoordZ_d;
 __constant__ FLOAT_TYPE velMomMap3D_d[361];
 __constant__ FLOAT_TYPE momCollMtx3D_d[361];
 __constant__ FLOAT_TYPE wIn_d;
+__constant__ FLOAT_TYPE g_d;
 
 //COLOR GRADIENT //
 __constant__ FLOAT_TYPE beta_d;
@@ -137,6 +138,8 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(momCollMtx2D_d, momCollMtx2D,
 				81 * sizeof(FLOAT_TYPE));
 	}
+
+	cudaMemcpyToSymbol(g_d, &args->g, sizeof(FLOAT_TYPE));
 
 	if (args->multiPhase){
 		FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
@@ -629,8 +632,6 @@ __host__ void initConstants3D(Arguments *args,
 
 		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
-
-
 	}
 }
 

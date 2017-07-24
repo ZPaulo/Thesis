@@ -1,0 +1,161 @@
+\relax 
+\@writefile{toc}{\contentsline {chapter}{Abstract}{v}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{Table of Contents}{vii}}
+\@writefile{toc}{\contentsline {chapter}{List of Figures}{ix}}
+\@writefile{toc}{\contentsline {chapter}{List of Tables}{xi}}
+\@writefile{toc}{\contentsline {chapter}{List of Abbreviations}{xiii}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{Acknowledgements}{xv}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {1}Introduction}{1}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\citation{aircraft_cfd}
+\citation{partic_erosion_cfd}
+\citation{wind_flow_cfd}
+\@writefile{toc}{\contentsline {chapter}{\numberline {2}Literature review}{3}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {2.1}Computational Fluid Dynamics}{3}}
+\citation{combust_cfd}
+\citation{weather_pred}
+\citation{america_cup}
+\citation{race_car_wing}
+\citation{cfd_present}
+\citation{lbm_springer}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Macroscopic scale}{4}}
+\citation{lbm_springer}
+\citation{gasautomata}
+\citation{lbm_springer}
+\citation{lbm_springer}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Microscopic scale}{5}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}Lattice Boltzmann Method}{5}}
+\citation{lbm_springer}
+\citation{multiphase}
+\citation{chenDoolenMP}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces 2D LBM model using 9 particles. (D2Q9)\relax }}{6}}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:d2q9}{{2.1}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces 3D LBM model using 19 particles. (D3Q19)\relax }}{6}}
+\newlabel{fig:d3q19}{{2.2}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}Multiphase flow}{6}}
+\citation{pourous}
+\citation{gasBubble}
+\citation{multiphase}
+\citation{gunstensen}
+\citation{moore}
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}High Performance Computing}{7}}
+\citation{irenehpc}
+\citation{amdahl}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces Moore's law over 120 years\relax }}{8}}
+\newlabel{fig:moore}{{2.3}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces A graphical representation of Amdahl's law\relax }}{9}}
+\newlabel{fig:amdahl}{{2.4}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Distributed memory}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.2}Shared memory}{10}}
+\citation{cuda_by_example}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.3}GPGPU}{11}}
+\citation{jozsa_thesis}
+\citation{szoke_thesis}
+\citation{jozsa_thesis}
+\citation{szoke_thesis}
+\citation{szoke_thesis}
+\citation{koleszar_thesis}
+\citation{maciej_thesis}
+\@writefile{toc}{\contentsline {section}{\numberline {2.4}Previous parallelisation works}{12}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Methodology}{15}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Lattice Boltzmann Method}{15}}
+\newlabel{eq:boltzEq}{{3.1}{15}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Discretization}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Collision}{16}}
+\newlabel{eq:bgkwEq}{{3.2}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.3}Streaming}{17}}
+\newlabel{sec:streaming}{{3.1.3}{17}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Streaming step following a 2DQ9 model.\relax }}{17}}
+\newlabel{fig:streaming}{{3.1}{17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.4}Boundary update}{17}}
+\newlabel{sec:boundary}{{3.1.4}{17}}
+\@writefile{toc}{\contentsline {subsubsection}{Wall}{18}}
+\@writefile{toc}{\contentsline {subsubsection}{Periodic boundary conditions}{18}}
+\@writefile{toc}{\contentsline {subsubsection}{Inlet}{18}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.5}Macro-variables update}{19}}
+\newlabel{sec:mpUpd}{{3.1.5}{19}}
+\newlabel{eq:densityUp}{{3.4}{19}}
+\newlabel{eq:velocityUp}{{3.5}{19}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}Color Gradient Model}{19}}
+\newlabel{eq:cgDistrib}{{3.6}{20}}
+\newlabel{eq:cgColl}{{3.7}{20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Single-phase collision operator}{20}}
+\newlabel{eq:newFEQ}{{3.8}{20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Perturbation operator}{21}}
+\newlabel{eq:colorGrad}{{3.9}{21}}
+\newlabel{eq:pert}{{3.10}{21}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Recoloring operator}{21}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Streaming and Boundary conditions}{22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.5}Macro-variables update}{22}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Meshes}{22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Used meshes}{23}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}CUDA programming}{23}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Thread arrangement}{23}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Thread arrangement in CUDA platform.\relax }}{24}}
+\newlabel{fig:threads}{{3.2}{24}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Memory structures}{24}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces Memory arrangement in CUDA compliant GPU.\relax }}{25}}
+\newlabel{fig:memCuda}{{3.3}{25}}
+\@writefile{toc}{\contentsline {subsubsection}{Registers}{26}}
+\@writefile{toc}{\contentsline {subsubsection}{Shared memory}{26}}
+\@writefile{toc}{\contentsline {subsubsection}{Constant memory}{27}}
+\@writefile{toc}{\contentsline {subsubsection}{Global memory}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.3}Warps}{27}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Results and Discussion}{29}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}In-house LBM solver}{29}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Code organisation}{29}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces A simplified flowchart of the solver's activity\relax }}{30}}
+\newlabel{fig:codeFlow}{{4.1}{30}}
+\citation{maciej_thesis}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.2}Data representation}{31}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.3}Performance}{31}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime for Cavity\_128 and Cavity\_256\relax }}{32}}
+\newlabel{fig:compareTimes}{{4.2}{32}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Code profiling for the run-times of Cavity\_128 with MacroDiff residuals\relax }}{33}}
+\newlabel{fig:initialProfiling}{{4.3}{33}}
+\citation{antonioThesis}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Overall time comparison using three different threads per block configuration\relax }}{34}}
+\newlabel{fig:timesThreads}{{4.4}{34}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.4}Validation}{34}}
+\bibdata{AllBib}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusions}{37}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\bibcite{amdahl}{1}
+\bibcite{moore}{2}
+\bibcite{wind_flow_cfd}{3}
+\bibcite{multiphase}{4}
+\bibcite{chenDoolenMP}{5}
+\bibcite{aircraft_cfd}{6}
+\bibcite{race_car_wing}{7}
+\bibcite{cfd_present}{8}
+\bibcite{gasautomata}{9}
+\bibcite{gunstensen}{10}
+\bibcite{cuda_by_example}{11}
+\bibcite{jozsa_thesis}{12}
+\bibcite{maciej_thesis}{13}
+\bibcite{pourous}{14}
+\bibcite{lbm_springer}{15}
+\bibcite{irenehpc}{16}
+\bibcite{partic_erosion_cfd}{17}
+\bibcite{combust_cfd}{18}
+\bibcite{weather_pred}{19}
+\bibcite{america_cup}{20}
+\bibcite{gasBubble}{21}
+\bibcite{szoke_thesis}{22}
+\bibcite{koleszar_thesis}{23}
+\bibstyle{plain}

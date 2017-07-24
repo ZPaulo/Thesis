@@ -49,7 +49,7 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 	int ms = depth_d * length_d;
 
 	FLOAT_TYPE r_r, b_r, u, v, r, chi;
-
+	FLOAT_TYPE aux1, mean_nu, omega_eff;
 	if (ind < ms) {
 		//necessary because of sum
 		p_in_d[ind] = 0;
@@ -98,7 +98,11 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 					(r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms]) -
 					(r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms]);
 
-			u_d[ind] = u / r;
+			aux1 = r_r / (r * r_viscosity_d) + b_r /(r * b_viscosity_d);
+			mean_nu = 1.0/aux1;
+			omega_eff = 1.0/(3.0*mean_nu+0.5);
+
+			u_d[ind] = u / r + g_d / (omega_eff);
 
 			v_d[ind] = v / r;
 
