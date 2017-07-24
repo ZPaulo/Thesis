@@ -55,3 +55,6 @@ FLOAT_TYPE getMaxYOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m,
 
 FLOAT_TYPE validateOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *extremes, int size,
 		FLOAT_TYPE ST_predicted, FLOAT_TYPE r_density, FLOAT_TYPE b_density);
+
+void analyticalPoiseuille(int m, int n, FLOAT_TYPE *analytical, FLOAT_TYPE r_density, FLOAT_TYPE b_density,
+		FLOAT_TYPE r_visc, FLOAT_TYPE b_visc, FLOAT_TYPE g, FLOAT_TYPE *y);

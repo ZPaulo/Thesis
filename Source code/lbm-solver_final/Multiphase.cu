@@ -1249,3 +1249,29 @@ FLOAT_TYPE validateOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m
 	printf("Theoretical "FLOAT_FORMAT" vs Numerical "FLOAT_FORMAT"\n", theoretical_omega, numerical_omega);
 	return (abs(theoretical_omega - numerical_omega) / theoretical_omega )* 100.0;
 }
+
+void analyticalPoiseuille(int m, int n, FLOAT_TYPE *analytical, FLOAT_TYPE r_density, FLOAT_TYPE b_density,
+		FLOAT_TYPE r_visc, FLOAT_TYPE b_visc, FLOAT_TYPE g, FLOAT_TYPE *y){
+
+	FLOAT_TYPE r_mu, b_mu;
+	r_mu = r_density * r_visc;
+	b_mu = b_density * b_visc;
+	int j_start, i;
+	if(m % 2 == 0)
+		j_start = m/2;
+	else
+		j_start = (m+1) / 2;
+	if(n % 2 == 0)
+		i = n/2;
+	else
+		i = (n+1) / 2;
+
+	for(int j = j_start; j < m; j++){
+		analytical[j] = -g * y[j * n + i] * y[j * n + i] / (2.0 * r_mu) + g * ((3.0 * b_mu + r_mu ) * y[j * n + i] / (4.0 * r_mu * (r_mu + b_mu))) +
+				g / (2.0 * r_mu)  - g * ((3.0 * b_mu + r_mu) / (4.0 * r_mu * (r_mu + b_mu)));
+	}
+	for(int j = 0; j < j_start; j++){
+		analytical[j] = -g * y[j * n + i] * y[j * n + i] / (2.0 * b_mu) + g * ((3.0 * b_mu + r_mu) * y[j * n + i]) / (4.0 * b_mu * (r_mu + b_mu));
+	}
+
+}

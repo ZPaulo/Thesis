@@ -102,9 +102,8 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 			mean_nu = 1.0/aux1;
 			omega_eff = 1.0/(3.0*mean_nu+0.5);
 
-			u_d[ind] = u / r + g_d / (omega_eff);
-
-			v_d[ind] = v / r;
+			u_d[ind] = u / r + external_force_d * g_d / (r * omega_eff);
+			v_d[ind] = v / r + (1-external_force_d) * g_d / omega_eff;
 
 			// p_in and p_out for the surface tension
 			chi=(r_r-b_r)/r;

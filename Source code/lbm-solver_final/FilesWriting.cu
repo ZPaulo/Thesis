@@ -361,18 +361,15 @@ void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *co
 	sprintf(outputFile, "./Results/%s.txt", fileName);
 	FILE * fp1;                 // file pointer to output file
 	fp1 = fopen(outputFile, "w"); // open file
+	fprintf(fp1, "y numerical analytical\n");
 	int i;
-	//	if(m % 2 == 0)
-	//		j = m/2;
-	//	else
-	//		j = (m+1) / 2;
 	if(n % 2 == 0)
 		i = n/2;
 	else
 		i = (n+1) / 2;
 
 	for (int j = 0; j < m; j++) {
-		fprintf(fp1, "%.10f %.10f %.4f\n", computed[j * n + i], analytical[j], y[j * n + i]);
+		fprintf(fp1, "%.4f %.10f %.10f\n", y[j * n + i], computed[j * n + i], analytical[j]);
 	}
 
 	fclose(fp1);

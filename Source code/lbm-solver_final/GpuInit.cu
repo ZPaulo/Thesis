@@ -55,6 +55,7 @@ __constant__ FLOAT_TYPE A_d;
 __constant__ FLOAT_TYPE r_density_d;
 __constant__ FLOAT_TYPE b_density_d;
 __constant__ FLOAT_TYPE st_predicted_d;
+__constant__ bool external_force_d;
 
 //COLOR GRADIENT 2D//
 __constant__ FLOAT_TYPE a1_d;
@@ -196,6 +197,7 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(cg_w_d, cg_w, 9 * sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(external_force_d, &args->external_force, sizeof(bool));
 	}
 }
 

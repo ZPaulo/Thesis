@@ -76,6 +76,7 @@ extern __constant__ FLOAT_TYPE bubble_radius_d;
 extern __constant__ FLOAT_TYPE st_predicted_d;
 extern __constant__ FLOAT_TYPE r_density_d;
 extern __constant__ FLOAT_TYPE b_density_d;
+extern __constant__ bool external_force_d;
 
 //#### 2D Color Gradient ####//
 extern __constant__ FLOAT_TYPE a1_d;

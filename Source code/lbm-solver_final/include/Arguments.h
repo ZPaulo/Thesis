@@ -126,6 +126,8 @@ typedef struct arg
     FLOAT_TYPE control_param;
     FLOAT_TYPE g_limit;
     int test_case;
+    bool external_force;
+
     //Bubble case
     FLOAT_TYPE bubble_radius;
     //COUETTE case

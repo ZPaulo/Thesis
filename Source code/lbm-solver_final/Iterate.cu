@@ -98,7 +98,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *bcY_d = createGpuArrayFlt(numConns, ARRAY_COPY, 0., bcY);
 	m = getLastValue(nodeIdY, numNodes);
 	n = getLastValue(nodeIdX, numNodes);
- printf("Num conne %d\n", numConns);
+	printf("Num conne %d\n", numConns);
 
 	delta = getGridSpacing(nodeIdX, nodeIdY, nodeX, numNodes);
 	numInletNodes = getNumInletNodes(bcType, latticeId, numConns,
@@ -451,8 +451,6 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 #else
 			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, r_f_d, b_f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d, cg_dir_d, args->test_case);
 
-			CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
-			CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
 			//			updateSurfaceTension(r_rho,b_rho,args->control_param, st_predicted, st_error, iter,args->r_alpha, args->b_alpha, args->bubble_radius, n ,m);
 			//gpu reduction is faster than serial surface tension
 			switch(args->test_case){
@@ -462,6 +460,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 				st_error[iter] = calculateSurfaceTension(p_in_mean, p_out_mean,args->r_alpha, args->b_alpha, args->bubble_radius, st_predicted);
 				break;
 			case 5:
+				CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
 				oscilating_y[iter] = getMaxYOscilating(r_rho, b_rho, n, m, nodeY);
 				break;
 			default:
@@ -556,7 +556,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																												/ CLOCKS_PER_SEC;
+																																																																																																																																																														/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -609,8 +609,14 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			WriteArray("surface tension",st_error, args->iterations,1);
 			break;
 		case 2:
-			analyticalCouette(args->kappa, nodeY, m, n, analytical);
-			writeCouetteSolution("Profile_Couette", analytical, u, nodeY, m, n);
+			if(args->g == 0.0){
+				analyticalCouette(args->kappa, nodeY, m, n, analytical);
+				writeCouetteSolution("Profile_Couette", analytical, u, nodeY, m, n);
+			}
+			else{
+				analyticalPoiseuille(m, n, analytical, args->r_density, args->b_density, args->r_viscosity, args->b_viscosity, args->g, nodeY);
+				writeCouetteSolution("Profile_Poiseuille", analytical, u, nodeY, m, n);
+			}
 			break;
 		case 3:
 			printf("Error %: "FLOAT_FORMAT"\n", deformingBubbleValid(r_rho, b_rho, n, m, (m / 2.0) * (n / 2.0)));

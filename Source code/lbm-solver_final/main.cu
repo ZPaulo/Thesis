@@ -58,6 +58,7 @@ int main(int argc, char* argv[]) {
 		args.b_alpha = 0.2;
 		args.r_viscosity = 1.0 / 6.0;
 		args.b_viscosity = args.r_viscosity / args.kappa * args.gamma;
+
 		//args.b_viscosity = 1.0 / 30.0;
 		args.beta = 0.99;
 		args.r_A = 0.0;
@@ -71,6 +72,7 @@ int main(int argc, char* argv[]) {
 		//Not file
 		args.b_density = args.r_density / args.gamma;
 		args.r_alpha = (1.0 - ((1.0 - args.b_alpha) / args.gamma));
+		args.external_force = 1; //0 is gravity, 1 for pressure difference
 	}
 
 	InputFilenames inFn;
