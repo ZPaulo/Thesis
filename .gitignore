@@ -2,3 +2,5 @@ Source\ code/lbm-solver_final/Results/*
 Source\ code/lbm-solver_final/Mesh/*
 *.vti
 *.o
+*.gz
+*/STARCDfiles/*
