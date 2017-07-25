@@ -216,9 +216,9 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	switch (cg_dir_d) {
 	case 0:
 		for(i = 1; i < 19; i++){
-			ind = index + c3D_d[i];
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			ind = index - c3D_d[i];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			grx += aux2 * cx3D_d[i];
 			gry += aux2 * cy3D_d[i];
@@ -232,8 +232,8 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	case 1: //NORTH
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] - abs(cy3D_d[i]) * length_d + cz3D_d[i] * ms;
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			grx += aux2 * cx3D_d[i];
 			grz += aux2 * cz3D_d[i];
@@ -245,8 +245,8 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	case 2: //SOUTH
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] + abs(cy3D_d[i]) * length_d + cz3D_d[i] * ms;
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			grx += aux2 * cx3D_d[i];
 			grz += aux2 * cz3D_d[i];
@@ -258,8 +258,8 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	case 3: //EAST
 		for(i = 1; i < 19; i++){
 			ind = index - abs(cx3D_d[i]) + cy3D_d[i] * length_d + cz3D_d[i] * ms;
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			gry += aux2 * cy3D_d[i];
 			grz += aux2 * cz3D_d[i];
@@ -271,8 +271,8 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	case 4: //WEST
 		for(i = 1; i < 19; i++){
 			ind = index + abs(cx3D_d[i]) + cy3D_d[i] * length_d + cz3D_d[i] * ms;
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			gry += aux2 * cy3D_d[i];
 			grz += aux2 * cz3D_d[i];
@@ -284,8 +284,8 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	case 5: // FRONT
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] + cy3D_d[i] * length_d - abs(cz3D_d[i]) * ms;
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			grx += aux2 * cx3D_d[i];
 			gry += aux2 * cy3D_d[i];
@@ -297,8 +297,8 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	case 6: // BACK
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] + cy3D_d[i] * length_d + abs(cz3D_d[i]) * ms;
-			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
-			aux2 = cg_w_d[i] * rho_d[ind];
+			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w3D_d[i] * rho_d[ind];
 
 			grx += aux2 * cx3D_d[i];
 			gry += aux2 * cy3D_d[i];
@@ -469,13 +469,13 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 		// invariable quantities
 		color_gradient_norm = sqrt(cg_x * cg_x + cg_y * cg_y + cg_z * cg_z);
+
 		k_r = r_r / r;
 		k_b = b_r / r;
 		k_k = beta_d * r_r * b_r / r;
 
 		mean_nu = 1.0 / (r_r / (r * r_viscosity_d ) + b_r / (r * b_viscosity_d));
 		omega_eff = 1.0/(3.0*mean_nu+0.5);
-
 		mean_alpha = r_alpha_d * r_r / r + b_alpha_d * b_r / r;
 
 		for (int dir=0;dir < 19;dir++){
@@ -490,9 +490,7 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 				else
 					cosin=0.0;
 				// calculate perturbation terms
-
 				pert=0.5 * A_d * color_gradient_norm * (w3D_d[dir]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert3D_d[dir]);
-
 			}
 			else{
 				// the perturbation terms are null
@@ -523,7 +521,7 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 
 			r_fColl_d[ind + dir * ms] = k_r * f_CollPert + k_k * cosin * (phi3D_d[dir] + teta3D_d[dir] * mean_alpha);
-			b_fColl_d[ind + dir * ms] = k_b * f_CollPert + k_k * cosin * (phi3D_d[dir] + teta3D_d[dir] * mean_alpha);
+			b_fColl_d[ind + dir * ms] = k_b * f_CollPert - k_k * cosin * (phi3D_d[dir] + teta3D_d[dir] * mean_alpha);
 		}
 	}
 

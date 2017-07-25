@@ -55,20 +55,20 @@ int main(int argc, char* argv[]) {
 		args.r_density = 1.0;
 		args.gamma = 1.0;
 		args.kappa = 1.0;
-		args.b_alpha = 0.2;
-		args.r_viscosity = 1.0 / 6.0;
+		args.b_alpha = 0.6;
+		args.r_viscosity = 4.0 / 9.0;
 		args.b_viscosity = args.r_viscosity / args.kappa * args.gamma;
 
 		//args.b_viscosity = 1.0 / 30.0;
 		args.beta = 0.99;
 		args.r_A = 0.0;
 		args.b_A = 0.0;
-		args.A = 0.0004;
+		args.A = 0.0001;
 		args.control_param = 0.9;
 		args.del = 0.1;
 		args.g_limit = 0;
 		args.bubble_radius = 18.0/128.0;
-		args.test_case = 2;
+		args.test_case = 1;
 		//Not file
 		args.b_density = args.r_density / args.gamma;
 		args.r_alpha = (1.0 - ((1.0 - args.b_alpha) / args.gamma));

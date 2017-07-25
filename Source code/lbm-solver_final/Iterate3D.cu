@@ -210,8 +210,6 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		w_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 		rho_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 	}
-	printf("WHAT1\n");
-
 
 	//Multiphase Color Gradient
 	FLOAT_TYPE *f, *r_rho, *b_rho, *st_error, *color_gradient, *r_f, *b_f, *r_fColl, *b_fColl;
@@ -459,7 +457,6 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			100.0 * (total - free) / (double) total);
 	int iter = 0;
 	while (iter < args->iterations) {
-		printf("\n");
 		CHECK(cudaThreadSynchronize());
 		CHECK(cudaEventRecord(start, 0)); // Start measuring time
 		////////////// COLLISION ///////////////
