@@ -77,6 +77,9 @@ extern __constant__ FLOAT_TYPE st_predicted_d;
 extern __constant__ FLOAT_TYPE r_density_d;
 extern __constant__ FLOAT_TYPE b_density_d;
 extern __constant__ bool external_force_d;
+extern __constant__ FLOAT_TYPE hocg_w_d[25];
+extern __constant__ int hocg_cx_d[25];
+extern __constant__ int hocg_cy_d[25];
 
 //#### 2D Color Gradient ####//
 extern __constant__ FLOAT_TYPE a1_d;

@@ -75,6 +75,9 @@ __constant__ FLOAT_TYPE w_pert_d[9];
 __constant__ FLOAT_TYPE g_limit_d;
 __constant__ FLOAT_TYPE c_norms_d[9];
 __constant__ FLOAT_TYPE cg_w_d[9];
+__constant__ FLOAT_TYPE hocg_w_d[25];
+__constant__ int hocg_cx_d[25];
+__constant__ int hocg_cy_d[25];
 
 //COLOR GRADIENT 3D//
 __constant__ FLOAT_TYPE r_viscosity_d;
@@ -198,6 +201,13 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(external_force_d, &args->external_force, sizeof(bool));
+
+		FLOAT_TYPE hocg_w[25] = {0., 960., 960., 960., 960., 448., 448., 448., 448., 84., 32., 1., 32., 84., 32., 1., 32., 84., 32., 1., 32., 84., 32., 1., 32.};
+		cudaMemcpyToSymbol(hocg_w_d, hocg_w, 25 * sizeof(FLOAT_TYPE));
+		int hocg_cx[25] = {0,1,0,-1,0,1,-1,-1,1,0,1,2,2,2,2,2,1,0,-1,-2,-2,-2,-2,-2,-1};
+		cudaMemcpyToSymbol(hocg_cx_d, hocg_cx, 25 * sizeof(int));
+		int hocg_cy[25] = {0,0,1,0,-1,1,1,-1,-1,2,2,2,1,0,-1,-2,-2,-2,-2,-2,-1,0,1,2,2};
+		cudaMemcpyToSymbol(hocg_cy_d, hocg_cy, 25 * sizeof(int));
 	}
 }
 
