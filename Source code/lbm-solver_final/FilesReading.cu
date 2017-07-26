@@ -98,7 +98,7 @@ void readInitFile(const char* filename, Arguments *args) {
 	args->iterations = atoi(line[11].c_str());
 	args->autosaveAfter = atoi(line[12].c_str());
 	args->autosaveEvery = atoi(line[13].c_str());
-	sscanf(line[14].c_str(), "%g %g %g %g", &args->StopCondition[0],
+	sscanf(line[14].c_str(), FLOAT_FORMAT" "FLOAT_FORMAT" "FLOAT_FORMAT" "FLOAT_FORMAT, &args->StopCondition[0],
 			&args->StopCondition[1], &args->StopCondition[2],
 			&args->StopCondition[3]);
 

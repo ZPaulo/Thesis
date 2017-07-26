@@ -194,8 +194,10 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	int *num_out_d = createGpuArrayInt(n*m, ARRAY_ZERO);
 	FLOAT_TYPE *oscilating_y = createHostArrayFlt(args->iterations, ARRAY_NONE);
 	FLOAT_TYPE *u0_d, *v0_d;
-
-
+	FLOAT_TYPE fMaxDiff = -1;
+	bool h_divergence;
+	bool *d_divergence;
+	CHECK(cudaMalloc(&d_divergence,sizeof(bool)));
 
 	if (args->inletProfile == NO_INLET) {
 		u0_d = createGpuArrayFlt(m * n, ARRAY_FILL, args->u);
@@ -211,6 +213,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *lift_d = createGpuArrayFlt(m * n, ARRAY_ZERO);
 
 	FLOAT_TYPE *f_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
+	FLOAT_TYPE *f_prev_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
 
 	FLOAT_TYPE *temp9a_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
@@ -226,7 +229,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	if(args->multiPhase){
 		initColorGradient(cg_directions, n, m);
 		CHECK(cudaMemcpy(cg_dir_d, cg_directions, SIZEINT(m*n), cudaMemcpyHostToDevice));
-		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, args->test_case);
+		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d,f_d, args->test_case);
 	}
 
 
@@ -449,7 +452,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			updateMacroMP(n,m,u,v,r_rho, b_rho, r_f, b_f, rho, args->control_param,args->r_alpha, args->b_alpha,
 					args->bubble_radius,st_error, iter,st_predicted,args->test_case);
 #else
-			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, r_f_d, b_f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d, cg_dir_d, args->test_case);
+			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, r_f_d, b_f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d, cg_dir_d,
+					f_d,args->test_case);
 
 			//			updateSurfaceTension(r_rho,b_rho,args->control_param, st_predicted, st_error, iter,args->r_alpha, args->b_alpha, args->bubble_radius, n ,m);
 			//gpu reduction is faster than serial surface tension
@@ -484,44 +488,52 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaEventRecord(start, 0));
 		FLOAT_TYPE r;
 		if(args->multiPhase){
-#if !CUDA
-			CHECK(cudaMemcpy(r_f_d, r_f, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-			CHECK(cudaMemcpy(b_f_d, b_f, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-			CHECK(cudaMemcpy(r_fColl_d, r_fColl, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-			CHECK(cudaMemcpy(b_fColl_d, b_fColl, SIZEFLT(m*n *9), cudaMemcpyHostToDevice));
-#endif
-			r = computeResidual2D(r_f_d, r_fColl_d, temp9a_d, temp9b_d, m,n);
+			gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
+			fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
 
-		}else
+			CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
+			if (h_divergence) {
+				fprintf(stderr, "\nDIVERGENCE!\n");
+				break;
+			}
+			if(abs(fMaxDiff) < args->StopCondition[0]){
+				printf("simulation converged!\n");
+				break;
+			}
+			CHECK(cudaFree(f_prev_d));
+			f_prev_d = createGpuArrayFlt(n * m * 9, ARRAY_CPYD, 0, f_d);
+
+		}else{
 			r = computeResidual2D(f_d, fColl_d, temp9a_d, temp9b_d, m,n);
-		if (r != r) {
-			fprintf(stderr, "\nDIVERGENCE!\n");
+			if (r != r) {
+				fprintf(stderr, "\nDIVERGENCE!\n");
 
-			writeResiduals(residualsFilename, norm, dragSum, liftSum, m * n,
-					iter + 1);
-			cudaEventDestroy(start);
-			cudaEventDestroy(stop);
+				writeResiduals(residualsFilename, norm, dragSum, liftSum, m * n,
+						iter + 1);
+				cudaEventDestroy(start);
+				cudaEventDestroy(stop);
 
-			freeAllHost(hostArrays, sizeof(hostArrays) / sizeof(hostArrays[0]));
-			freeAllGpu(gpuArrays, sizeof(gpuArrays) / sizeof(gpuArrays[0]));
+				freeAllHost(hostArrays, sizeof(hostArrays) / sizeof(hostArrays[0]));
+				freeAllGpu(gpuArrays, sizeof(gpuArrays) / sizeof(gpuArrays[0]));
 
-			return 1; // ERROR!
-		}
-		norm[iter] = r;
-		if (args->boundaryId > 0) {
-			dragSum[iter] = computeDragLift2D(bcMask_d, drag_d, tempA_d,
-					tempB_d, m, n, args->boundaryId);
-			liftSum[iter] = computeDragLift2D(bcMask_d, lift_d, tempA_d,
-					tempB_d, m, n, args->boundaryId);
+				return 1; // ERROR!
+			}
+			norm[iter] = r;
+			if (args->boundaryId > 0) {
+				dragSum[iter] = computeDragLift2D(bcMask_d, drag_d, tempA_d,
+						tempB_d, m, n, args->boundaryId);
+				liftSum[iter] = computeDragLift2D(bcMask_d, lift_d, tempA_d,
+						tempB_d, m, n, args->boundaryId);
+			}
 		}
 
 		CHECK(cudaEventRecord(stop, 0));
 		CHECK(cudaEventSynchronize(stop));
 		CHECK(cudaEventElapsedTime(&cudatime, start, stop));
 		taskTime[T_RESI] += cudatime;
-		printf("Iterating... %d/%d (%3.1f %%)\r", iter + 1, args->iterations,
+		printf("Iterating... %d/%d (%3.1f %%) Residual Max %.10f\r", iter + 1, args->iterations,
 				(FLOAT_TYPE) (iter + 1) * 100
-				/ (FLOAT_TYPE) (args->iterations));
+				/ (FLOAT_TYPE) (args->iterations), fMaxDiff);
 
 		iter++; // update loop variable
 		////////////// Autosave ///////////////
@@ -556,7 +568,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																														/ CLOCKS_PER_SEC;
+																																																																																																																																																																								/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -619,15 +631,15 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			}
 			break;
 		case 3:
-			printf("Error %: "FLOAT_FORMAT"\n", deformingBubbleValid(r_rho, b_rho, n, m, (m / 2.0) * (n / 2.0)));
+			printf("Error % : "FLOAT_FORMAT"\n", deformingBubbleValid(r_rho, b_rho, n, m, (m / 2.0) * (n / 2.0)));
 			break;
 		case 4:
 			//validate coalescence case
-			printf("Error %: "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
+			printf("Error % : "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
 			break;
 		case 5:
 			writeOscilatingSolution("Oscilating_frequency", oscilating_y, args->iterations);
-			printf("Error %: "FLOAT_FORMAT"\n", validateOscilating(r_rho, b_rho, n, m, oscilating_y, args->iterations,st_predicted, args->r_density, args->b_density));
+			printf("Error % : "FLOAT_FORMAT"\n", validateOscilating(r_rho, b_rho, n, m, oscilating_y, args->iterations,st_predicted, args->r_density, args->b_density));
 			break;
 		default:
 			printf("Suface tension error: "FLOAT_FORMAT"\n", st_error[iter-1]);

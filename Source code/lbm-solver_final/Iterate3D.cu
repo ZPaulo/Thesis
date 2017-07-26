@@ -64,7 +64,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE maxInletCoordZ; // maximum inlet coordinate in z
 	FLOAT_TYPE minInletCoordZ; // minimum inlet coordinate in z
 	int numInletNodes;         // number of inlet nodes
-	FLOAT_TYPE uMaxDiff = -1, vMaxDiff = -1, wMaxDiff = -1, rhoMaxDiff = -1;
+	FLOAT_TYPE uMaxDiff = -1, vMaxDiff = -1, wMaxDiff = -1, rhoMaxDiff = -1, fMaxDiff = -1;
 	int *nodeIdX, *nodeIdY, *nodeIdZ, *nodeType, *bcNodeIdX, *bcNodeIdY,
 	*bcNodeIdZ, *latticeId, *bcType, *bcBoundId;
 	FLOAT_TYPE *nodeX, *nodeY, *nodeZ, *bcX, *bcY, *bcZ;
@@ -203,12 +203,16 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		//		gpuInitInletProfile3D<<<(int) (m * h / THREADS) + 1, tpb>>>(u1_d, v1_d,
 		//				w1_d, coordY_d, coordZ_d, m * h);
 	}
-	FLOAT_TYPE *u_prev_d, *v_prev_d, *w_prev_d, *rho_prev_d;
+	FLOAT_TYPE *u_prev_d, *v_prev_d, *w_prev_d, *rho_prev_d, *f_prev_d;
 	if (args->TypeOfResiduals == MacroDiff) {
-		u_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-		v_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-		w_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-		rho_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+		if(args->multiPhase)
+			f_prev_d = createGpuArrayFlt(m * n * h * 19, ARRAY_ZERO);
+		else{
+			u_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+			v_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+			w_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+			rho_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+		}
 	}
 
 	//Multiphase Color Gradient
@@ -301,7 +305,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	if(args->multiPhase){
 		initColorGradient3D(cg_directions, n, m, h);
 		CHECK(cudaMemcpy(cg_dir_d, cg_directions, SIZEINT(m*n*h), cudaMemcpyHostToDevice));
+		CHECK(cudaThreadSynchronize());
 		initCGBubble3D<<<bpg1,tpb>>>(coordX_d,coordY_d,coordZ_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, f_d, 1);
+		CHECK(cudaThreadSynchronize());
 	}
 #endif
 
@@ -315,7 +321,11 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	}
 
 	FLOAT_TYPE *temp19a_d, *temp19b_d;
-	if (args->TypeOfResiduals != MacroDiff) {
+	if(args->multiPhase){
+		temp19a_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
+		temp19b_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
+	}
+	else if (args->TypeOfResiduals != MacroDiff) {
 		temp19a_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 		temp19b_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	}
@@ -637,44 +647,59 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 					bool h_divergence = false;
 					CHECK(cudaMalloc(&d_divergence,sizeof(bool)));
 					CHECK(cudaMemcpy(d_divergence,&h_divergence,sizeof(bool),cudaMemcpyHostToDevice));
-					gpu_abs_sub<<<bpg1, tpb>>>(u_d, u_prev_d, tempA_d,
-							n * m * h, d_divergence);
-					uMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
-					gpu_abs_sub<<<bpg1, tpb>>>(v_d, v_prev_d, tempA_d,
-							n * m * h, d_divergence);
-					vMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
-					gpu_abs_sub<<<bpg1, tpb>>>(w_d, w_prev_d, tempA_d,
-							n * m * h, d_divergence);
-					wMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
-					gpu_abs_sub<<<bpg1, tpb>>>(rho_d, rho_prev_d, tempA_d,
-							n * m * h, d_divergence);
-					CHECK(
-							cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
+					if(args->multiPhase){
+						gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp19a_d, n * m * h * 19, d_divergence);
+						fMaxDiff = gpu_max_h(temp19a_d, temp19b_d, n * m * h * 19);
+					}
+					else{
+						gpu_abs_sub<<<bpg1, tpb>>>(u_d, u_prev_d, tempA_d,
+								n * m * h, d_divergence);
+						uMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
+						gpu_abs_sub<<<bpg1, tpb>>>(v_d, v_prev_d, tempA_d,
+								n * m * h, d_divergence);
+						vMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
+						gpu_abs_sub<<<bpg1, tpb>>>(w_d, w_prev_d, tempA_d,
+								n * m * h, d_divergence);
+						wMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
+						gpu_abs_sub<<<bpg1, tpb>>>(rho_d, rho_prev_d, tempA_d,
+								n * m * h, d_divergence);
+						rhoMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
+					}
+					CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
 					CHECK(cudaFree(d_divergence));
 					if (h_divergence) {
 						fprintf(stderr, "\nDIVERGENCE!\n");
 						break;
 					}
-					rhoMaxDiff = gpu_max_h(tempA_d, tempB_d, n * m * h);
-					if (abs(uMaxDiff) < args->StopCondition[0] &&
+
+					if(args->multiPhase){
+						if(abs(fMaxDiff) < args->StopCondition[0]){
+							printf("simulation converged!\n");
+							break;
+						}
+					}
+					else if (abs(uMaxDiff) < args->StopCondition[0] &&
 							abs(vMaxDiff) < args->StopCondition[1] &&
 							abs(wMaxDiff) < args->StopCondition[2] &&
 							abs(rhoMaxDiff) < args->StopCondition[3]) {
 						printf("simulation converged!\n");
 						break;
 					}
-					writeMacroDiffs(iter + 1, uMaxDiff, vMaxDiff, wMaxDiff,
-							rhoMaxDiff);
-					CHECK(cudaFree(u_prev_d));
-					CHECK(cudaFree(v_prev_d));
-					CHECK(cudaFree(w_prev_d));
-					CHECK(cudaFree(rho_prev_d));
-					u_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0, u_d);
-					v_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0, v_d);
-					w_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0, w_d);
-					rho_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0,
-							rho_d);
-
+					//writeMacroDiffs(iter + 1, uMaxDiff, vMaxDiff, wMaxDiff,	rhoMaxDiff);
+					if(args->multiPhase){
+						CHECK(cudaFree(f_prev_d));
+						f_prev_d = createGpuArrayFlt(n * m * h * 19, ARRAY_CPYD, 0, f_d);
+					}else{
+						CHECK(cudaFree(u_prev_d));
+						CHECK(cudaFree(v_prev_d));
+						CHECK(cudaFree(w_prev_d));
+						CHECK(cudaFree(rho_prev_d));
+						u_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0, u_d);
+						v_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0, v_d);
+						w_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0, w_d);
+						rho_prev_d = createGpuArrayFlt(n * m * h, ARRAY_CPYD, 0,
+								rho_d);
+					}
 				}
 			}
 
@@ -744,7 +769,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						u, v, w, rho, nodeType, n, m, h, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																		/ CLOCKS_PER_SEC;
+																																																																												/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////

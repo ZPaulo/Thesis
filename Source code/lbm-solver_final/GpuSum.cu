@@ -9,10 +9,10 @@
 
 __global__ void gpu_abs_sub(FLOAT_TYPE *A, FLOAT_TYPE *B, FLOAT_TYPE *C,
 		int size, bool *divergence) {
-
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
 			+ threadIdx.x;
+	*divergence = false;
 	if (ind < size) {
 		if(A[ind]!=A[ind]||B[ind]!=B[ind]) {
 			*divergence=true;

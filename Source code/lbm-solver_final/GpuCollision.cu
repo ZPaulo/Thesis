@@ -42,9 +42,6 @@ __device__ FLOAT_TYPE calculateColorGradientY(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b
 
 	FLOAT_TYPE res = 0.0;
 	int n = length_d;
-
-	//int cx2D[9] = { 0, 1, 0, -1,  0, 1, -1, -1,  1 };
-	//int cy2D[9] = { 0, 0, 1,  0, -1, 1,  1, -1, -1 };
 	FLOAT_TYPE cg_w1 = 4.0/12.0;
 	FLOAT_TYPE cg_w2 = 1.0/12.0;
 	switch (cg_dir_d) {
@@ -84,9 +81,6 @@ __device__ FLOAT_TYPE calculateColorGradientX(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b
 	FLOAT_TYPE res = 0.0;
 	int n = length_d;
 
-	//int cx2D[9] = { 0, 1, 0, -1,  0, 1, -1, -1,  1 };
-	//int cy2D[9] = { 0, 0, 1,  0, -1, 1,  1, -1, -1 };
-	//cg weights = {0, 4, 4, 4, 4, 1, 1, 1, 1}/12
 	FLOAT_TYPE cg_w1 = 4.0/12.0;
 	FLOAT_TYPE cg_w2 = 1.0/12.0;
 	switch (cg_dir_d) {
@@ -389,7 +383,7 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 		r_omega_temp=omega_eff;
 		b_omega_temp=omega_eff;
 
-		calculateHOColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &color_gradient_x, &color_gradient_y);
+		calculateColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &color_gradient_x, &color_gradient_y);
 		//		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		//		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 
