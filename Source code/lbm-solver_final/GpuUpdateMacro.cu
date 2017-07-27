@@ -139,7 +139,7 @@ __global__ void gpuUpdateMacro3D(int *fluid_d, FLOAT_TYPE* rho_d,
 {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																									+ threadIdx.x;
+																																	+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	FLOAT_TYPE r, rU, rV, rW;
@@ -213,16 +213,23 @@ __global__ void gpuUpdateMacro3D(int *fluid_d, FLOAT_TYPE* rho_d,
 __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* w_d, int* bcBoundId_d,
 		FLOAT_TYPE* f_d, FLOAT_TYPE g, unsigned long long *bcMask_d,int updateInltOutl, FLOAT_TYPE* r_f_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* r_rho_d,
-		FLOAT_TYPE* b_rho_d)
+		FLOAT_TYPE* b_rho_d, FLOAT_TYPE *p_in_d, FLOAT_TYPE *p_out_d,
+		int *num_in_d, int *num_out_d, int test_case)
 {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
-	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																									+ threadIdx.x;
+	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x) + threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	FLOAT_TYPE r_r, b_r, r, rU, rV, rW;
 
 	if (ind < ms) {
+		//necessary because of sum
+		if(test_case == 1){
+			p_in_d[ind] = 0;
+			p_out_d[ind] = 0;
+			num_in_d[ind] = 0;
+			num_out_d[ind] = 0;
+		}
 		if (fluid_d[ind] == 1) {
 			r_r = b_r = rU = rV = rW = 0.0;
 			r_r = r_f_d[ind] +
@@ -324,10 +331,23 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 			r = r_r + b_r;
 
 			rho_d[ind] = r;
-			//GRAVITY? u_d[ind] = rU / r + g / (omega_d);
 			u_d[ind] = rU / r;
 			v_d[ind] = rV / r;
 			w_d[ind] = rW / r;
+
+			if(test_case == 1){
+				// p_in and p_out for the surface tension
+				FLOAT_TYPE chi=(r_r-b_r)/r;
+
+				if (chi >= control_param_d){
+					num_in_d[ind] = 1;
+					p_in_d[ind] = r_r;
+				}
+				else if (chi <= -control_param_d){
+					num_out_d[ind] = 1;
+					p_out_d[ind] = b_r;
+				}
+			}
 		}
 	}
 

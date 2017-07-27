@@ -1088,39 +1088,63 @@ void updateSurfaceTension(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE contr
 	st_error[iteration]=abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
 
-FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted){
+FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha,
+		FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted){
 
 	FLOAT_TYPE st_laplace;
 	p_in_mean=(3.0/5.0)*(1.0-r_alpha)*p_in_mean;      // pressure average inside the bubble
 	p_out_mean=(3.0/5.0)*(1.0-b_alpha)*p_out_mean;   // pressure average outside the bubble
-	st_laplace=20*(p_in_mean-p_out_mean);
+	st_laplace=bubble_radius * (p_in_mean-p_out_mean);
 
 	return abs(st_predicted-st_laplace)/(st_predicted)*100.0;
 }
 
-FLOAT_TYPE validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE radius){
-	int j;
+FLOAT_TYPE calculateSurfaceTension3D(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha,
+		FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted){
+
+	FLOAT_TYPE st_laplace;
+	p_in_mean=(1.0/2.0)*(1.0-r_alpha)*p_in_mean;      // pressure average inside the bubble
+	p_out_mean=(1.0/2.0)*(1.0-b_alpha)*p_out_mean;   // pressure average outside the bubble
+	st_laplace=bubble_radius * (p_in_mean-p_out_mean);
+
+	return abs(st_predicted-st_laplace)/(st_predicted)*100.0;
+}
+
+void validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE radius, int h){
+	int j,k;
 	if(m % 2 == 0)
 		j = m/2;
 	else
 		j = (m+1) / 2;
+	if(h % 2 == 0)
+		k = h / 2;
+	else
+		k = (h+1) / 2;
 
 	FLOAT_TYPE rho;
 	FLOAT_TYPE aux = 0.0;
+	int ms = m * n;
 	for(int i = 0; i < n; i++){
-		rho = r_rho[j * n + i] + b_rho[j * n + i];
-		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.0){
-			aux += 1 * (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+		rho = r_rho[k * ms + j * n + i] + b_rho[k * ms + j * n + i];
+		if((r_rho[k * ms + j * n + i] - b_rho[k * ms + j * n + i]) / rho > 0.0){
+			aux += 1 * (r_rho[k * ms + j * n + i] - b_rho[k * ms + j * n + i]) / rho;
 		}
 	}
 
-	//	printf("counter %d\n", aux);
-	return (abs(radius * sqrt(2.0) - ((FLOAT_TYPE)aux) / ( n * 2.0)) / (radius * sqrt(2.0))) * 100.0;
+	FLOAT_TYPE predicted;
+	if(h > 0)
+		predicted = radius * pow(2.0, (1.0 / 3.0));
+	else
+		predicted = radius * sqrt(2.0);
+
+	aux /= n * 2.0;
+	printf("Predicted radius: "FLOAT_FORMAT" Final radius: "FLOAT_FORMAT"  (physical units)\n", predicted, aux);
+	printf("Radius error % = "FLOAT_FORMAT" \n", (abs(aux - predicted) / predicted) * 100.0);
 }
 
-void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE *analytical){
+void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE *analytical, FLOAT_TYPE ux, int h){
 
-	int j_start, i;
+	int j_start, i, k;
 	if(m % 2 == 0)
 		j_start = m/2;
 	else
@@ -1130,33 +1154,50 @@ void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE
 	else
 		i = (n+1) / 2;
 
+	if(h % 2 == 0)
+		k = h / 2;
+	else
+		k = (h+1) / 2;
+
+	int ms = n * m;
 	for(int j = j_start; j < m; j++){
-		analytical[j] = (2.0 * y[j*n + i] / (kappa + 1.0) + (kappa - 1.0) / (kappa + 1.0)) * 0.00001;
+		analytical[j] = (2.0 * y[k * ms + j*n + i] / (kappa + 1.0) + (kappa - 1.0) / (kappa + 1.0)) * ux;
 	}
 	for(int j = 0; j < j_start; j++){
-		analytical[j] = (2.0 * kappa * y[j*n + i] / (kappa + 1.0)) * 0.00001;
+		analytical[j] = (2.0 * kappa * y[k * ms + j*n + i] / (kappa + 1.0)) * ux;
 	}
 }
 
-FLOAT_TYPE deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE initial_area){
-	int j;
+void deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, int h){
+	int j,k;
 	if(m % 2 == 0)
 		j = m/2;
 	else
 		j = (m+1) / 2;
+	if(h % 2 == 0)
+		k = h / 2;
+	else
+		k = (h+1) / 2;
 
 	FLOAT_TYPE rho;
 	FLOAT_TYPE aux = 0.0;
+	int ms = m * n;
 	for(int i = 0; i < n; i++){
-		rho = r_rho[j * n + i] + b_rho[j * n + i];
-		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho > 0.0){
-			aux += (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+		rho = r_rho[k * ms + j * n + i] + b_rho[k * ms + j * n + i];
+		if((r_rho[k * ms + j * n + i] - b_rho[k * ms + j * n + i]) / rho > 0.0){
+			aux += (r_rho[k * ms + j * n + i] - b_rho[k * ms + j * n + i]) / rho;
 		}
 	}
 
 	aux /= 2.0;
-	printf("Radius error % = "FLOAT_FORMAT" \n", (abs(aux - (n / (2.0 * sqrt(M_PI)))) / aux) * 100.0);
-	return (abs(initial_area - (M_PI * aux * aux)) / initial_area) * 100.0;
+	FLOAT_TYPE predicted;
+	if(h > 0){
+		predicted = n / 2.0 / pow((4.0/3.0 * M_PI),(1.0/3.0));
+	}else{
+		predicted = n / (2.0 * sqrt(M_PI));
+	}
+	printf("Predicted radius: "FLOAT_FORMAT" Final radius: "FLOAT_FORMAT"\n", predicted, aux);
+	printf("Radius error % = "FLOAT_FORMAT" \n", (abs(aux - predicted) / predicted) * 100.0);
 }
 
 void initInletVelocity(FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE u_veloc, FLOAT_TYPE v_veloc, int n, int m){

@@ -43,11 +43,11 @@ void updateSurfaceTension(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE contr
 
 FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha, FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted);
 
-FLOAT_TYPE validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE radius);
+void validateCoalescenceCase(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE radius, int h = 0);
 
-void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE *analytical);
+void analyticalCouette(FLOAT_TYPE kappa, FLOAT_TYPE *y, int m, int n, FLOAT_TYPE *analytical, FLOAT_TYPE u, int h = 0);
 
-FLOAT_TYPE deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE initial_area);
+void deformingBubbleValid(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, int h = 0);
 
 void initInletVelocity(FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE u_veloc, FLOAT_TYPE v_veloc, int n, int m);
 
@@ -58,3 +58,6 @@ FLOAT_TYPE validateOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m
 
 void analyticalPoiseuille(int m, int n, FLOAT_TYPE *analytical, FLOAT_TYPE r_density, FLOAT_TYPE b_density,
 		FLOAT_TYPE r_visc, FLOAT_TYPE b_visc, FLOAT_TYPE g, FLOAT_TYPE *y);
+
+FLOAT_TYPE calculateSurfaceTension3D(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha,
+		FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted);

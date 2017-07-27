@@ -22,6 +22,21 @@ __global__ void gpu_abs_sub(FLOAT_TYPE *A, FLOAT_TYPE *B, FLOAT_TYPE *C,
 	}
 }
 
+__global__ void gpu_abs_relSub(FLOAT_TYPE *A, FLOAT_TYPE *B, FLOAT_TYPE *C,
+		int size, bool *divergence) {
+	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
+	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
+			+ threadIdx.x;
+	*divergence = false;
+	if (ind < size) {
+		if(A[ind]!=A[ind]||B[ind]!=B[ind]) {
+			*divergence=true;
+		}
+		C[ind] = abs(A[ind] - B[ind]) / A[ind];
+
+	}
+}
+
 __global__ void gpu_sqsub(FLOAT_TYPE *A, FLOAT_TYPE *B, FLOAT_TYPE *C,
 		int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;

@@ -39,7 +39,7 @@ void WriteResultsMultiPhase(char* OutputFile, int* fluid, FLOAT_TYPE* CoordX, FL
 
 void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h = 1, int dir = 1);
 
-void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *computed, FLOAT_TYPE *y, int m, int n);
+void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *computed, FLOAT_TYPE *y, int m, int n, int h = 0);
 
 void writeOscilatingSolution(char* fileName, FLOAT_TYPE *extremes, int size);
 #endif

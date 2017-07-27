@@ -356,20 +356,26 @@ void WriteArray(char* fileName, FLOAT_TYPE *arr, int n, int m, int h, int dir){
 	fclose(fp1);
 }
 
-void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *computed, FLOAT_TYPE *y, int m, int n){
+void writeCouetteSolution(char* fileName, FLOAT_TYPE *analytical, FLOAT_TYPE *computed, FLOAT_TYPE *y, int m, int n, int h){
 	char outputFile[300];
 	sprintf(outputFile, "./Results/%s.txt", fileName);
 	FILE * fp1;                 // file pointer to output file
 	fp1 = fopen(outputFile, "w"); // open file
 	fprintf(fp1, "y numerical analytical\n");
-	int i;
+	int i, k;
 	if(n % 2 == 0)
 		i = n/2;
 	else
 		i = (n+1) / 2;
 
+	if(h % 2 == 0)
+		k = h / 2;
+	else
+		k = (h+1) / 2;
+
+	int ms = n * m;
 	for (int j = 0; j < m; j++) {
-		fprintf(fp1, "%.4f %.10f %.10f\n", y[j * n + i], computed[j * n + i], analytical[j]);
+		fprintf(fp1, "%.4f %.10f %.10f\n", y[k * ms + j * n + i], computed[k * ms + j * n + i], analytical[j]);
 	}
 
 	fclose(fp1);

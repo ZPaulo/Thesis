@@ -53,6 +53,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE minInletCoordY; // minimum inlet coordinate in y
 	int numInletNodes;         // number of inlet nodes
 
+	int AuxMacroDiff = 1;
+
 	int *nodeIdX, *nodeIdY, *nodeType, *bcNodeIdX, *bcNodeIdY, *latticeId,
 	*bcType, *bcBoundId,*tempi;
 	FLOAT_TYPE *nodeX, *nodeY, *bcX, *bcY,*temp;
@@ -213,7 +215,6 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *lift_d = createGpuArrayFlt(m * n, ARRAY_ZERO);
 
 	FLOAT_TYPE *f_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
-	FLOAT_TYPE *f_prev_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
 
 	FLOAT_TYPE *temp9a_d = createGpuArrayFlt(9 * m * n, ARRAY_ZERO);
@@ -232,6 +233,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d,f_d, args->test_case);
 	}
 
+	FLOAT_TYPE *f_prev_d = createGpuArrayFlt(9 * m * n, ARRAY_COPY,0,f_d);
 
 #endif
 	int *mask = createHostArrayInt(m * n, ARRAY_ZERO);
@@ -461,7 +463,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			case 1:
 				p_in_mean = gpu_sum_h(p_in_d, p_in_d, ms) / gpu_sum_int_h(num_in_d, num_in_d, ms);
 				p_out_mean = gpu_sum_h(p_out_d, p_out_d, ms) / gpu_sum_int_h(num_out_d, num_out_d, ms);
-				st_error[iter] = calculateSurfaceTension(p_in_mean, p_out_mean,args->r_alpha, args->b_alpha, args->bubble_radius, st_predicted);
+				st_error[iter] = calculateSurfaceTension(p_in_mean, p_out_mean,args->r_alpha, args->b_alpha, args->bubble_radius * n, st_predicted);
 				break;
 			case 5:
 				CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
@@ -484,54 +486,59 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		taskTime[T_MACR] += cudatime;
 
 		// COMPUTE RESIDUALS
-		CHECK(cudaThreadSynchronize());
-		CHECK(cudaEventRecord(start, 0));
-		FLOAT_TYPE r;
-		if(args->multiPhase){
-			gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
-			fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
+		if (AuxMacroDiff * args->ShowMacroDiff == iter + 1) {
+			CHECK(cudaThreadSynchronize());
+			CHECK(cudaEventRecord(start, 0));
+			FLOAT_TYPE r;
+			if(args->multiPhase){
+//				gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
+				gpu_abs_relSub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
+				fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
+				//	printf("MAX diff "FLOAT_FORMAT"\n", fMaxDiff);
+				CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
+				if (h_divergence) {
+					fprintf(stderr, "\nDIVERGENCE!\n");
+					break;
+				}
+				if(abs(fMaxDiff) < args->StopCondition[0]){
+					printf("simulation converged!\n");
+					break;
+				}
+				CHECK(cudaFree(f_prev_d));
+				f_prev_d = createGpuArrayFlt(n * m * 9, ARRAY_CPYD, 0, f_d);
 
-			CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
-			if (h_divergence) {
-				fprintf(stderr, "\nDIVERGENCE!\n");
-				break;
+			}else{
+				r = computeResidual2D(f_d, fColl_d, temp9a_d, temp9b_d, m,n);
+				if (r != r) {
+					fprintf(stderr, "\nDIVERGENCE!\n");
+
+					writeResiduals(residualsFilename, norm, dragSum, liftSum, m * n,
+							iter + 1);
+					cudaEventDestroy(start);
+					cudaEventDestroy(stop);
+
+					freeAllHost(hostArrays, sizeof(hostArrays) / sizeof(hostArrays[0]));
+					freeAllGpu(gpuArrays, sizeof(gpuArrays) / sizeof(gpuArrays[0]));
+
+					return 1; // ERROR!
+				}
+				norm[iter] = r;
+				if (args->boundaryId > 0) {
+					dragSum[iter] = computeDragLift2D(bcMask_d, drag_d, tempA_d,
+							tempB_d, m, n, args->boundaryId);
+					liftSum[iter] = computeDragLift2D(bcMask_d, lift_d, tempA_d,
+							tempB_d, m, n, args->boundaryId);
+				}
 			}
-			if(abs(fMaxDiff) < args->StopCondition[0]){
-				printf("simulation converged!\n");
-				break;
-			}
-			CHECK(cudaFree(f_prev_d));
-			f_prev_d = createGpuArrayFlt(n * m * 9, ARRAY_CPYD, 0, f_d);
 
-		}else{
-			r = computeResidual2D(f_d, fColl_d, temp9a_d, temp9b_d, m,n);
-			if (r != r) {
-				fprintf(stderr, "\nDIVERGENCE!\n");
+			CHECK(cudaEventRecord(stop, 0));
+			CHECK(cudaEventSynchronize(stop));
+			CHECK(cudaEventElapsedTime(&cudatime, start, stop));
+			taskTime[T_RESI] += cudatime;
+			AuxMacroDiff++;
 
-				writeResiduals(residualsFilename, norm, dragSum, liftSum, m * n,
-						iter + 1);
-				cudaEventDestroy(start);
-				cudaEventDestroy(stop);
-
-				freeAllHost(hostArrays, sizeof(hostArrays) / sizeof(hostArrays[0]));
-				freeAllGpu(gpuArrays, sizeof(gpuArrays) / sizeof(gpuArrays[0]));
-
-				return 1; // ERROR!
-			}
-			norm[iter] = r;
-			if (args->boundaryId > 0) {
-				dragSum[iter] = computeDragLift2D(bcMask_d, drag_d, tempA_d,
-						tempB_d, m, n, args->boundaryId);
-				liftSum[iter] = computeDragLift2D(bcMask_d, lift_d, tempA_d,
-						tempB_d, m, n, args->boundaryId);
-			}
 		}
-
-		CHECK(cudaEventRecord(stop, 0));
-		CHECK(cudaEventSynchronize(stop));
-		CHECK(cudaEventElapsedTime(&cudatime, start, stop));
-		taskTime[T_RESI] += cudatime;
-		printf("Iterating... %d/%d (%3.1f %%) Residual Max %.10f\r", iter + 1, args->iterations,
+		printf("Iterating... %d/%d (%3.1f %%) Residual Max %.15f\r", iter + 1, args->iterations,
 				(FLOAT_TYPE) (iter + 1) * 100
 				/ (FLOAT_TYPE) (args->iterations), fMaxDiff);
 
@@ -568,7 +575,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																																								/ CLOCKS_PER_SEC;
+																																																																																																																																																																										/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -622,23 +629,26 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			break;
 		case 2:
 			if(args->g == 0.0){
-				analyticalCouette(args->kappa, nodeY, m, n, analytical);
+				analyticalCouette(args->kappa, nodeY, m, n, analytical, args->u);
 				writeCouetteSolution("Profile_Couette", analytical, u, nodeY, m, n);
+				printf("Couette profile written to Profile_Couette in Results/\n");
 			}
 			else{
 				analyticalPoiseuille(m, n, analytical, args->r_density, args->b_density, args->r_viscosity, args->b_viscosity, args->g, nodeY);
 				writeCouetteSolution("Profile_Poiseuille", analytical, u, nodeY, m, n);
+				printf("Poiseuille profile written to Profile_Poiseuille in Results/\n");
 			}
 			break;
 		case 3:
-			printf("Error % : "FLOAT_FORMAT"\n", deformingBubbleValid(r_rho, b_rho, n, m, (m / 2.0) * (n / 2.0)));
+			deformingBubbleValid(r_rho, b_rho, n, m);
 			break;
 		case 4:
 			//validate coalescence case
-			printf("Error % : "FLOAT_FORMAT"\n", validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius));
+			validateCoalescenceCase(r_rho, b_rho, n, m, args->bubble_radius);
 			break;
 		case 5:
 			writeOscilatingSolution("Oscilating_frequency", oscilating_y, args->iterations);
+			printf("Oscilation frequency written to Oscilating_frequency in Results/\n");
 			printf("Error % : "FLOAT_FORMAT"\n", validateOscilating(r_rho, b_rho, n, m, oscilating_y, args->iterations,st_predicted, args->r_density, args->b_density));
 			break;
 		default:
