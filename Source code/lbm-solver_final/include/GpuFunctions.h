@@ -430,7 +430,7 @@ __host__ void initColorGradient(int *color_gradient_directions_d, int n, int m);
 
 __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
 		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d,
-		int *color_gradient_directions_d);
+		int *color_gradient_directions_d, bool high_order);
 
 __global__ void gpuStreaming2DCG(int* fluid_d, int* stream_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* r_fColl_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* b_fColl_d, int *cg_dir_d);
 
@@ -443,13 +443,11 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* r_rho_d, FLOAT_TYPE* b_rho_d, FLOAT_TYPE *p_in_d, FLOAT_TYPE *p_out_d,
 		int *num_in_d, int *num_out_d, int *cg_direction, FLOAT_TYPE *f_d, int test_case);
 
-__host__ int gpu_sum_int_h(int *C, int *D, int size);
-__global__ void gpu_sum256_int(int *A, int *B, int size);
 __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *f_d, int test_case);
 FLOAT_TYPE calculateSurfaceTension(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean);
 
 __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
-		FLOAT_TYPE *v_d, FLOAT_TYPE *w_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d);
+		FLOAT_TYPE *v_d, FLOAT_TYPE *w_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order);
 __host__ void initColorGradient3D(int *color_gradient_directions, int n, int m, int h);
 __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* w_d, int* bcBoundId_d,
@@ -460,6 +458,10 @@ __global__ void initCGBubble3D(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d
 		FLOAT_TYPE *b_f_d, FLOAT_TYPE *f_d, int test_case);
 
 __device__ void calculateHOColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, int cg_dir_d, int index, FLOAT_TYPE *cg_x, FLOAT_TYPE *cg_y);
+
+__host__ void initHOColorGradient(int *color_gradient_directions, int n, int m);
+
+__host__ void initHOColorGradient3D(int *color_gradient_directions, int n, int m, int h);
 // to be used in 2D inlet profile computation in gpuInitInletProfile3D
 //from: http://stackoverflow.com/questions/18455414/how-to-do-power-of-complex-number-in-cublas
 //__host__ __device__ FLOAT_TYPE  carg(const cuDoubleComplex& z) {return (FLOAT_TYPE )atan2(cuCimag(z), cuCreal(z));} // polar angle

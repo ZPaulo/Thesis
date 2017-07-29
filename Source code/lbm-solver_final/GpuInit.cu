@@ -89,6 +89,11 @@ __constant__ FLOAT_TYPE teta3D_d[19];
 __constant__ FLOAT_TYPE chi3D_d[19];
 __constant__ FLOAT_TYPE psi3D_d[19];
 __constant__ FLOAT_TYPE cg_w3D_d[19];
+__constant__ FLOAT_TYPE hocg_w3D_d[105];
+__constant__ int hocg_cx3D_d[105];
+__constant__ int hocg_cy3D_d[105];
+__constant__ int hocg_cz3D_d[105];
+__constant__ int hoc3D_d[105];
 
 __host__ void initConstants2D(Arguments *args,
 		FLOAT_TYPE maxInletCoordY, FLOAT_TYPE minInletCoordY,
@@ -212,6 +217,35 @@ __host__ void initConstants2D(Arguments *args,
 	}
 }
 
+__host__ void initHOColorGradient(int *color_gradient_directions, int n, int m){
+	int jn = m-1;
+	int js = 0;
+	int ie = n-1;
+	int iw = 0;
+	for(int j = 0; j < m;j++){
+		for(int i = 0; i < n; i++){
+
+			if(j == m-1  && i != 0 && i != n-1) //NORTH
+				color_gradient_directions[j * n + i] = 1;
+			else if(j == 0 && i != 0 && i != n-1 ) //SOUTH
+				color_gradient_directions[j * n + i] = 2;
+			else if(i == n - 1  && j != 0 && j != m-1 ) //EAST
+				color_gradient_directions[j * n + i] = 3;
+			else if(i == 0 && j != 0 && j != m-1 ) //WEST
+				color_gradient_directions[j * n + i] = 4;
+			else if(j == 1 || j == m-2  || i == 1 || i == n-2) //Neighbour boundary
+				color_gradient_directions[j * n + i] = 11;
+		}
+	}
+
+	//CORNERS
+	//Probably should handle corners
+	color_gradient_directions[jn * n + ie] = 5; //NE
+	color_gradient_directions[jn * n + iw] = 6; //NW
+	color_gradient_directions[js * n + ie] = 7; //SE
+	color_gradient_directions[js * n + iw] = 8; //SW
+}
+
 __host__ void initColorGradient(int *color_gradient_directions, int n, int m){
 	//NORTH is 1, SOUTH 2, EAST 3, WEST 4, 0 is okay
 	int jn = m-1;
@@ -247,6 +281,38 @@ __host__ void initColorGradient3D(int *color_gradient_directions, int n, int m, 
 		for(int j = 0; j < m;j++){
 			for(int i = 0; i < n; i++){
 				if(j != m-1 && j != 0 && i != 0 && i != n-1 && k != 0 && k != h-1)
+					color_gradient_directions[k * ms + j * n + i] = 0;
+				else if(j == m-1 && i != 0 && i != n-1 && k != 0 && k != h-1) //NORTH
+					color_gradient_directions[k * ms + j * n + i] = 1;
+				else if(j == 0 && i != 0 && i != n-1 && k != 0 && k != h-1) //SOUTH
+					color_gradient_directions[k * ms + j * n + i] = 2;
+				else if(i == n - 1 && j != 0 && j != m-1 && k != 0 && k != h-1) //EAST
+					color_gradient_directions[k * ms + j * n + i] = 3;
+				else if(i == 0 && j != 0 && j != m-1 && k != 0 && k != h-1 ) //WEST
+					color_gradient_directions[k * ms + j * n + i] = 4;
+				else if(k == h-1 && j != 0 && j != m-1 && i != 0 && i != n-1) //FRONT
+					color_gradient_directions[k * ms + j * n + i] = 5;
+				else if(k == 0 && j != 0 && j != m-1 && i != 0 && i != n-1)  //BACK
+					color_gradient_directions[k * ms + j * n + i] = 6;
+				else { //edges and corners
+					color_gradient_directions[k * ms + j * n + i] = -1; // corners
+				}
+			}
+		}
+	}
+}
+
+__host__ void initHOColorGradient3D(int *color_gradient_directions, int n, int m, int h){
+
+	//NORTH is 1, SOUTH 2, EAST 3, WEST 4, FRONT 5, BACK 6, 0 is okay
+	int ms = n * m;
+
+	for(int k = 0; k < h; k++){
+		for(int j = 0; j < m;j++){
+			for(int i = 0; i < n; i++){
+				if(j == 1 || j == m-2  || i == 1 || i == n-2|| k == 1 || k == h-2) //Neighbour boundary
+					color_gradient_directions[k * ms + j * n + i] = 11;
+				else if(j != m-1 && j != 0 && i != 0 && i != n-1 && k != 0 && k != h-1)
 					color_gradient_directions[k * ms + j * n + i] = 0;
 				else if(j == m-1 && i != 0 && i != n-1 && k != 0 && k != h-1) //NORTH
 					color_gradient_directions[k * ms + j * n + i] = 1;
@@ -720,6 +786,8 @@ __host__ void initConstants3D(Arguments *args,
 	cudaMemcpyToSymbol(opp3D_d, opp3D, 19 * sizeof(int));
 	cudaMemcpyToSymbol(w3D_d, w, 19 * sizeof(FLOAT_TYPE));
 
+	cudaMemcpyToSymbol(g_d, &args->g, sizeof(FLOAT_TYPE));
+
 	cudaMemcpyToSymbol(outletProfile_d, &args->outletProfile,
 			sizeof(OutletProfile));
 	cudaMemcpyToSymbol(boundaryType_d, &args->boundaryType,
@@ -811,6 +879,48 @@ __host__ void initConstants3D(Arguments *args,
 
 		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
+
+		FLOAT_TYPE hocg_w[105];
+		hocg_w[0] = 0.0;
+		for(int i = 1; i < 7;i++)
+			hocg_w[i] = 4.0 / 45.0;
+		for(int i = 7; i < 19;i++)
+			hocg_w[i] = 1.0 / 21.0;
+		for(int i = 19; i < 27;i++)
+			hocg_w[i] = 2.0 / 105.0;
+		for(int i = 27; i < 33;i++)
+			hocg_w[i] = 5.0 / 504.0;
+		for(int i = 33; i < 57;i++)
+			hocg_w[i] = 1.0 / 315.0;
+		for(int i = 57; i < 81;i++)
+			hocg_w[i] = 1.0 / 630.0;
+		for(int i = 81; i < 105;i++)
+			hocg_w[i] = 1.0 / 5040.0;
+
+
+		cudaMemcpyToSymbol(hocg_w3D_d, hocg_w, 105 * sizeof(FLOAT_TYPE));
+		int hocg_cx[105] = {0,1,0,0,-1,0,0,1,1,0,-1,1,-1,1,0,0,-1,-1,0,1,-1,1,1,-1,-1,1,
+				-1,2,0,0,-2,0,0,2,1,2,1,0,0,-2,2,-1,1,-2,-1,-2,2,-2,-1,1,-1,0,0,0,0,0,0,
+				2,1,1,-2,2,2,-2,-2,2,-2,-1,1,1,-1,-1,1,-1,-1,1,1,-1,-1,1,-1,2,2,1,-2,2,2,
+				-2,-2,2,-2,-2,2,2,-2,-2,2,-2,-1,1,1,-1,-1,1,-1};
+		cudaMemcpyToSymbol(hocg_cx3D_d, hocg_cx, 105 * sizeof(int));
+		int hocg_cy[105] = {0,0,1,0,0,-1,0,1,0,1,1,-1,0,0,-1,1,-1,0,-1,1,1,-1,1,-1,1,-1,
+				-1,0,2,0,0,-2,0,1,2,0,0,2,1,1,-1,2,-2,-1,-2,0,0,0,0,0,0,-2,2,-2,-1,1,-1,
+				1,2,1,1,-1,1,-1,1,-1,-1,2,-2,2,-2,2,-2,-2,1,-1,1,-1,1,-1,-1,2,1,2,2,-2,2
+				,-2,2,-2,-2,1,-1,1,-1,1,-1,-1,2,-2,2,-2,2,-2,-2};
+		cudaMemcpyToSymbol(hocg_cy3D_d, hocg_cy, 105 * sizeof(int));
+		int hocg_cz[105] = {0,0,0,1,0,0,-1,0,1,1,0,0,1,-1,1,-1,0,-1,-1,1,1,1,-1,1,-1,-1,
+				-1,0,0,2,0,0,-2,0,0,1,2,1,2,0,0,0,0,0,0,1,-1,-1,2,-2,-2,1,-1,-1,2,-2,-2,
+				1,1,2,1,1,-1,1,-1,-1,-1,1,1,-1,1,-1,-1,-1,2,2,-2,2,-2,-2,-2,1,2,2,1,1,-1,
+				1,-1,-1,-1,2,2,-2,2,-2,-2,-2,2,2,-2,2,-2,-2,-2};
+		cudaMemcpyToSymbol(hocg_cz3D_d, hocg_cz, 105 * sizeof(int));
+
+		int hoc3D[105];
+		int ms = n * m;
+		for(int i = 0; i < 105; i++){
+			hoc3D[i] = hocg_cz[i] * ms + hocg_cy[i] * n + hocg_cx[i];
+		}
+		cudaMemcpyToSymbol(hoc3D_d, hoc3D, 105 * sizeof(int));
 	}
 }
 
@@ -821,9 +931,9 @@ __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-																																																																														* (maxInletCoordY_d - minInletCoordY_d);
+																																																																																				* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-																																																																														* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																																																																																				* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
@@ -832,7 +942,7 @@ __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																																																													+ threadIdx.x;
+																																																																																			+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -1025,7 +1135,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		dz = bcZ[bci] - nodeZ[ind];
 		if (CurvedBCs == (BoundaryType) CURVED) {
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-																																																																															/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																																																																																					/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
 		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);

@@ -312,11 +312,12 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE p_out_mean;
 	FLOAT_TYPE ms = n * m * h;
 	if(args->multiPhase){
-		initColorGradient3D(cg_directions, n, m, h);
+		if(args->high_order)
+			initHOColorGradient3D(cg_directions, n, m, h);
+		else
+			initColorGradient3D(cg_directions, n, m, h);
 		CHECK(cudaMemcpy(cg_dir_d, cg_directions, SIZEINT(m*n*h), cudaMemcpyHostToDevice));
-		CHECK(cudaThreadSynchronize());
 		initCGBubble3D<<<bpg1,tpb>>>(coordX_d,coordY_d,coordZ_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, f_d, args->test_case);
-		CHECK(cudaThreadSynchronize());
 	}
 #endif
 
@@ -495,7 +496,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						args->g_limit, args->A,r_fColl, b_fColl, weight, cx, cy, cz, f, args->r_viscosity,
 						args->b_viscosity, args->r_alpha, args->b_alpha, chi, phi, psi, teta, cg_w);
 #else
-				gpuCollBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d);
+				gpuCollBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
 #endif
 			}
 			else{
@@ -747,6 +748,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			AuxMacroDiff++;
 
 		}
+		if(args->multiPhase){
+			CHECK(cudaFree(f_prev_d));
+			f_prev_d = createGpuArrayFlt(n * m * h * 19, ARRAY_CPYD, 0, f_d);
+		}
 		norm[iter] = r;
 		if(args->multiPhase){
 			printf(
@@ -803,7 +808,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						u, v, w, rho, nodeType, n, m, h, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																								/ CLOCKS_PER_SEC;
+																																																																																												/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////

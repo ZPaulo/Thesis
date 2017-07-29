@@ -110,6 +110,11 @@ extern __constant__ FLOAT_TYPE teta3D_d[19];
 extern __constant__ FLOAT_TYPE chi3D_d[19];
 extern __constant__ FLOAT_TYPE psi3D_d[19];
 extern __constant__ FLOAT_TYPE cg_w3D_d[19];
+extern __constant__ FLOAT_TYPE hocg_w3D_d[105];
+extern __constant__ int hocg_cx3D_d[105];
+extern __constant__ int hocg_cy3D_d[105];
+extern __constant__ int hocg_cz3D_d[105];
+extern __constant__ int hoc3D_d[105];
 
 //#### 3D d3q19 ####//
 extern __constant__ int cx3D_d[19];                   ///< velocity x unit vector components

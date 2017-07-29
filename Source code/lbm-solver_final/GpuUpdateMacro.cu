@@ -220,7 +220,7 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x) + threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
-	FLOAT_TYPE r_r, b_r, r, rU, rV, rW;
+	FLOAT_TYPE r_r, b_r, r, rU, rV, rW, aux1, mean_nu, omega_eff;
 
 	if (ind < ms) {
 		//necessary because of sum
@@ -231,6 +231,11 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 			num_out_d[ind] = 0;
 		}
 		if (fluid_d[ind] == 1) {
+
+			aux1 = r_rho_d[ind] / (rho_d[ind] * r_viscosity_d) + b_rho_d[ind] /(rho_d[ind] * b_viscosity_d);
+			mean_nu = 1.0/aux1;
+			omega_eff = 1.0/(3.0*mean_nu+0.5);
+
 			r_r = b_r = rU = rV = rW = 0.0;
 			r_r = r_f_d[ind] +
 					r_f_d[ind + ms] +
@@ -331,8 +336,8 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 			r = r_r + b_r;
 
 			rho_d[ind] = r;
-			u_d[ind] = rU / r;
-			v_d[ind] = rV / r;
+			u_d[ind] =  rU / r + external_force_d * g_d / (r * omega_eff);
+			v_d[ind] = rV / r + (1-external_force_d) * g_d / omega_eff;
 			w_d[ind] = rW / r;
 
 			if(test_case == 1){
