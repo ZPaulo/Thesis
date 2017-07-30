@@ -74,7 +74,7 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		FLOAT_TYPE* f_d, FLOAT_TYPE* u1_d, FLOAT_TYPE* v1_d, FLOAT_TYPE* w1_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int bci = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																	+ threadIdx.x;
+																																									+ threadIdx.x;
 
 	int ms = depth_d * length_d * height_d;
 	FLOAT_TYPE uW, vW, wW, dW;
@@ -100,17 +100,17 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					vW = v1_d[ind];
 					wW = w1_d[ind];
 					dW = 1.0 / (1.0 + uW)
-																																					* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
-																																					                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																					                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
-																																					                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																					                                                                                                          + f_d[ind + 18 * ms]
-																																					                                                                                                                + 2.0
-																																					                                                                                                                * (f_d[ind + 2 * ms]
-																																					                                                                                                                       + f_d[ind + 8 * ms]
-																																					                                                                                                                             + f_d[ind + 10 * ms]
-																																					                                                                                                                                   + f_d[ind + 12 * ms]
-																																					                                                                                                                                         + f_d[ind + 14 * ms]));
+																																													* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
+																																													                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																													                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
+																																													                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																													                                                                                                          + f_d[ind + 18 * ms]
+																																													                                                                                                                + 2.0
+																																													                                                                                                                * (f_d[ind + 2 * ms]
+																																													                                                                                                                       + f_d[ind + 8 * ms]
+																																													                                                                                                                             + f_d[ind + 10 * ms]
+																																													                                                                                                                                   + f_d[ind + 12 * ms]
+																																													                                                                                                                                         + f_d[ind + 14 * ms]));
 
 					Nxy = 0.5
 							* (f_d[ind + 3 * ms] + f_d[ind + 15 * ms]
@@ -146,17 +146,17 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					vE = v1_d[ind];
 					wE = w1_d[ind];
 					dE = 1.0 / (1.0 - uE)
-																																					* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
-																																					                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																					                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
-																																					                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																					                                                                                                          + f_d[ind + 18 * ms]
-																																					                                                                                                                + 2.0
-																																					                                                                                                                * (f_d[ind + 1 * ms]
-																																					                                                                                                                       + f_d[ind + 7 * ms]
-																																					                                                                                                                             + f_d[ind + 9 * ms]
-																																					                                                                                                                                   + f_d[ind + 11 * ms]
-																																					                                                                                                                                         + f_d[ind + 13 * ms]));
+																																													* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
+																																													                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																													                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
+																																													                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																													                                                                                                          + f_d[ind + 18 * ms]
+																																													                                                                                                                + 2.0
+																																													                                                                                                                * (f_d[ind + 1 * ms]
+																																													                                                                                                                       + f_d[ind + 7 * ms]
+																																													                                                                                                                             + f_d[ind + 9 * ms]
+																																													                                                                                                                                   + f_d[ind + 11 * ms]
+																																													                                                                                                                                         + f_d[ind + 13 * ms]));
 
 					Nxy = 0.5
 							* (f_d[ind + 3 * ms] + f_d[ind + 15 * ms]
@@ -192,17 +192,17 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					vS = v1_d[ind];
 					wS = w1_d[ind];
 					dS = 1.0 / (1.0 - vS)
-																																					* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																					                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
-																																					                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
-																																					                                                                               + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																					                                                                                                          + f_d[ind + 14 * ms]
-																																					                                                                                                                + 2.0
-																																					                                                                                                                * (f_d[ind + 4 * ms]
-																																					                                                                                                                       + f_d[ind + 9 * ms]
-																																					                                                                                                                             + f_d[ind + 10 * ms]
-																																					                                                                                                                                   + f_d[ind + 16 * ms]
-																																					                                                                                                                                         + f_d[ind + 18 * ms]));
+																																													* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																													                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
+																																													                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
+																																													                                                                               + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																													                                                                                                          + f_d[ind + 14 * ms]
+																																													                                                                                                                + 2.0
+																																													                                                                                                                * (f_d[ind + 4 * ms]
+																																													                                                                                                                       + f_d[ind + 9 * ms]
+																																													                                                                                                                             + f_d[ind + 10 * ms]
+																																													                                                                                                                                   + f_d[ind + 16 * ms]
+																																													                                                                                                                                         + f_d[ind + 18 * ms]));
 
 					Nyx = 0.5
 							* (f_d[ind + 1 * ms] + f_d[ind + 11 * ms]
@@ -238,17 +238,17 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					vN = v1_d[ind];
 					wN = w1_d[ind];
 					dN = 1.0 / (1.0 + vN)
-																																					* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																					                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
-																																					                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
-																																					                                                                               + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																					                                                                                                          + f_d[ind + 14 * ms]
-																																					                                                                                                                + 2.0
-																																					                                                                                                                * (f_d[ind + 3 * ms]
-																																					                                                                                                                       + f_d[ind + 7 * ms]
-																																					                                                                                                                             + f_d[ind + 8 * ms]
-																																					                                                                                                                                   + f_d[ind + 15 * ms]
-																																					                                                                                                                                         + f_d[ind + 17 * ms]));
+																																													* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																													                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
+																																													                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
+																																													                                                                               + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																													                                                                                                          + f_d[ind + 14 * ms]
+																																													                                                                                                                + 2.0
+																																													                                                                                                                * (f_d[ind + 3 * ms]
+																																													                                                                                                                       + f_d[ind + 7 * ms]
+																																													                                                                                                                             + f_d[ind + 8 * ms]
+																																													                                                                                                                                   + f_d[ind + 15 * ms]
+																																													                                                                                                                                         + f_d[ind + 17 * ms]));
 
 					Nyx = 0.5
 							* (f_d[ind + 1 * ms] + f_d[ind + 11 * ms]
@@ -285,17 +285,17 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					vB = v1_d[ind];
 					wB = w1_d[ind];
 					dB = 1.0 / (1.0 - wB)
-																																					* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																					                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																					                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
-																																					                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																					                                                                                                         + f_d[ind + 10 * ms]
-																																					                                                                                                               + 2.0
-																																					                                                                                                               * (f_d[ind + 6 * ms]
-																																					                                                                                                                      + f_d[ind + 13 * ms]
-																																					                                                                                                                            + f_d[ind + 14 * ms]
-																																					                                                                                                                                  + f_d[ind + 17 * ms]
-																																					                                                                                                                                        + f_d[ind + 18 * ms]));
+																																													* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																													                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																													                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
+																																													                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																													                                                                                                         + f_d[ind + 10 * ms]
+																																													                                                                                                               + 2.0
+																																													                                                                                                               * (f_d[ind + 6 * ms]
+																																													                                                                                                                      + f_d[ind + 13 * ms]
+																																													                                                                                                                            + f_d[ind + 14 * ms]
+																																													                                                                                                                                  + f_d[ind + 17 * ms]
+																																													                                                                                                                                        + f_d[ind + 18 * ms]));
 
 					Nzx = 0.5
 							* (f_d[ind + 1 * ms] + f_d[ind + 7 * ms]
@@ -334,17 +334,17 @@ __global__ void gpuBcInlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					vT = v1_d[ind];
 					wT = w1_d[ind];
 					dT = (1.0 / (1.0 + wT))
-																																					* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																					                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																					                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
-																																					                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																					                                                                                                         + f_d[ind + 10 * ms]
-																																					                                                                                                               + 2.0
-																																					                                                                                                               * (f_d[ind + 5 * ms]
-																																					                                                                                                                      + f_d[ind + 11 * ms]
-																																					                                                                                                                            + f_d[ind + 12 * ms]
-																																					                                                                                                                                  + f_d[ind + 15 * ms]
-																																					                                                                                                                                        + f_d[ind + 16 * ms]));
+																																													* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																													                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																													                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
+																																													                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																													                                                                                                         + f_d[ind + 10 * ms]
+																																													                                                                                                               + 2.0
+																																													                                                                                                               * (f_d[ind + 5 * ms]
+																																													                                                                                                                      + f_d[ind + 11 * ms]
+																																													                                                                                                                            + f_d[ind + 12 * ms]
+																																													                                                                                                                                  + f_d[ind + 15 * ms]
+																																													                                                                                                                                        + f_d[ind + 16 * ms]));
 
 					Nzx = 0.5
 							* (f_d[ind + 1 * ms] + f_d[ind + 7 * ms]
@@ -446,7 +446,7 @@ __global__ void gpuBcSimpleWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		FLOAT_TYPE *f_d, FLOAT_TYPE *fColl_d, FLOAT_TYPE *q_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int bci = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																	+ threadIdx.x;
+																																									+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 	int dir;
 
@@ -493,7 +493,7 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		FLOAT_TYPE *f_d, FLOAT_TYPE *fColl_d, FLOAT_TYPE *q_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int bci = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																	+ threadIdx.x;
+																																									+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 	int dir;
 
@@ -568,18 +568,18 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 						vW = 0.0;
 						wW = 0.0;
 						dW = 1.0 / (1.0 + uW)
-																																						* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
-																																						                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																						                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
-																																						                                                                               + f_d[ind + 16 * ms]
-																																						                                                                                     + f_d[ind + 17 * ms]
-																																						                                                                                           + f_d[ind + 18 * ms]
-																																						                                                                                                 + 2.0
-																																						                                                                                                 * (f_d[ind + 2 * ms]
-																																						                                                                                                        + f_d[ind + 8 * ms]
-																																						                                                                                                              + f_d[ind + 10 * ms]
-																																						                                                                                                                    + f_d[ind + 12 * ms]
-																																						                                                                                                                          + f_d[ind + 14 * ms]));
+																																														* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
+																																														                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																														                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
+																																														                                                                               + f_d[ind + 16 * ms]
+																																														                                                                                     + f_d[ind + 17 * ms]
+																																														                                                                                           + f_d[ind + 18 * ms]
+																																														                                                                                                 + 2.0
+																																														                                                                                                 * (f_d[ind + 2 * ms]
+																																														                                                                                                        + f_d[ind + 8 * ms]
+																																														                                                                                                              + f_d[ind + 10 * ms]
+																																														                                                                                                                    + f_d[ind + 12 * ms]
+																																														                                                                                                                          + f_d[ind + 14 * ms]));
 
 						Nxy = 0.5
 								* (f_d[ind + 3 * ms] + f_d[ind + 15 * ms]
@@ -618,18 +618,18 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 						vE = 0.0;
 						wE = 0.0;
 						dE = 1.0 / (1.0 - uE)
-																																						* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
-																																						                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																						                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
-																																						                                                                               + f_d[ind + 16 * ms]
-																																						                                                                                     + f_d[ind + 17 * ms]
-																																						                                                                                           + f_d[ind + 18 * ms]
-																																						                                                                                                 + 2.0
-																																						                                                                                                 * (f_d[ind + 1 * ms]
-																																						                                                                                                        + f_d[ind + 7 * ms]
-																																						                                                                                                              + f_d[ind + 9 * ms]
-																																						                                                                                                                    + f_d[ind + 11 * ms]
-																																						                                                                                                                          + f_d[ind + 13 * ms]));
+																																														* (f_d[ind + 0 * ms] + f_d[ind + 3 * ms]
+																																														                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																														                                                     + f_d[ind + 6 * ms] + f_d[ind + 15 * ms]
+																																														                                                                               + f_d[ind + 16 * ms]
+																																														                                                                                     + f_d[ind + 17 * ms]
+																																														                                                                                           + f_d[ind + 18 * ms]
+																																														                                                                                                 + 2.0
+																																														                                                                                                 * (f_d[ind + 1 * ms]
+																																														                                                                                                        + f_d[ind + 7 * ms]
+																																														                                                                                                              + f_d[ind + 9 * ms]
+																																														                                                                                                                    + f_d[ind + 11 * ms]
+																																														                                                                                                                          + f_d[ind + 13 * ms]));
 
 						Nxy = 0.5
 								* (f_d[ind + 3 * ms] + f_d[ind + 15 * ms]
@@ -668,18 +668,18 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 						vS = 0.0;
 						wS = 0.0;
 						dS = 1.0 / (1.0 - vS)
-																																						* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																						                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
-																																						                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
-																																						                                                                               + f_d[ind + 12 * ms]
-																																						                                                                                     + f_d[ind + 13 * ms]
-																																						                                                                                           + f_d[ind + 14 * ms]
-																																						                                                                                                 + 2.0
-																																						                                                                                                 * (f_d[ind + 4 * ms]
-																																						                                                                                                        + f_d[ind + 9 * ms]
-																																						                                                                                                              + f_d[ind + 10 * ms]
-																																						                                                                                                                    + f_d[ind + 16 * ms]
-																																						                                                                                                                          + f_d[ind + 18 * ms]));
+																																														* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																														                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
+																																														                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
+																																														                                                                               + f_d[ind + 12 * ms]
+																																														                                                                                     + f_d[ind + 13 * ms]
+																																														                                                                                           + f_d[ind + 14 * ms]
+																																														                                                                                                 + 2.0
+																																														                                                                                                 * (f_d[ind + 4 * ms]
+																																														                                                                                                        + f_d[ind + 9 * ms]
+																																														                                                                                                              + f_d[ind + 10 * ms]
+																																														                                                                                                                    + f_d[ind + 16 * ms]
+																																														                                                                                                                          + f_d[ind + 18 * ms]));
 
 						Nyx = 0.5
 								* (f_d[ind + 1 * ms] + f_d[ind + 11 * ms]
@@ -718,18 +718,18 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 						vN = 0.0;
 						wN = 0.0;
 						dN = 1.0 / (1.0 + vN)
-																																						* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																						                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
-																																						                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
-																																						                                                                               + f_d[ind + 12 * ms]
-																																						                                                                                     + f_d[ind + 13 * ms]
-																																						                                                                                           + f_d[ind + 14 * ms]
-																																						                                                                                                 + 2.0
-																																						                                                                                                 * (f_d[ind + 3 * ms]
-																																						                                                                                                        + f_d[ind + 7 * ms]
-																																						                                                                                                              + f_d[ind + 8 * ms]
-																																						                                                                                                                    + f_d[ind + 15 * ms]
-																																						                                                                                                                          + f_d[ind + 17 * ms]));
+																																														* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																														                           + f_d[ind + 2 * ms] + f_d[ind + 5 * ms]
+																																														                                                     + f_d[ind + 6 * ms] + f_d[ind + 11 * ms]
+																																														                                                                               + f_d[ind + 12 * ms]
+																																														                                                                                     + f_d[ind + 13 * ms]
+																																														                                                                                           + f_d[ind + 14 * ms]
+																																														                                                                                                 + 2.0
+																																														                                                                                                 * (f_d[ind + 3 * ms]
+																																														                                                                                                        + f_d[ind + 7 * ms]
+																																														                                                                                                              + f_d[ind + 8 * ms]
+																																														                                                                                                                    + f_d[ind + 15 * ms]
+																																														                                                                                                                          + f_d[ind + 17 * ms]));
 
 						Nyx = 0.5
 								* (f_d[ind + 1 * ms] + f_d[ind + 11 * ms]
@@ -770,17 +770,17 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 						vB = 0.0;
 						wB = 0.0;
 						dB = 1.0 / (1.0 - wB)
-																																						* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																						                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																						                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
-																																						                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																						                                                                                                         + f_d[ind + 10 * ms]
-																																						                                                                                                               + 2.0
-																																						                                                                                                               * (f_d[ind + 6 * ms]
-																																						                                                                                                                      + f_d[ind + 13 * ms]
-																																						                                                                                                                            + f_d[ind + 14 * ms]
-																																						                                                                                                                                  + f_d[ind + 17 * ms]
-																																						                                                                                                                                        + f_d[ind + 18 * ms]));
+																																														* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																														                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																														                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
+																																														                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																														                                                                                                         + f_d[ind + 10 * ms]
+																																														                                                                                                               + 2.0
+																																														                                                                                                               * (f_d[ind + 6 * ms]
+																																														                                                                                                                      + f_d[ind + 13 * ms]
+																																														                                                                                                                            + f_d[ind + 14 * ms]
+																																														                                                                                                                                  + f_d[ind + 17 * ms]
+																																														                                                                                                                                        + f_d[ind + 18 * ms]));
 
 						Nzx = 0.5
 								* (f_d[ind + 1 * ms] + f_d[ind + 7 * ms]
@@ -819,17 +819,17 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 						vT = 0.0;
 						wT = 0.0;
 						dT = (1.0 / (1.0 + wT))
-																																						* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
-																																						                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																						                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
-																																						                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																						                                                                                                         + f_d[ind + 10 * ms]
-																																						                                                                                                               + 2.0
-																																						                                                                                                               * (f_d[ind + 5 * ms]
-																																						                                                                                                                      + f_d[ind + 11 * ms]
-																																						                                                                                                                            + f_d[ind + 12 * ms]
-																																						                                                                                                                                  + f_d[ind + 15 * ms]
-																																						                                                                                                                                        + f_d[ind + 16 * ms]));
+																																														* (f_d[ind + 0 * ms] + f_d[ind + 1 * ms]
+																																														                           + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																														                                                     + f_d[ind + 4 * ms] + f_d[ind + 7 * ms]
+																																														                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																														                                                                                                         + f_d[ind + 10 * ms]
+																																														                                                                                                               + 2.0
+																																														                                                                                                               * (f_d[ind + 5 * ms]
+																																														                                                                                                                      + f_d[ind + 11 * ms]
+																																														                                                                                                                            + f_d[ind + 12 * ms]
+																																														                                                                                                                                  + f_d[ind + 15 * ms]
+																																														                                                                                                                                        + f_d[ind + 16 * ms]));
 
 						Nzx = 0.5
 								* (f_d[ind + 1 * ms] + f_d[ind + 7 * ms]
@@ -876,33 +876,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 16 * ms] = f_d[ind + 17 * ms] - Ny;
 				//Buried links
 				f_d[ind + 12 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 13 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (x[0] == -1 && z[1] == 1) { //BOTTOM EAST
@@ -920,33 +920,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 
 				//Buried links
 				f_d[ind + 11 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 14 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (y[0] == 1 && z[1] == 1) { //BOTTOM SOUTH
@@ -961,33 +961,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 12 * ms] = f_d[ind + 13 * ms] - Nx;
 				//Buried links
 				f_d[ind + 16 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 17 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (y[0] == -1 && z[1] == 1) { //BOTTOM NORTH
@@ -1002,33 +1002,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 12 * ms] = f_d[ind + 13 * ms] - Nx;
 				//Buried links
 				f_d[ind + 15 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
 				f_d[ind + 18 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
 
 			}
 			if (x[0] == 1 && z[1] == -1) { //TOP WEST
@@ -1045,33 +1045,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 18 * ms] = f_d[ind + 15 * ms] - Ny;
 				//Buried links
 				f_d[ind + 11 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 14 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                                                    + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (x[0] == -1 && z[1] == -1) { //TOP EAST
@@ -1087,33 +1087,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 18 * ms] = f_d[ind + 15 * ms] - Ny;
 				//Buried links
 				f_d[ind + 12 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 13 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (y[0] == 1 && z[1] == -1) { //TOP SOUTH
@@ -1128,33 +1128,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 14 * ms] = f_d[ind + 11 * ms] - Nx;
 				//Buried links
 				f_d[ind + 15 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
 				f_d[ind + 18 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 17 * ms]);
 			}
 			if (y[0] == -1 && z[1] == -1) { //TOP NORTH
 				Nx = -0.25 * (f_d[ind + 1 * ms] - f_d[ind + 2 * ms]);
@@ -1168,33 +1168,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 14 * ms] = f_d[ind + 11 * ms] - Nx;
 				//Buried links
 				f_d[ind + 16 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 17 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
-																																				                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 8 * ms] + f_d[ind + 9 * ms]
+																																												                                                                                                                         + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                                                    + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (x[0] == 1 && y[1] == -1) { //NORTH WEST
@@ -1209,33 +1209,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 18 * ms] = f_d[ind + 15 * ms] - Nz;
 				//Buried links
 				f_d[ind + 7 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 10 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 			if (x[0] == -1 && y[1] == -1) { //NORTH EAST
@@ -1250,33 +1250,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 18 * ms] = f_d[ind + 15 * ms] - Nz;
 				//Buried links
 				f_d[ind + 8 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
 				f_d[ind + 9 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
 
 			}
 			if (x[0] == 1 && y[1] == 1) { //SOUTH WEST
@@ -1291,33 +1291,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 17 * ms] = f_d[ind + 16 * ms] - Nz;
 				//Buried links
 				f_d[ind + 8 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
 				f_d[ind + 9 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                     + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                                + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                           + f_d[ind + 18 * ms]);
 
 			}
 			if (x[0] == -1 && y[1] == 1) { //SOUTH EAST
@@ -1332,33 +1332,33 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 17 * ms] = f_d[ind + 16 * ms] - Nz;
 				//Buried links
 				f_d[ind + 7 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				f_d[ind + 10 * ms] = (1. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 				//Resting link
 				f_d[ind + 0 * ms] = (12. / 22.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
-																																				                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
-																																				                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 12 * ms] + f_d[ind + 13 * ms]
+																																												                                                                                                                                                    + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                                               + f_d[ind + 16 * ms] + f_d[ind + 17 * ms]
+																																												                                                                                                                                                                                                          + f_d[ind + 18 * ms]);
 
 			}
 
@@ -1374,12 +1374,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 11 * ms] = f_d[ind + 14 * ms];
 				f_d[ind + 15 * ms] = f_d[ind + 18 * ms];
 				C18 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                     + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                     + f_d[ind + 18 * ms]);
 				f_d[ind + 8 * ms] = C18;
 				f_d[ind + 9 * ms] = C18;
 				f_d[ind + 12 * ms] = C18;
@@ -1398,12 +1398,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 12 * ms] = f_d[ind + 13 * ms];
 				f_d[ind + 15 * ms] = f_d[ind + 18 * ms];
 				C27 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                         + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                    + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                         + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                    + f_d[ind + 18 * ms]);
 				f_d[ind + 7 * ms] = C27;
 				f_d[ind + 10 * ms] = C27;
 				f_d[ind + 11 * ms] = C27;
@@ -1423,12 +1423,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 11 * ms] = f_d[ind + 14 * ms];
 				f_d[ind + 16 * ms] = f_d[ind + 17 * ms];
 				C36 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                    + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                    + f_d[ind + 17 * ms]);
 				f_d[ind + 7 * ms] = C36;
 				f_d[ind + 10 * ms] = C36;
 				f_d[ind + 12 * ms] = C36;
@@ -1447,12 +1447,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 12 * ms] = f_d[ind + 13 * ms];
 				f_d[ind + 16 * ms] = f_d[ind + 17 * ms];
 				C45 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                          + f_d[ind + 13 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                     + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                          + f_d[ind + 13 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                     + f_d[ind + 17 * ms]);
 				f_d[ind + 8 * ms] = C45;
 				f_d[ind + 9 * ms] = C45;
 				f_d[ind + 11 * ms] = C45;
@@ -1469,12 +1469,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 13 * ms] = f_d[ind + 12 * ms];
 				f_d[ind + 17 * ms] = f_d[ind + 16 * ms];
 				C45 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                          + f_d[ind + 13 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                     + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                          + f_d[ind + 13 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                     + f_d[ind + 17 * ms]);
 				f_d[ind + 8 * ms] = C45;
 				f_d[ind + 9 * ms] = C45;
 				f_d[ind + 11 * ms] = C45;
@@ -1491,12 +1491,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 14 * ms] = f_d[ind + 11 * ms];
 				f_d[ind + 17 * ms] = f_d[ind + 16 * ms];
 				C36 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                         + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
-																																				                                                                                                                                                    + f_d[ind + 17 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                         + f_d[ind + 14 * ms] + f_d[ind + 16 * ms]
+																																												                                                                                                                                                    + f_d[ind + 17 * ms]);
 				f_d[ind + 7 * ms] = C36;
 				f_d[ind + 10 * ms] = C36;
 				f_d[ind + 12 * ms] = C36;
@@ -1514,12 +1514,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 13 * ms] = f_d[ind + 12 * ms];
 				f_d[ind + 18 * ms] = f_d[ind + 15 * ms];
 				C27 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
-																																				                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 12 * ms]
-																																				                                                                                                                         + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                    + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 8 * ms]
+																																												                                                                                               + f_d[ind + 9 * ms] + f_d[ind + 12 * ms]
+																																												                                                                                                                         + f_d[ind + 13 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                    + f_d[ind + 18 * ms]);
 				f_d[ind + 7 * ms] = C27;
 				f_d[ind + 10 * ms] = C27;
 				f_d[ind + 11 * ms] = C27;
@@ -1537,12 +1537,12 @@ __global__ void gpuBcComplexWall3D(int *bcIdx_d, unsigned long long *bcMask_d,
 				f_d[ind + 14 * ms] = f_d[ind + 11 * ms];
 				f_d[ind + 18 * ms] = f_d[ind + 15 * ms];
 				C18 = (1. / 18.)
-																																				* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
-																																				                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
-																																				                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
-																																				                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
-																																				                                                                                                                          + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
-																																				                                                                                                                                                     + f_d[ind + 18 * ms]);
+																																												* (f_d[ind + ms] + f_d[ind + 2 * ms] + f_d[ind + 3 * ms]
+																																												                                           + f_d[ind + 4 * ms] + f_d[ind + 5 * ms]
+																																												                                                                     + f_d[ind + 6 * ms] + f_d[ind + 7 * ms]
+																																												                                                                                               + f_d[ind + 10 * ms] + f_d[ind + 11 * ms]
+																																												                                                                                                                          + f_d[ind + 14 * ms] + f_d[ind + 15 * ms]
+																																												                                                                                                                                                     + f_d[ind + 18 * ms]);
 				f_d[ind + 8 * ms] = C18;
 				f_d[ind + 9 * ms] = C18;
 				f_d[ind + 12 * ms] = C18;
@@ -1657,7 +1657,7 @@ __global__ void gpuBcOutlet3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int bci = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																	+ threadIdx.x;
+																																									+ threadIdx.x;
 	int ms = depth_d * length_d;
 	int n = length_d;
 	int l = length_d * depth_d;
@@ -1883,20 +1883,9 @@ __global__ void gpuBcPeriodic2D(int *bcIdx_d, int *bcMask_d,
 	if (ind < ms) {
 
 		int ori = orientation_d[ind];
-//		if(ind > 16250)
-//					printf("ori %d at %d\n", ori, ind);
 		switch(ori){
 		case 1: //NORTH
-			if(test_case != 2){
-				r_f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms - offsetY];
-				r_f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms - offsetY];
-				r_f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms - offsetY];
-
-				b_f_d[ind + 4 * ms] = b_f_d[ind + 4 * ms - offsetY];
-				b_f_d[ind + 7 * ms] = b_f_d[ind + 7 * ms - offsetY];
-				b_f_d[ind + 8 * ms] = b_f_d[ind + 8 * ms - offsetY];
-			}
-			else{
+			if(test_case == 2){
 				FLOAT_TYPE u_temp = u_d[ind], v_temp = v_d[ind];
 				FLOAT_TYPE r_temp = (1. / (1. + v_temp)) * (r_f_d[ind] + r_f_d[ind + 1 * ms] + r_f_d[ind + 3 * ms]
 				                                                                                     + 2 * (r_f_d[ind + 2 * ms] + r_f_d[ind + 6 * ms] + r_f_d[ind + 5 * ms]) );
@@ -1915,18 +1904,27 @@ __global__ void gpuBcPeriodic2D(int *bcIdx_d, int *bcMask_d,
 				b_rho_d[ind] = b_temp;
 				rho_d[ind] = r_temp + b_temp;
 			}
+			else if(test_case == 6){
+				r_f_d[ind + 4 * ms] = r_f_d[ind + 2 * ms];
+				r_f_d[ind + 7 * ms] = r_f_d[ind + 5 * ms];
+				r_f_d[ind + 8 * ms] = r_f_d[ind + 6 * ms];
+
+				b_f_d[ind + 4 * ms] = b_f_d[ind + 2 * ms];
+				b_f_d[ind + 7 * ms] = b_f_d[ind + 5 * ms];
+				b_f_d[ind + 8 * ms] = b_f_d[ind + 6 * ms];
+			}
+			else {
+				r_f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms - offsetY];
+				r_f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms - offsetY];
+				r_f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms - offsetY];
+
+				b_f_d[ind + 4 * ms] = b_f_d[ind + 4 * ms - offsetY];
+				b_f_d[ind + 7 * ms] = b_f_d[ind + 7 * ms - offsetY];
+				b_f_d[ind + 8 * ms] = b_f_d[ind + 8 * ms - offsetY];
+			}
 			break;
 		case 2: //SOUTH
-			if(test_case != 2){
-				r_f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms + offsetY];
-				r_f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms + offsetY];
-				r_f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms + offsetY];
-
-				b_f_d[ind + 2 * ms] = b_f_d[ind + 2 * ms + offsetY];
-				b_f_d[ind + 5 * ms] = b_f_d[ind + 5 * ms + offsetY];
-				b_f_d[ind + 6 * ms] = b_f_d[ind + 6 * ms + offsetY];
-			}
-			else{
+			if(test_case == 2){
 				FLOAT_TYPE u_temp = u_d[ind], v_temp = v_d[ind];
 
 				FLOAT_TYPE r_temp = (1. / (1. - v_temp)) *
@@ -1945,6 +1943,24 @@ __global__ void gpuBcPeriodic2D(int *bcIdx_d, int *bcMask_d,
 				r_rho_d[ind] = r_temp;
 				b_rho_d[ind] = b_temp;
 				rho_d[ind] = r_temp + b_temp;
+			}
+			else if(test_case == 6){
+				r_f_d[ind + 2 * ms] = r_f_d[ind + 4 * ms];
+				r_f_d[ind + 5 * ms] = r_f_d[ind + 7 * ms];
+				r_f_d[ind + 6 * ms] = r_f_d[ind + 8 * ms];
+
+				b_f_d[ind + 2 * ms] = b_f_d[ind + 4 * ms];
+				b_f_d[ind + 5 * ms] = b_f_d[ind + 7 * ms];
+				b_f_d[ind + 6 * ms] = b_f_d[ind + 8 * ms];
+			}
+			else{
+				r_f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms + offsetY];
+				r_f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms + offsetY];
+				r_f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms + offsetY];
+
+				b_f_d[ind + 2 * ms] = b_f_d[ind + 2 * ms + offsetY];
+				b_f_d[ind + 5 * ms] = b_f_d[ind + 5 * ms + offsetY];
+				b_f_d[ind + 6 * ms] = b_f_d[ind + 6 * ms + offsetY];
 			}
 			break;
 		case 3: //EAST
@@ -2009,7 +2025,7 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		FLOAT_TYPE* f_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int bci = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																	+ threadIdx.x;
+																																									+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 	int offsetX = length_d - 1; //to get from west to east pairs of periodic nodes
 	int offsetY = length_d * (depth_d - 1); //to get from north to south pairs of periodic nodes
@@ -2070,7 +2086,7 @@ __global__ void gpuBcSymm3D(int *bcIdx_d, unsigned long long *bcMask_d,
 		FLOAT_TYPE* f_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int bci = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																	+ threadIdx.x;
+																																									+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	if (bci < size) {

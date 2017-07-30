@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 	if(args.multiPhase){
 		//Read from file
 		args.r_density = 1.0;
-		args.gamma = 2.0;
+		args.gamma = 1.0;
 		args.kappa = 1.0;
 		args.b_alpha = 4.0 / 9.0;
 		args.r_viscosity = 1.0 / 2.0;
@@ -61,9 +61,9 @@ int main(int argc, char* argv[]) {
 
 		args.b_viscosity = 1.0 / 2.0;
 		args.beta = 0.99;
-		args.r_A = 0.0;
-		args.b_A = 0.0;
-		args.A = 0.0001;
+		args.r_A = 0.0001;
+		args.b_A = 0.0001;
+		args.A = 0.0;
 		args.control_param = 0.9;
 		args.del = 0.1;
 		args.g_limit = 0;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 		args.b_density = args.r_density / args.gamma;
 		args.r_alpha = (1.0 - ((1.0 - args.b_alpha) / args.gamma));
 		args.external_force = 0; //0 is gravity, 1 for pressure difference
-		args.high_order = 1; // order of color gradient
+		args.high_order = 0; // order of color gradient
 	}
 
 	InputFilenames inFn;

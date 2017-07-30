@@ -73,6 +73,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	float cudatime;
 	CHECK(cudaEventCreate(&start));
 	CHECK(cudaEventCreate(&stop));
+
 	numNodes = readNodeFile(inFn->node, &nodeIdX, &nodeIdY, &tempi, &nodeX,
 			&nodeY, &temp, &nodeType,args->TypeOfProblem);
 
@@ -81,8 +82,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		return 2;
 	}
 	int *fluid_d = createGpuArrayInt(numNodes, ARRAY_COPY, 0, nodeType);
-	FLOAT_TYPE *coordX_d = createGpuArrayFlt(numNodes, ARRAY_COPY, 0., nodeX);
-	FLOAT_TYPE *coordY_d = createGpuArrayFlt(numNodes, ARRAY_COPY, 0., nodeY);
+
 	numConns = readConnFile(inFn->bc, &bcNodeIdX, &bcNodeIdY, &tempi,
 			&latticeId, &bcType, &bcX, &bcY, &temp, &bcBoundId,args->TypeOfProblem);
 
@@ -98,18 +98,36 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	int *bcBoundId_d = createGpuArrayInt(numConns, ARRAY_COPY, 0, bcBoundId);
 	FLOAT_TYPE *bcX_d = createGpuArrayFlt(numConns, ARRAY_COPY, 0., bcX);
 	FLOAT_TYPE *bcY_d = createGpuArrayFlt(numConns, ARRAY_COPY, 0., bcY);
-	m = getLastValue(nodeIdY, numNodes);
-	n = getLastValue(nodeIdX, numNodes);
-	printf("Num conne %d\n", numConns);
+	if(!args->multiPhase || args->test_case != 6){
+		m = getLastValue(nodeIdY, numNodes);
+		n = getLastValue(nodeIdX, numNodes);
 
-	delta = getGridSpacing(nodeIdX, nodeIdY, nodeX, numNodes);
-	numInletNodes = getNumInletNodes(bcType, latticeId, numConns,
-			args->TypeOfProblem);
-	maxInletCoordY = getMaxInletCoordY(bcType, latticeId, bcY, delta, numConns,args->TypeOfProblem);
-	minInletCoordY = getMinInletCoordY(bcType, latticeId, bcY, delta, numConns,args->TypeOfProblem);
+		delta = getGridSpacing(nodeIdX, nodeIdY, nodeX, numNodes);
+		numInletNodes = getNumInletNodes(bcType, latticeId, numConns,
+				args->TypeOfProblem);
+		maxInletCoordY = getMaxInletCoordY(bcType, latticeId, bcY, delta, numConns,args->TypeOfProblem);
+		minInletCoordY = getMinInletCoordY(bcType, latticeId, bcY, delta, numConns,args->TypeOfProblem);
+	}
+	else{
+		m = 1024;
+		n = 256;
+		free(nodeX);
+		free(nodeY);
+		nodeX = createHostArrayFlt(n*m,ARRAY_ZERO);
+		nodeY = createHostArrayFlt(n*m,ARRAY_ZERO);
+		FLOAT_TYPE deltaX = 1.0 / (n-1), deltaY = (2.0 / (m-1));
+		for(int j = 0; j < m; j++){
+			for(int i = 0; i < n; i++){
+				nodeX[j * n + i] = i * deltaX;
+				nodeY[j * n + i] = j * deltaY;
+			}
+		}
+	}
+
+	FLOAT_TYPE *coordX_d = createGpuArrayFlt(m*n, ARRAY_COPY, 0., nodeX);
+	FLOAT_TYPE *coordY_d = createGpuArrayFlt(m*n, ARRAY_COPY, 0., nodeY);
 	FLOAT_TYPE *nodeZ = createHostArrayFlt(m * n, ARRAY_ZERO);
-	writeInitLog(logFilename, args, delta, m, n, 1, numInletNodes,
-			maxInletCoordY, minInletCoordY, 0.0, 0.0);
+	writeInitLog(logFilename, args, delta, m, n, 1, numInletNodes, maxInletCoordY, minInletCoordY, 0.0, 0.0);
 	logFile = fopen(logFilename, "a");
 
 	// In case of no autosave
@@ -253,6 +271,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			bcIdx, mask, delta, m, n, numConns);
 	printf("BCCOUNT %d\n", bcCount);
 
+	printf("END\n");
 	int *bcIdxCollapsed_d = createGpuArrayInt(bcCount, ARRAY_ZERO);
 	int *bcMaskCollapsed_d = createGpuArrayInt(bcCount, ARRAY_ZERO);
 	FLOAT_TYPE *qCollapsed_d = createGpuArrayFlt(8 * bcCount, ARRAY_ZERO);
@@ -499,7 +518,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 				fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
 				//	printf("MAX diff "FLOAT_FORMAT"\n", fMaxDiff);
 				CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
-				if (h_divergence) {
+				if (h_divergence || fMaxDiff != fMaxDiff) {
 					fprintf(stderr, "\nDIVERGENCE!\n");
 					break;
 				}
@@ -578,7 +597,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																																												/ CLOCKS_PER_SEC;
+																																																																																																																																																																																								/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////

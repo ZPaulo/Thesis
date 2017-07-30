@@ -500,6 +500,36 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 				b_f_d[index + 8 * ms] = b_density_d * aux2;
 			}
 			break;
+		case 6:
+			if( y_d[index] > (1.0 + 0.1 * cos( 2*M_PI*x_d[index]))){
+				aux1 = (1 - r_alpha_d) / 5.0;
+				aux2 = (1 - r_alpha_d) / 20.0;
+				r_rho_d[index] = r_density_d;
+				r_f_d[index + 0 * ms] = r_density_d * r_alpha_d;
+				r_f_d[index + 1 * ms] = r_density_d * aux1;
+				r_f_d[index + 2 * ms] = r_density_d * aux1;
+				r_f_d[index + 3 * ms] = r_density_d * aux1;
+				r_f_d[index + 4 * ms] = r_density_d * aux1;
+				r_f_d[index + 5 * ms] = r_density_d * aux2;
+				r_f_d[index + 6 * ms] = r_density_d * aux2;
+				r_f_d[index + 7 * ms] = r_density_d * aux2;
+				r_f_d[index + 8 * ms] = r_density_d * aux2;
+			}
+			else {
+				aux1 = (1 - b_alpha_d) / 5.0;
+				aux2 = (1 - b_alpha_d) / 20.0;
+				b_rho_d[index] = b_density_d;
+				b_f_d[index + 0 * ms] = b_density_d * b_alpha_d;
+				b_f_d[index + 1 * ms] = b_density_d * aux1;
+				b_f_d[index + 2 * ms] = b_density_d * aux1;
+				b_f_d[index + 3 * ms] = b_density_d * aux1;
+				b_f_d[index + 4 * ms] = b_density_d * aux1;
+				b_f_d[index + 5 * ms] = b_density_d * aux2;
+				b_f_d[index + 6 * ms] = b_density_d * aux2;
+				b_f_d[index + 7 * ms] = b_density_d * aux2;
+				b_f_d[index + 8 * ms] = b_density_d * aux2;
+			}
+			break;
 		default:
 			break;
 		}
@@ -681,6 +711,56 @@ __global__ void initCGBubble3D(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d
 			break;
 		case 4: //Couette
 			if(y_d[index] > 0.5){
+				r_rho_d[index] = r_density_d;
+				// initialise density
+				rho_d[index] = r_density_d;
+				//r_f_d[index] = 0; First r_f_d is 0
+				f_d[index + 1 * ms] = r_f_d[index + 1 * ms] = r_density_d * phi3D_d[1];
+				f_d[index + 2 * ms] = r_f_d[index + 2 * ms] = r_density_d * phi3D_d[2];
+				f_d[index + 3 * ms] = r_f_d[index + 3 * ms] = r_density_d * phi3D_d[3];
+				f_d[index + 4 * ms] = r_f_d[index + 4 * ms] = r_density_d * phi3D_d[4];
+				f_d[index + 5 * ms] = r_f_d[index + 5 * ms] = r_density_d * phi3D_d[5];
+				f_d[index + 6 * ms] = r_f_d[index + 6 * ms] = r_density_d * phi3D_d[6];
+				f_d[index + 7 * ms] = r_f_d[index + 7 * ms] = r_density_d * phi3D_d[7];
+				f_d[index + 8 * ms] = r_f_d[index + 8 * ms] = r_density_d * phi3D_d[8];
+				f_d[index + 9 * ms] = r_f_d[index + 9 * ms] = r_density_d * phi3D_d[9];
+				f_d[index + 10 * ms] = r_f_d[index + 10 * ms] = r_density_d * phi3D_d[10];
+				f_d[index + 11 * ms] = r_f_d[index + 11 * ms] = r_density_d * phi3D_d[11];
+				f_d[index + 12 * ms] = r_f_d[index + 12 * ms] = r_density_d * phi3D_d[12];
+				f_d[index + 13 * ms] = r_f_d[index + 13 * ms] = r_density_d * phi3D_d[13];
+				f_d[index + 14 * ms] = r_f_d[index + 14 * ms] = r_density_d * phi3D_d[14];
+				f_d[index + 15 * ms] = r_f_d[index + 15 * ms] = r_density_d * phi3D_d[15];
+				f_d[index + 16 * ms] = r_f_d[index + 16 * ms] = r_density_d * phi3D_d[16];
+				f_d[index + 17 * ms] = r_f_d[index + 17 * ms] = r_density_d * phi3D_d[17];
+				f_d[index + 18 * ms] = r_f_d[index + 18 * ms] = r_density_d * phi3D_d[18];
+			}
+			else {
+				b_rho_d[index] = b_density_d;
+				// initialise density
+				rho_d[index] = b_density_d;
+				f_d[index + 1 * ms] = b_f_d[index + 1 * ms] = b_density_d * phi3D_d[1];
+				f_d[index + 2 * ms] = b_f_d[index + 2 * ms] = b_density_d * phi3D_d[2];
+				f_d[index + 3 * ms] = b_f_d[index + 3 * ms] = b_density_d * phi3D_d[3];
+				f_d[index + 4 * ms] = b_f_d[index + 4 * ms] = b_density_d * phi3D_d[4];
+				f_d[index + 5 * ms] = b_f_d[index + 5 * ms] = b_density_d * phi3D_d[5];
+				f_d[index + 6 * ms] = b_f_d[index + 6 * ms] = b_density_d * phi3D_d[6];
+				f_d[index + 7 * ms] = b_f_d[index + 7 * ms] = b_density_d * phi3D_d[7];
+				f_d[index + 8 * ms] = b_f_d[index + 8 * ms] = b_density_d * phi3D_d[8];
+				f_d[index + 9 * ms] = b_f_d[index + 9 * ms] = b_density_d * phi3D_d[9];
+				f_d[index + 10 * ms] = b_f_d[index + 10 * ms] = b_density_d * phi3D_d[10];
+				f_d[index + 11 * ms] = b_f_d[index + 11 * ms] = b_density_d * phi3D_d[11];
+				f_d[index + 12 * ms] = b_f_d[index + 12 * ms] = b_density_d * phi3D_d[12];
+				f_d[index + 13 * ms] = b_f_d[index + 13 * ms] = b_density_d * phi3D_d[13];
+				f_d[index + 14 * ms] = b_f_d[index + 14 * ms] = b_density_d * phi3D_d[14];
+				f_d[index + 15 * ms] = b_f_d[index + 15 * ms] = b_density_d * phi3D_d[15];
+				f_d[index + 16 * ms] = b_f_d[index + 16 * ms] = b_density_d * phi3D_d[16];
+				f_d[index + 17 * ms] = b_f_d[index + 17 * ms] = b_density_d * phi3D_d[17];
+				f_d[index + 18 * ms] = b_f_d[index + 18 * ms] = b_density_d * phi3D_d[18];
+			}
+			break;
+		case 5: //RT
+
+			if( y_d[index] > (1 + 0.1 * cos( 2*M_PI*x_d[index]))){
 				r_rho_d[index] = r_density_d;
 				// initialise density
 				rho_d[index] = r_density_d;
@@ -931,9 +1011,9 @@ __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-																																																																																				* (maxInletCoordY_d - minInletCoordY_d);
+																																																																																										* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-																																																																																				* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																																																																																										* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
@@ -942,7 +1022,7 @@ __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																																																																			+ threadIdx.x;
+																																																																																									+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -1134,8 +1214,9 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		dy = bcY[bci] - nodeY[ind];
 		dz = bcZ[bci] - nodeZ[ind];
 		if (CurvedBCs == (BoundaryType) CURVED) {
+
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-																																																																																					/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																																																																																											/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
 		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);
@@ -1148,12 +1229,11 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		int ind = bcNodeIdX[bci] + bcNodeIdY[bci] * n + bcNodeIdZ[bci] * n * m;
 		; //node_dim
 		if (bcMask[ind] & BC3D_CORNER) {
-
 			for (int dir_i = 0; dir_i < 19; dir_i++) {
 				if (bcMask[ind] & BC3D_MASK((unsigned long long)BC3D_ALL, dir_i)) {
 					bcMask[ind] &= ~(unsigned long long) BC3D_MASK(
 							(unsigned long long)BC3D_ALL, dir_i);
-					bcMask[ind] |= BC3D_MASK((unsigned long long)BC3D_WALL,
+					bcMask[ind] |= BC3D_MASK((unsigned long long)BC3D_CYCL,
 							dir_i);
 
 				}
