@@ -115,7 +115,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		free(nodeY);
 		nodeX = createHostArrayFlt(n*m,ARRAY_ZERO);
 		nodeY = createHostArrayFlt(n*m,ARRAY_ZERO);
-		FLOAT_TYPE deltaX = 1.0 / (n-1), deltaY = (2.0 / (m-1));
+		FLOAT_TYPE deltaX = 1.0 / (n-1), deltaY = (4.0 / (m-1));
 		for(int j = 0; j < m; j++){
 			for(int i = 0; i < n; i++){
 				nodeX[j * n + i] = i * deltaX;
@@ -163,9 +163,14 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *b_f = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
 	FLOAT_TYPE *r_fColl = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
 	FLOAT_TYPE *b_fColl = createHostArrayFlt(m * n * 9, ARRAY_ZERO);
-	FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
-	FLOAT_TYPE	b_omega = 1.0/(3.0 * args->b_viscosity+0.5);
-	FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+
+	FLOAT_TYPE aux1 = args->r_density / ((args->r_density + args->b_density) * args->r_viscosity) +
+			args->b_density / ((args->r_density + args->b_density) * args->b_viscosity);
+	FLOAT_TYPE mean_nu = 1.0/aux1;
+	FLOAT_TYPE omega_eff = 1.0/(3.0*mean_nu+0.5);
+
+	FLOAT_TYPE st_predicted = 4.0 * args->A / 9.0 / omega_eff;
+
 	int *cg_directions = createHostArrayInt(n*m, ARRAY_ZERO);
 #if !CUDA
 	FLOAT_TYPE r_phi[9];
@@ -390,7 +395,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						r_omega, b_omega, args->control_param, args->del, args->beta,
 						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
 #else
-				gpuCollBgkwGC2D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, r_f_d, b_f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
+				gpuCollBgkwGC2D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, r_f_d, b_f_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
 #endif
 			}else{
 				gpuCollBgkw2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, f_d,

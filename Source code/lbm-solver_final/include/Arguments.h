@@ -118,11 +118,8 @@ typedef struct arg
     FLOAT_TYPE gamma;
     FLOAT_TYPE r_viscosity;
     FLOAT_TYPE b_viscosity;
-    FLOAT_TYPE r_A;
-    FLOAT_TYPE b_A;
     FLOAT_TYPE A;
     FLOAT_TYPE beta;
-    FLOAT_TYPE del;
     FLOAT_TYPE control_param;
     FLOAT_TYPE g_limit;
     int test_case;

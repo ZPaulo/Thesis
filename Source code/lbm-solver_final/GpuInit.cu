@@ -54,23 +54,14 @@ __constant__ FLOAT_TYPE bubble_radius_d;
 __constant__ FLOAT_TYPE A_d;
 __constant__ FLOAT_TYPE r_density_d;
 __constant__ FLOAT_TYPE b_density_d;
-__constant__ FLOAT_TYPE st_predicted_d;
 __constant__ bool external_force_d;
 
 //COLOR GRADIENT 2D//
-__constant__ FLOAT_TYPE a1_d;
-__constant__ FLOAT_TYPE a2_d;
-__constant__ FLOAT_TYPE a3_d;
-__constant__ FLOAT_TYPE a4_d;
-__constant__ FLOAT_TYPE a5_d;
-__constant__ FLOAT_TYPE r_omega_d;
-__constant__ FLOAT_TYPE b_omega_d;
 __constant__ FLOAT_TYPE control_param_d;
-__constant__ FLOAT_TYPE del_d;
-__constant__ FLOAT_TYPE b_A_d;
-__constant__ FLOAT_TYPE r_A_d;
-__constant__ FLOAT_TYPE b_phi_d[9];
-__constant__ FLOAT_TYPE r_phi_d[9];
+__constant__ FLOAT_TYPE phi_d[9];
+__constant__ FLOAT_TYPE teta_d[9];
+__constant__ FLOAT_TYPE chi_d[9];
+__constant__ FLOAT_TYPE psi_d[9];
 __constant__ FLOAT_TYPE w_pert_d[9];
 __constant__ FLOAT_TYPE g_limit_d;
 __constant__ FLOAT_TYPE c_norms_d[9];
@@ -151,37 +142,27 @@ __host__ void initConstants2D(Arguments *args,
 	cudaMemcpyToSymbol(g_d, &args->g, sizeof(FLOAT_TYPE));
 
 	if (args->multiPhase){
-		FLOAT_TYPE r_omega = 1.0/(3.0 * args->r_viscosity+0.5);
-		FLOAT_TYPE b_omega = 1.0/(3.0 * args->b_viscosity+0.5);
-		cudaMemcpyToSymbol(r_omega_d, &r_omega, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(b_omega_d, &b_omega, sizeof(FLOAT_TYPE));
-		FLOAT_TYPE a1      =   2.0 * r_omega * b_omega/(r_omega+b_omega);
-		FLOAT_TYPE a2      =   2.0 * (r_omega - a1) / args->del;
-		FLOAT_TYPE a3      =   -a2 / (2.0 * args->del);
-		FLOAT_TYPE a4      =   2.0 * (a1 - b_omega) / args->del;
-		FLOAT_TYPE a5      =   a4 / (2.0 * args->del);
-		cudaMemcpyToSymbol(a1_d, &a1, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(a2_d, &a2, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(a3_d, &a3, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(a4_d, &a4, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(a5_d, &a5, sizeof(FLOAT_TYPE));
-
-
 
 		cudaMemcpyToSymbol(control_param_d, &args->control_param, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(del_d, &args->del, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(beta_d, &args->beta, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(r_A_d, &args->r_A, sizeof(FLOAT_TYPE));
-		cudaMemcpyToSymbol(b_A_d, &args->b_A, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(A_d, &args->A, sizeof(FLOAT_TYPE));
 
-		FLOAT_TYPE aux1=(1-args->r_alpha)/5.0;
-		FLOAT_TYPE aux2=(1-args->r_alpha)/20.0;
-		FLOAT_TYPE r_phi[9] = {args->r_alpha, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
-		cudaMemcpyToSymbol(r_phi_d, r_phi, 9 * sizeof(FLOAT_TYPE));
-		aux1=(1-args->b_alpha)/5.0;
-		aux2=(1-args->b_alpha)/20.0;
-		FLOAT_TYPE b_phi[9] = {args->b_alpha, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
-		cudaMemcpyToSymbol(b_phi_d, b_phi, 9 * sizeof(FLOAT_TYPE));
+		FLOAT_TYPE aux1 = 1.0 / 5.0;
+		FLOAT_TYPE aux2 = 1.0 /20.0;
+		FLOAT_TYPE phi[9] = {0.0, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
+		cudaMemcpyToSymbol(phi_d, phi, 9 * sizeof(FLOAT_TYPE));
+		aux1 = -1.0 / 5.0;
+		aux2 = -1.0 / 20.0;
+		FLOAT_TYPE teta[9] = {1.0, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
+		cudaMemcpyToSymbol(teta_d, teta, 9 * sizeof(FLOAT_TYPE));
+		aux1 = -1.0 / 6.0;
+		aux2 = 1.0 / 12.0;
+		FLOAT_TYPE chi[9] = {-8.0 / 3.0, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
+		cudaMemcpyToSymbol(chi_d, chi, 9 * sizeof(FLOAT_TYPE));
+		aux1 = 1.0 / 2.0;
+		aux2 = 1.0 / 8.0;
+		FLOAT_TYPE psi[9] = {0.0, aux1, aux1, aux1, aux1, aux2, aux2,aux2, aux2};
+		cudaMemcpyToSymbol(psi_d, psi, 9 * sizeof(FLOAT_TYPE));
 
 		FLOAT_TYPE w_pert[9] = {-4.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0,
 				5.0 / 108.0, 5.0 / 108.0, 5.0 / 108.0, 5.0 / 108.0};
@@ -199,8 +180,8 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(b_alpha_d, &args->b_alpha, sizeof(FLOAT_TYPE));
 		args->bubble_radius /= n;
 		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
-		FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
-		cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
+//		FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
+//		cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
 
 		FLOAT_TYPE cg_w[9] = {0., 4. / 12., 4. / 12., 4. / 12., 4. / 12., 1. / 12., 1. / 12., 1. / 12., 1. / 12.};
 		cudaMemcpyToSymbol(cg_w_d, cg_w, 9 * sizeof(FLOAT_TYPE));
@@ -214,6 +195,9 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(hocg_cx_d, hocg_cx, 25 * sizeof(int));
 		int hocg_cy[25] = {0,0,1,0,-1,1,1,-1,-1,2,2,2,1,0,-1,-2,-2,-2,-2,-2,-1,0,1,2,2};
 		cudaMemcpyToSymbol(hocg_cy_d, hocg_cy, 25 * sizeof(int));
+
+		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
+		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
 	}
 }
 
@@ -501,7 +485,7 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 			}
 			break;
 		case 6:
-			if( y_d[index] > (1.0 + 0.1 * cos( 2*M_PI*x_d[index]))){
+			if( y_d[index] > (2.0 + 0.1 * cos( 2*M_PI*x_d[index]))){
 				aux1 = (1 - r_alpha_d) / 5.0;
 				aux2 = (1 - r_alpha_d) / 20.0;
 				r_rho_d[index] = r_density_d;
@@ -954,8 +938,6 @@ __host__ void initConstants3D(Arguments *args,
 		cudaMemcpyToSymbol(b_alpha_d, &args->b_alpha, sizeof(FLOAT_TYPE));
 		args->bubble_radius /= n;
 		cudaMemcpyToSymbol(bubble_radius_d, &args->bubble_radius, sizeof(FLOAT_TYPE));
-		//FLOAT_TYPE st_predicted = (2.0/9.0)*(1.0+1.0/args->gamma)/(0.5*(r_omega+b_omega))*0.5*args->r_density*(args->r_A+args->b_A);
-		//cudaMemcpyToSymbol(st_predicted_d, &st_predicted, sizeof(FLOAT_TYPE));
 
 		cudaMemcpyToSymbol(r_viscosity_d, &args->r_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
@@ -1011,9 +993,9 @@ __global__ void gpuInitInletProfile2D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 
 	if (idx < size) {
 		inletLenghth2 = (maxInletCoordY_d - minInletCoordY_d)
-																																																																																										* (maxInletCoordY_d - minInletCoordY_d);
+																																																																																												* (maxInletCoordY_d - minInletCoordY_d);
 		u0_d[idx] = 4 * 1.5 * uIn_d * (y_d[idx] - minInletCoordY_d)
-																																																																																										* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
+																																																																																												* (maxInletCoordY_d - y_d[idx]) / inletLenghth2;
 		v0_d[idx] = vIn_d;
 	}
 }
@@ -1022,7 +1004,7 @@ __global__ void gpuInitInletProfile3D(FLOAT_TYPE *u0_d, FLOAT_TYPE *v0_d,
 		FLOAT_TYPE *w0_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d, int size) {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int idx = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																																																																									+ threadIdx.x;
+																																																																																											+ threadIdx.x;
 	FLOAT_TYPE rad = 0.;
 	FLOAT_TYPE Tta = 0.;
 	FLOAT_TYPE eta = 0.;
@@ -1216,7 +1198,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 		if (CurvedBCs == (BoundaryType) CURVED) {
 
 			q[ind * 18 + dir - 1] = sqrt(dx * dx + dy * dy + dz * dz)
-																																																																																											/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
+																																																																																													/ (delta * qLat[dir]); //q = |AC|/|AB| A,B nodos C boundary
 		}
 		//        if(ind == 30757)        printf("q[ind*18 + dir-1]: %f\n", q[ind*18 + dir-1]);
 		//q_d[ind+(dir-1)*ms] = sqrt( dx*dx + dy*dy ) / (*delta_d * qLat_d[dir]);

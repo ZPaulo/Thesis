@@ -73,36 +73,27 @@ extern __constant__ FLOAT_TYPE g_limit_d;
 extern __constant__ FLOAT_TYPE r_alpha_d;
 extern __constant__ FLOAT_TYPE b_alpha_d;
 extern __constant__ FLOAT_TYPE bubble_radius_d;
-extern __constant__ FLOAT_TYPE st_predicted_d;
 extern __constant__ FLOAT_TYPE r_density_d;
 extern __constant__ FLOAT_TYPE b_density_d;
 extern __constant__ bool external_force_d;
+extern __constant__ FLOAT_TYPE A_d;
+extern __constant__ FLOAT_TYPE r_viscosity_d;
+extern __constant__ FLOAT_TYPE b_viscosity_d;
+
+//#### 2D Color Gradient ####//
+extern __constant__ FLOAT_TYPE control_param_d;
+extern __constant__ FLOAT_TYPE phi_d[9];
+extern __constant__ FLOAT_TYPE teta_d[9];
+extern __constant__ FLOAT_TYPE chi_d[9];
+extern __constant__ FLOAT_TYPE psi_d[9];
+extern __constant__ FLOAT_TYPE w_pert_d[9];
+extern __constant__ FLOAT_TYPE c_norms_d[9];
+extern __constant__ FLOAT_TYPE cg_w_d[9];
 extern __constant__ FLOAT_TYPE hocg_w_d[25];
 extern __constant__ int hocg_cx_d[25];
 extern __constant__ int hocg_cy_d[25];
 
-//#### 2D Color Gradient ####//
-extern __constant__ FLOAT_TYPE a1_d;
-extern __constant__ FLOAT_TYPE a2_d;
-extern __constant__ FLOAT_TYPE a3_d;
-extern __constant__ FLOAT_TYPE a4_d;
-extern __constant__ FLOAT_TYPE a5_d;
-extern __constant__ FLOAT_TYPE r_omega_d;
-extern __constant__ FLOAT_TYPE b_omega_d;
-extern __constant__ FLOAT_TYPE control_param_d;
-extern __constant__ FLOAT_TYPE del_d;
-extern __constant__ FLOAT_TYPE b_A_d;
-extern __constant__ FLOAT_TYPE r_A_d;
-extern __constant__ FLOAT_TYPE b_phi_d[9];
-extern __constant__ FLOAT_TYPE r_phi_d[9];
-extern __constant__ FLOAT_TYPE w_pert_d[9];
-extern __constant__ FLOAT_TYPE c_norms_d[9];
-extern __constant__ FLOAT_TYPE cg_w_d[9];
-
 //#### 3D Color Gradient ####//
-extern __constant__ FLOAT_TYPE A_d;
-extern __constant__ FLOAT_TYPE r_viscosity_d;
-extern __constant__ FLOAT_TYPE b_viscosity_d;
 extern __constant__ FLOAT_TYPE c_norms3D_d[19];
 extern __constant__ FLOAT_TYPE w_pert3D_d[19];
 extern __constant__ FLOAT_TYPE phi3D_d[19];

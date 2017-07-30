@@ -53,22 +53,19 @@ int main(int argc, char* argv[]) {
 	if(args.multiPhase){
 		//Read from file
 		args.r_density = 1.0;
-		args.gamma = 1.0;
+		args.gamma = 3.0;
 		args.kappa = 1.0;
 		args.b_alpha = 4.0 / 9.0;
-		args.r_viscosity = 1.0 / 2.0;
+		args.r_viscosity = 5e-3;
 //		args.b_viscosity = args.r_viscosity / args.kappa * args.gamma;
 
-		args.b_viscosity = 1.0 / 2.0;
+		args.b_viscosity = 5e-3;
 		args.beta = 0.99;
-		args.r_A = 0.0001;
-		args.b_A = 0.0001;
 		args.A = 0.0;
 		args.control_param = 0.9;
-		args.del = 0.1;
 		args.g_limit = 0;
 		args.bubble_radius = 18.0;
-		args.test_case = 1;
+		args.test_case = 6;
 		//Not file
 		args.b_density = args.r_density / args.gamma;
 		args.r_alpha = (1.0 - ((1.0 - args.b_alpha) / args.gamma));

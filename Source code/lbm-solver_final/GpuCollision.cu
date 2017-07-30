@@ -115,40 +115,77 @@ __device__ FLOAT_TYPE calculateColorGradientX(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b
 	return res;
 }
 
-__device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, int cg_dir_d, int index, FLOAT_TYPE *cg_x, FLOAT_TYPE *cg_y){
+__device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,FLOAT_TYPE *rho_d, int cg_dir_d, int index, FLOAT_TYPE *cg_x, FLOAT_TYPE *cg_y,
+		FLOAT_TYPE *gr_x, FLOAT_TYPE *gr_y){
 	FLOAT_TYPE cgx = 0.0;
 	FLOAT_TYPE cgy = 0.0;
+	FLOAT_TYPE grx = 0.0;
+	FLOAT_TYPE gry = 0.0;
+	FLOAT_TYPE  aux1, aux2;
 	int ind, i;
 	switch (cg_dir_d) {
 	case 0:
 		for(i = 1; i < 9; i++){
 			ind = index + cx2D_d[i] + cy2D_d[i] * length_d;
-			cgx += (r_rho_d[ind] - b_rho_d[ind]) * cx2D_d[i] * cg_w_d[i];
-			cgy += (r_rho_d[ind] - b_rho_d[ind]) * cy2D_d[i] * cg_w_d[i];
+			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w_d[i] * rho_d[ind];
+
+			grx += aux2 * cx2D_d[i];
+			gry += aux2 * cy2D_d[i];
+
+			cgx += aux1 * cx2D_d[i];
+			cgy += aux1 * cy2D_d[i];
 		}
 		break;
 	case 1: //NORTH
 		for(i = 1; i < 9; i++){
 			ind = index + cx2D_d[i] - abs(cy2D_d[i]) * length_d;
 			cgx += (r_rho_d[ind] - b_rho_d[ind]) * cx2D_d[i] * cg_w_d[i];
+
+			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w_d[i] * rho_d[ind];
+
+			grx += aux2 * cx2D_d[i];
+
+			cgx += aux1 * cx2D_d[i];
 		}
 		break;
 	case 2: //SOUTH
 		for(i = 1; i < 9; i++){
 			ind = index + cx2D_d[i] + abs(cy2D_d[i]) * length_d;
 			cgx += (r_rho_d[ind] - b_rho_d[ind]) * cx2D_d[i] * cg_w_d[i];
+
+			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w_d[i] * rho_d[ind];
+
+			grx += aux2 * cx2D_d[i];
+			cgx += aux1 * cx2D_d[i];
 		}
 		break;
 	case 3: //EAST
 		for(i = 1; i < 9; i++){
 			ind = index - abs(cx2D_d[i]) + cy2D_d[i] * length_d;
 			cgy += (r_rho_d[ind] - b_rho_d[ind]) * cy2D_d[i] * cg_w_d[i];
+
+			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w_d[i] * rho_d[ind];
+
+			gry += aux2 * cy2D_d[i];
+
+			cgy += aux1 * cy2D_d[i];
 		}
 		break;
 	case 4: //WEST
 		for(i = 1; i < 9; i++){
 			ind = index + abs(cx2D_d[i]) + cy2D_d[i] * length_d;
 			cgy += (r_rho_d[ind] - b_rho_d[ind]) * cy2D_d[i] * cg_w_d[i];
+
+			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
+			aux2 = cg_w_d[i] * rho_d[ind];
+
+			gry += aux2 * cy2D_d[i];
+
+			cgy += aux1 * cy2D_d[i];
 		}
 		break;
 	default:
@@ -156,6 +193,9 @@ __device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,
 	}
 	(*cg_x) = cgx;
 	(*cg_y) = cgy;
+
+	(*gr_x) = grx;
+	(*gr_y) = gry;
 }
 
 __device__ void calculateHOColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, int cg_dir_d, int index, FLOAT_TYPE *cg_x, FLOAT_TYPE *cg_y){
@@ -473,15 +513,16 @@ __global__ void gpuCollBgkw2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 }
 
 __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
-		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
+		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d,  FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
 
 	int ind = blockIdx.x * blockDim.x + threadIdx.x;
 	int ms = depth_d*length_d;
-	int index9;
-	FLOAT_TYPE r_r, b_r, r, u, v, color_gradient_x, color_gradient_y;
-	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, aux1, mean_nu, omega_eff;
-	FLOAT_TYPE prod_c_g, r_pert, b_pert;
-	FLOAT_TYPE r_CollPert, b_CollPert;
+	int cx, cy;
+	FLOAT_TYPE r_r, b_r, r, u, v, cg_x, cg_y, gr_x, gr_y;
+	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, mean_nu, omega_eff;
+	FLOAT_TYPE prod_c_g, pert;
+	FLOAT_TYPE f_CollPert;
+	FLOAT_TYPE G1, G2, G3, G4, prod_u_grad_rho, mean_alpha, TC, cu1, cu2, f_eq;
 	if (ind < ms)
 	{
 		u =   u_d[ind];
@@ -490,27 +531,38 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 		b_r = b_rho_d[ind];
 		r = rho_d[ind];
 
-		aux1 = r_r / (r * r_viscosity_d) + b_r /(r * b_viscosity_d);
-		mean_nu = 1.0/aux1;
-		omega_eff = 1.0/(3.0*mean_nu+0.5);
-
 		if(high_order)
-			calculateHOColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &color_gradient_x, &color_gradient_y);
+			calculateHOColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y);
 		else{
-			calculateColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &color_gradient_x, &color_gradient_y);
+			calculateColorGradient(r_rho_d,b_rho_d, rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &gr_x, &gr_y);
+			//		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
+			//		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		}
-		//		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
-		//		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 
-		color_gradient_norm = sqrt(color_gradient_x * color_gradient_x + color_gradient_y * color_gradient_y);
+		G1 = 2.0 * u * gr_x;
+		G2 = u * gr_y + v*gr_x;
+		G3 = G2;
+		G4 = 2.0 * v * gr_y;
+
+		prod_u_grad_rho = u * gr_x + v * gr_y;
+
+		mean_nu = 1.0 / (r_r / (r * r_viscosity_d) + b_r /(r * b_viscosity_d));
+		omega_eff = 1.0 / (3.0 * mean_nu + 0.5);
+		mean_alpha = r_alpha_d * r_r / r + b_alpha_d * b_r / r;
+
+
+		color_gradient_norm = sqrt(cg_x * cg_x + cg_y * cg_y);
 		k_r=r_r/r;
 		k_b=b_r/r;
-		k_k= beta_d * r_r * b_r/(r * r);
+		k_k= beta_d * r_r * b_r / r;
 
+		cu1 = u*u + v*v;
 
 		for (int k=0;k<9;k++){
+			cx = cx2D_d[k];
+			cy = cy2D_d[k];
 			if (color_gradient_norm > g_limit_d){
-				prod_c_g=cx2D_d[k]*color_gradient_x+cy2D_d[k]*color_gradient_y;
+				prod_c_g=cx * cg_x + cy * cg_y;
 				if (k!=0){
 					cosin= prod_c_g / (color_gradient_norm*c_norms_d[k]);
 				}
@@ -518,23 +570,29 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 					cosin=0.0;
 
 				// calculate perturbation terms
-				r_pert=0.5*r_A_d*color_gradient_norm*(w2D_d[k]*(prod_c_g * prod_c_g) / (color_gradient_norm * color_gradient_norm)-w_pert_d[k]);
-				b_pert=0.5*b_A_d*color_gradient_norm*(w2D_d[k]*(prod_c_g * prod_c_g) / (color_gradient_norm * color_gradient_norm)-w_pert_d[k]);
+				pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
 			}
 			else{
 				// the perturbation terms are null
-				r_pert=0;
-				b_pert=0;
+				pert=0.0;
 			}
 
-			index9 = ind + k * ms;
-			// calculate updated distribution function
-			r_CollPert = omega_eff*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], r_r, w2D_d[k], r_phi_d[k]) + (1-omega_eff)*r_f_d[index9]+r_pert;
-			b_CollPert = omega_eff*feqc2DCG(u,  cx2D_d[k], v,  cy2D_d[k], b_r, w2D_d[k], b_phi_d[k]) + (1-omega_eff)*b_f_d[index9]+b_pert;
+			TC = 0.0;
+			TC += G1 * cx * cx;
+			TC += G2 * cx * cy;
+			TC += G3 * cx * cy;
+			TC += G4 * cy * cy;
 
-			//perform recolor step
-			r_fColl_d[index9]=k_r*(r_CollPert + b_CollPert)+k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
-			b_fColl_d[index9]=k_b*(r_CollPert + b_CollPert)-k_k*cosin*(r_r*r_phi_d[k]+b_r*b_phi_d[k]);
+			cu2 = u*cx + v*cy;
+			f_eq = mean_nu * (chi_d[k] * prod_u_grad_rho + psi_d[k] * TC) + r *
+					(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
+
+			// calculate updated distribution function
+			f_CollPert = omega_eff*f_eq + (1-omega_eff)*f_d[ind + k * ms] + pert;
+
+
+			r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+			b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
 		}
 	}
 
@@ -545,11 +603,12 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 	int ind =  (blockIdx.x + blockIdx.y * gridDim.x) * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x) + threadIdx.x;
 	int ms = depth_d*length_d*height_d;
-	FLOAT_TYPE r_r, b_r, r, u, v, w, cg_x, cg_y, cg_z, gr_x, gr_y, gr_z, cx, cy, cz;
+	FLOAT_TYPE r_r, b_r, r, u, v, w, cg_x, cg_y, cg_z, gr_x, gr_y, gr_z;
 	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, mean_nu, omega_eff, TC, mean_alpha;
 	FLOAT_TYPE prod_c_g, pert, prod_u_grad_rho, cu1, cu2;
 	FLOAT_TYPE f_CollPert, f_eq;
 	FLOAT_TYPE G1, G2, G3, G4, G5, G6, G7, G8, G9;
+	int cx, cy, cz;
 	if (ind < ms)
 	{
 		u =   u_d[ind];
@@ -624,7 +683,7 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 			cu2 = u*cx + v*cy + w*cz;
 			// calculate equilibrium distribution function
-			f_eq = mean_alpha * (chi3D_d[dir] * prod_u_grad_rho + psi3D_d[dir] * TC) + r *
+			f_eq = mean_nu * (chi3D_d[dir] * prod_u_grad_rho + psi3D_d[dir] * TC) + r *
 					(phi3D_d[dir] + teta3D_d[dir] * mean_alpha + w3D_d[dir] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
 
 			// calculate updated distribution function
@@ -801,8 +860,8 @@ __global__ void gpuCollMrt3D(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																																																								+ (threadIdx.y * blockDim.x)
-																																																																								+ threadIdx.x;
+																																																																												+ (threadIdx.y * blockDim.x)
+																																																																												+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], mEq2[19], m[19], collision[19], f[19];
@@ -934,8 +993,8 @@ __global__ void gpuCollMrt3D_short(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																																																								+ (threadIdx.y * blockDim.x)
-																																																																								+ threadIdx.x;
+																																																																												+ (threadIdx.y * blockDim.x)
+																																																																												+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], m[19], collision[19];
