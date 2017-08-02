@@ -96,6 +96,7 @@ int main(int argc, char* argv[]) {
 	} else {
 		readInitFile(inFn.init, &args);
 	}
+	printf("problem %s\n", args.problemName);
 	snprintf(inFn.node, sizeof(inFn.node), "Mesh/%s_Node.dat",
 			args.problemName);
 	printf("%s\n", inFn.node);
