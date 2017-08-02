@@ -496,6 +496,11 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 				CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
 				oscilating_y[iter] = getMaxYOscilating(r_rho, b_rho, n, m, nodeY);
 				break;
+			case 6:
+				CHECK(cudaMemcpy(r_rho, r_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(b_rho, b_rho_d, SIZEFLT(m*n), cudaMemcpyDeviceToHost));
+				oscilating_y[iter] = getMinYRT(r_rho, b_rho, n, m, nodeY);
+				break;
 			default:
 				break;
 			}
@@ -676,6 +681,9 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			writeOscilatingSolution("Oscilating_frequency", oscilating_y, args->iterations);
 			printf("Oscilation frequency written to Oscilating_frequency in Results/\n");
 			printf("Error % : "FLOAT_FORMAT"\n", validateOscilating(r_rho, b_rho, n, m, oscilating_y, args->iterations,st_predicted, args->r_density, args->b_density));
+			break;
+		case 6:
+			writeOscilatingSolution("RT_Interface", oscilating_y, args->iterations);
 			break;
 		default:
 			printf("Suface tension error: "FLOAT_FORMAT"\n", st_error[iter-1]);
