@@ -125,6 +125,7 @@ __device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,
 	int ind, i;
 	switch (cg_dir_d) {
 	case 0:
+#pragma unroll 8
 		for(i = 1; i < 9; i++){
 			ind = index + cx2D_d[i] + cy2D_d[i] * length_d;
 			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -138,10 +139,9 @@ __device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,
 		}
 		break;
 	case 1: //NORTH
+#pragma unroll 8
 		for(i = 1; i < 9; i++){
 			ind = index + cx2D_d[i] - abs(cy2D_d[i]) * length_d;
-			cgx += (r_rho_d[ind] - b_rho_d[ind]) * cx2D_d[i] * cg_w_d[i];
-
 			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
 			aux2 = cg_w_d[i] * rho_d[ind];
 
@@ -151,9 +151,9 @@ __device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,
 		}
 		break;
 	case 2: //SOUTH
+#pragma unroll 8
 		for(i = 1; i < 9; i++){
 			ind = index + cx2D_d[i] + abs(cy2D_d[i]) * length_d;
-			cgx += (r_rho_d[ind] - b_rho_d[ind]) * cx2D_d[i] * cg_w_d[i];
 
 			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
 			aux2 = cg_w_d[i] * rho_d[ind];
@@ -163,9 +163,9 @@ __device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,
 		}
 		break;
 	case 3: //EAST
+#pragma unroll 8
 		for(i = 1; i < 9; i++){
 			ind = index - abs(cx2D_d[i]) + cy2D_d[i] * length_d;
-			cgy += (r_rho_d[ind] - b_rho_d[ind]) * cy2D_d[i] * cg_w_d[i];
 
 			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
 			aux2 = cg_w_d[i] * rho_d[ind];
@@ -176,9 +176,9 @@ __device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,
 		}
 		break;
 	case 4: //WEST
+#pragma unroll 8
 		for(i = 1; i < 9; i++){
 			ind = index + abs(cx2D_d[i]) + cy2D_d[i] * length_d;
-			cgy += (r_rho_d[ind] - b_rho_d[ind]) * cy2D_d[i] * cg_w_d[i];
 
 			aux1 = cg_w_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
 			aux2 = cg_w_d[i] * rho_d[ind];
@@ -513,12 +513,12 @@ __global__ void gpuCollBgkw2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 }
 
 __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
-		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d,  FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
+		FLOAT_TYPE *v_d, FLOAT_TYPE *r_f_d, FLOAT_TYPE *b_f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
 
 	int ind = blockIdx.x * blockDim.x + threadIdx.x;
 	int ms = depth_d*length_d;
 	int cx, cy;
-	FLOAT_TYPE r_r, b_r, r, u, v, cg_x, cg_y, gr_x, gr_y;
+	FLOAT_TYPE r_r, b_r, r, u, v, cg_x, cg_y, gr_x, gr_y, f;
 	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, mean_nu, omega_eff;
 	FLOAT_TYPE prod_c_g, pert;
 	FLOAT_TYPE f_CollPert;
@@ -531,12 +531,13 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 		b_r = b_rho_d[ind];
 		r = rho_d[ind];
 
+
 		if(high_order)
 			calculateHOColorGradient(r_rho_d,b_rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y);
 		else{
 			calculateColorGradient(r_rho_d,b_rho_d, rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &gr_x, &gr_y);
-			//		color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
-			//		color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
+//					color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
+//					color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		}
 
 		G1 = 2.0 * u * gr_x;
@@ -558,6 +559,7 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 
 		cu1 = u*u + v*v;
 
+#pragma unroll 9
 		for (int k=0;k<9;k++){
 			cx = cx2D_d[k];
 			cy = cy2D_d[k];
@@ -588,7 +590,8 @@ __global__ void gpuCollBgkwGC2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 					(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
 
 			// calculate updated distribution function
-			f_CollPert = omega_eff*f_eq + (1-omega_eff)*f_d[ind + k * ms] + pert;
+			f = r_f_d[ind + k * ms] + b_f_d[ind + k * ms];
+			f_CollPert = omega_eff*f_eq + (1-omega_eff)*f + pert;
 
 
 			r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);

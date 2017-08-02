@@ -43,7 +43,7 @@ __global__ void gpuUpdateMacro2D(int *fluid_d, FLOAT_TYPE* rho_d,
 __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* r_rho_d,
 		FLOAT_TYPE* b_rho_d, FLOAT_TYPE *p_in_d, FLOAT_TYPE *p_out_d,
-		int *num_in_d, int *num_out_d, int *cg_direction, FLOAT_TYPE *f_d, int test_case) {
+		int *num_in_d, int *num_out_d, int *cg_direction, int test_case) {
 	int ind = threadIdx.x + blockIdx.x * blockDim.x;
 
 	int ms = depth_d * length_d;
@@ -83,15 +83,15 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 					b_f_d[ind + 7 * ms] +
 					b_f_d[ind + 8 * ms];
 
-			f_d[ind] = r_f_d[ind] + b_f_d[ind];
-			f_d[ind + 1 * ms] = r_f_d[ind + 1 * ms] + b_f_d[ind + 1 * ms];
-			f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms];
-			f_d[ind + 3 * ms] = r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms];
-			f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms];
-			f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms];
-			f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms];
-			f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms];
-			f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms];
+//			f_d[ind] = r_f_d[ind] + b_f_d[ind];
+//			f_d[ind + 1 * ms] = r_f_d[ind + 1 * ms] + b_f_d[ind + 1 * ms];
+//			f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms];
+//			f_d[ind + 3 * ms] = r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms];
+//			f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms];
+//			f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms];
+//			f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms];
+//			f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms];
+//			f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms];
 
 			r_rho_d[ind] = r_r;
 			b_rho_d[ind] = b_r;
