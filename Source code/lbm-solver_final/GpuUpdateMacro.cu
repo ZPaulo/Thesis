@@ -40,8 +40,8 @@ __global__ void gpuUpdateMacro2D(int *fluid_d, FLOAT_TYPE* rho_d,
 	}
 }
 
-__global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
-		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* r_rho_d,
+__global__ void gpuUpdateMacro2DCG(FLOAT_TYPE* rho_d,
+		FLOAT_TYPE* u_d, FLOAT_TYPE* v_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE *f_d, FLOAT_TYPE* r_rho_d,
 		FLOAT_TYPE* b_rho_d, FLOAT_TYPE *p_in_d, FLOAT_TYPE *p_out_d,
 		int *num_in_d, int *num_out_d, int *cg_direction, int test_case) {
 	int ind = threadIdx.x + blockIdx.x * blockDim.x;
@@ -52,10 +52,12 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 	FLOAT_TYPE aux1, mean_nu, omega_eff;
 	if (ind < ms) {
 		//necessary because of sum
-		p_in_d[ind] = 0;
-		p_out_d[ind] = 0;
-		num_in_d[ind] = 0;
-		num_out_d[ind] = 0;
+		if(test_case == 1){
+			p_in_d[ind] = 0;
+			p_out_d[ind] = 0;
+			num_in_d[ind] = 0;
+			num_out_d[ind] = 0;
+		}
 
 		if (cg_direction[ind] == 0 || (test_case != 2 && test_case != 6) || (cg_direction[ind] == 3 || cg_direction[ind] == 4)) {
 
@@ -83,15 +85,15 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 					b_f_d[ind + 7 * ms] +
 					b_f_d[ind + 8 * ms];
 
-//			f_d[ind] = r_f_d[ind] + b_f_d[ind];
-//			f_d[ind + 1 * ms] = r_f_d[ind + 1 * ms] + b_f_d[ind + 1 * ms];
-//			f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms];
-//			f_d[ind + 3 * ms] = r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms];
-//			f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms];
-//			f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms];
-//			f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms];
-//			f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms];
-//			f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms];
+			f_d[ind] = r_f_d[ind] + b_f_d[ind];
+			f_d[ind + 1 * ms] = r_f_d[ind + 1 * ms] + b_f_d[ind + 1 * ms];
+			f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms];
+			f_d[ind + 3 * ms] = r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms];
+			f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms];
+			f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms];
+			f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms];
+			f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms];
+			f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms];
 
 			r_rho_d[ind] = r_r;
 			b_rho_d[ind] = b_r;
@@ -116,16 +118,18 @@ __global__ void gpuUpdateMacro2DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 			u_d[ind] = u / r + external_force_d * g_d / (r * omega_eff);
 			v_d[ind] = v / r + (1-external_force_d) * g_d / omega_eff;
 
-			// p_in and p_out for the surface tension
-			chi=(r_r-b_r)/r;
+			if(test_case == 1){
+				// p_in and p_out for the surface tension
+				chi=(r_r-b_r)/r;
 
-			if (chi >= control_param_d){
-				num_in_d[ind] = 1;
-				p_in_d[ind] = r_r;
-			}
-			else if (chi <= -control_param_d){
-				num_out_d[ind] = 1;
-				p_out_d[ind] = b_r;
+				if (chi >= control_param_d){
+					num_in_d[ind] = 1;
+					p_in_d[ind] = r_r;
+				}
+				else if (chi <= -control_param_d){
+					num_out_d[ind] = 1;
+					p_out_d[ind] = b_r;
+				}
 			}
 		}
 	}
@@ -138,7 +142,7 @@ __global__ void gpuUpdateMacro3D(int *fluid_d, FLOAT_TYPE* rho_d,
 {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																					+ threadIdx.x;
+																																									+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	FLOAT_TYPE r, rU, rV, rW;

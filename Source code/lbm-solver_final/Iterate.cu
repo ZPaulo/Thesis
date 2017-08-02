@@ -258,7 +258,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		else
 			initColorGradient(cg_directions, n, m);
 		CHECK(cudaMemcpy(cg_dir_d, cg_directions, SIZEINT(m*n), cudaMemcpyHostToDevice));
-		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, args->test_case);
+		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, f_d, args->test_case);
 	}
 
 	FLOAT_TYPE *f_prev_d = createGpuArrayFlt(9 * m * n, ARRAY_COPY,0,r_f_d);
@@ -394,7 +394,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						r_omega, b_omega, args->control_param, args->del, args->beta,
 						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
 #else
-				gpuCollBgkwGC2D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, r_f_d, b_f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
+				gpuCollBgkwGC2D<<<bpg1, tpb>>>(rho_d, r_rho_d, b_rho_d, u_d, v_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
 #endif
 			}else{
 				gpuCollBgkw2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, f_d,
@@ -480,7 +480,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			updateMacroMP(n,m,u,v,r_rho, b_rho, r_f, b_f, rho, args->control_param,args->r_alpha, args->b_alpha,
 					args->bubble_radius,st_error, iter,st_predicted,args->test_case);
 #else
-			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, r_f_d, b_f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d, cg_dir_d,
+			gpuUpdateMacro2DCG<<<bpg1, tpb>>>(rho_d, u_d, v_d, r_f_d, b_f_d, f_d, r_rho_d, b_rho_d, p_in_d, p_out_d, num_in_d, num_out_d, cg_dir_d,
 					args->test_case);
 
 			//			updateSurfaceTension(r_rho,b_rho,args->control_param, st_predicted, st_error, iter,args->r_alpha, args->b_alpha, args->bubble_radius, n ,m);
@@ -518,7 +518,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			FLOAT_TYPE r;
 			if(args->multiPhase){
 				//				gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
-				gpu_abs_relSub<<<bpg1, tpb>>>(r_f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
+				gpu_abs_relSub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
 				fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
 				//	printf("MAX diff "FLOAT_FORMAT"\n", fMaxDiff);
 				CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
@@ -531,7 +531,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 					break;
 				}
 				CHECK(cudaFree(f_prev_d));
-				f_prev_d = createGpuArrayFlt(n * m * 9, ARRAY_CPYD, 0, r_f_d);
+				f_prev_d = createGpuArrayFlt(n * m * 9, ARRAY_CPYD, 0, f_d);
 
 			}else{
 				r = computeResidual2D(f_d, fColl_d, temp9a_d, temp9b_d, m,n);

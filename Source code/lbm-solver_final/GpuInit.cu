@@ -319,7 +319,7 @@ __host__ void initHOColorGradient3D(int *color_gradient_directions, int n, int m
 }
 
 __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_f_d,
-		FLOAT_TYPE *b_f_d, int test_case){
+		FLOAT_TYPE *b_f_d, FLOAT_TYPE *f_d, int test_case){
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	int ms = length_d * depth_d;
 
@@ -519,6 +519,15 @@ __global__ void initCGBubble(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *r_rho
 		}
 		// initialise density
 		rho_d[index] = r_rho_d[index] + b_rho_d[index];
+		f_d[index] = r_f_d[index] + b_f_d[index];
+		f_d[index + 1 * ms] = r_f_d[index + 1 * ms] + b_f_d[index + 1 * ms];
+		f_d[index + 2 * ms] = r_f_d[index + 2 * ms] + b_f_d[index + 2 * ms];
+		f_d[index + 3 * ms] = r_f_d[index + 3 * ms] + b_f_d[index + 3 * ms];
+		f_d[index + 4 * ms] = r_f_d[index + 4 * ms] + b_f_d[index + 4 * ms];
+		f_d[index + 5 * ms] = r_f_d[index + 5 * ms] + b_f_d[index + 5 * ms];
+		f_d[index + 6 * ms] = r_f_d[index + 6 * ms] + b_f_d[index + 6 * ms];
+		f_d[index + 7 * ms] = r_f_d[index + 7 * ms] + b_f_d[index + 7 * ms];
+		f_d[index + 8 * ms] = r_f_d[index + 8 * ms] + b_f_d[index + 8 * ms];
 	}
 }
 
