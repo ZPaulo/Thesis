@@ -597,45 +597,44 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 
 		cu1 = u*u + v*v;
 
-#pragma unroll 9
-		for (int k=0;k<9;k++){
-			cx = cx2D_d[k];
-			cy = cy2D_d[k];
-			if (color_gradient_norm > g_limit_d){
-				prod_c_g=cx * cg_x + cy * cg_y;
-				if (k!=0){
-					cosin= prod_c_g / (color_gradient_norm*c_norms_d[k]);
+	#pragma unroll 9
+			for (int k=0;k<9;k++){
+				cx = cx2D_d[k];
+				cy = cy2D_d[k];
+				if (color_gradient_norm > g_limit_d){
+					prod_c_g=cx * cg_x + cy * cg_y;
+					if (k!=0){
+						cosin= prod_c_g / (color_gradient_norm*c_norms_d[k]);
+					}
+					else
+						cosin=0.0;
+
+					// calculate perturbation terms
+					pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
 				}
-				else
-					cosin=0.0;
+				else{
+					// the perturbation terms are null
+					pert=0.0;
+				}
 
-				// calculate perturbation terms
-				pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
+				TC = 0.0;
+				TC += G1 * cx * cx;
+				TC += G2 * cx * cy;
+				TC += G3 * cx * cy;
+				TC += G4 * cy * cy;
+
+				cu2 = u*cx + v*cy;
+				f_eq = mean_nu * (chi_d[k] * prod_u_grad_rho + psi_d[k] * TC) + r *
+						(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
+
+				// calculate updated distribution function
+				f_CollPert = omega_eff*f_eq + (1-omega_eff) * f_d[ind + k * ms] + pert;
+
+
+				r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+				b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
 			}
-			else{
-				// the perturbation terms are null
-				pert=0.0;
-			}
-
-			TC = 0.0;
-			TC += G1 * cx * cx;
-			TC += G2 * cx * cy;
-			TC += G3 * cx * cy;
-			TC += G4 * cy * cy;
-
-			cu2 = u*cx + v*cy;
-			f_eq = mean_nu * (chi_d[k] * prod_u_grad_rho + psi_d[k] * TC) + r *
-					(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
-
-			// calculate updated distribution function
-			f_CollPert = omega_eff*f_eq + (1-omega_eff) * f_d[ind + k * ms] + pert;
-
-
-			r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
-			b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
-		}
 	}
-
 }
 
 __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
@@ -900,8 +899,8 @@ __global__ void gpuCollMrt3D(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																																																														+ (threadIdx.y * blockDim.x)
-																																																																														+ threadIdx.x;
+																																																																																														+ (threadIdx.y * blockDim.x)
+																																																																																														+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], mEq2[19], m[19], collision[19], f[19];
@@ -1033,8 +1032,8 @@ __global__ void gpuCollMrt3D_short(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																																																														+ (threadIdx.y * blockDim.x)
-																																																																														+ threadIdx.x;
+																																																																																														+ (threadIdx.y * blockDim.x)
+																																																																																														+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], m[19], collision[19];
