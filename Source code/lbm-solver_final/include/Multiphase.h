@@ -61,3 +61,5 @@ void analyticalPoiseuille(int m, int n, FLOAT_TYPE *analytical, FLOAT_TYPE r_den
 
 FLOAT_TYPE calculateSurfaceTension3D(FLOAT_TYPE p_in_mean, FLOAT_TYPE p_out_mean, FLOAT_TYPE r_alpha, FLOAT_TYPE b_alpha,
 		FLOAT_TYPE bubble_radius, FLOAT_TYPE st_predicted);
+
+FLOAT_TYPE getMinYRT(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *nodeY);

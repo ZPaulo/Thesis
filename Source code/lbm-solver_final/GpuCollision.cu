@@ -24,12 +24,6 @@ __device__ FLOAT_TYPE feqc2D(FLOAT_TYPE u, FLOAT_TYPE uc, FLOAT_TYPE v, FLOAT_TY
 	return rho * w * (1. + 3.*vec + 4.5*vec*vec - 1.5*(u*u + v*v));
 }
 
-__device__ FLOAT_TYPE feqc2DCG(FLOAT_TYPE u, FLOAT_TYPE uc, FLOAT_TYPE v, FLOAT_TYPE vc, FLOAT_TYPE rho, FLOAT_TYPE w, FLOAT_TYPE phi)
-{
-	FLOAT_TYPE vec = u*uc + v*vc;
-	return rho * (phi + w * (3.*vec + 4.5*vec*vec - 1.5*(u*u + v*v)));
-}
-
 __device__ FLOAT_TYPE feqc3D(FLOAT_TYPE u, FLOAT_TYPE uc, FLOAT_TYPE v, FLOAT_TYPE vc, FLOAT_TYPE w, FLOAT_TYPE wc, FLOAT_TYPE rho, FLOAT_TYPE weight)
 {
 	FLOAT_TYPE vec = u*uc + v*vc + w*wc;
@@ -408,8 +402,6 @@ __device__ void calculateHOColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_
 	case 0:
 		for(i = 1; i < 105; i++){
 			ind = index + hoc3D_d[i];
-			if(ind > length_d * depth_d * height_d)
-				printf("AQUI %d %d\n", ind,hoc3D_d[i]);
 			aux1 = hocg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
 			aux2 = hocg_w3D_d[i] * rho_d[ind];
 
@@ -526,6 +518,31 @@ __device__ void calculateHOColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_
 	(*gr_z) = grz;
 }
 
+__device__ FLOAT_TYPE calcPerturb2D(FLOAT_TYPE cg_norm, FLOAT_TYPE w, FLOAT_TYPE prod_c_g, FLOAT_TYPE w_pert){
+	if(cg_norm > g_limit_d)
+		return 0.5 * A_d * cg_norm * (w * (prod_c_g *prod_c_g) / (cg_norm * cg_norm) - w_pert);
+	else
+		return 0.0;
+}
+
+__device__ FLOAT_TYPE calcCosin2D(FLOAT_TYPE cg_norm, FLOAT_TYPE c_norm, FLOAT_TYPE prod_c_g){
+	if(cg_norm > g_limit_d)
+		return prod_c_g / (cg_norm * c_norm);
+	else
+		return 0.0;
+}
+
+__device__ FLOAT_TYPE calcTC(int cx, int cy, FLOAT_TYPE G1, FLOAT_TYPE G2,FLOAT_TYPE G3,FLOAT_TYPE G4){
+	return G1 * cx * cx + G2 * cx * cy + G3 * cx * cy + G4 * cy * cy;
+}
+
+__device__ FLOAT_TYPE feq2DCG(FLOAT_TYPE u, FLOAT_TYPE v, int cx, int cy, FLOAT_TYPE chi, FLOAT_TYPE psi, FLOAT_TYPE teta, FLOAT_TYPE phi,
+		FLOAT_TYPE TC, FLOAT_TYPE prod_u_grad_rho, FLOAT_TYPE r, FLOAT_TYPE mean_alpha, FLOAT_TYPE w, FLOAT_TYPE cu1, FLOAT_TYPE mean_nu){
+	FLOAT_TYPE cu2 = u*cx + v*cy;
+	return mean_nu * (chi * prod_u_grad_rho + psi * TC) + r *
+			(phi + teta * mean_alpha + w * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
+}
+
 __global__ void gpuCollBgkw2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 		FLOAT_TYPE *v_d, FLOAT_TYPE *f_d, FLOAT_TYPE *fColl_d)
 {
@@ -574,8 +591,6 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 			calculateHOColorGradient(r_rho_d,b_rho_d, rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &gr_x, &gr_y);
 		else{
 			calculateColorGradient(r_rho_d,b_rho_d, rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &gr_x, &gr_y);
-			//					color_gradient_x = calculateColorGradientX(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
-			//					color_gradient_y = calculateColorGradientY(r_rho_d,b_rho_d, cg_dir_d[ind], ind);
 		}
 
 		G1 = 2.0 * u * gr_x;
@@ -597,43 +612,42 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 
 		cu1 = u*u + v*v;
 
-	#pragma unroll 9
-			for (int k=0;k<9;k++){
-				cx = cx2D_d[k];
-				cy = cy2D_d[k];
-				if (color_gradient_norm > g_limit_d){
-					prod_c_g=cx * cg_x + cy * cg_y;
-					if (k!=0){
-						cosin= prod_c_g / (color_gradient_norm*c_norms_d[k]);
-					}
-					else
-						cosin=0.0;
-
-					// calculate perturbation terms
-					pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
+#pragma unroll 9
+		for (int k=0;k<9;k++){
+			cx = cx2D_d[k];
+			cy = cy2D_d[k];
+			if (color_gradient_norm > g_limit_d){
+				prod_c_g=cx * cg_x + cy * cg_y;
+				if (k!=0){
+					cosin= prod_c_g / (color_gradient_norm*c_norms_d[k]);
 				}
-				else{
-					// the perturbation terms are null
-					pert=0.0;
-				}
+				else
+					cosin=0.0;
 
-				TC = 0.0;
-				TC += G1 * cx * cx;
-				TC += G2 * cx * cy;
-				TC += G3 * cx * cy;
-				TC += G4 * cy * cy;
-
-				cu2 = u*cx + v*cy;
-				f_eq = mean_nu * (chi_d[k] * prod_u_grad_rho + psi_d[k] * TC) + r *
-						(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
-
-				// calculate updated distribution function
-				f_CollPert = omega_eff*f_eq + (1-omega_eff) * f_d[ind + k * ms] + pert;
-
-
-				r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
-				b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+				// calculate perturbation terms
+				pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
 			}
+			else{
+				// the perturbation terms are null
+				pert=0.0;
+			}
+
+			TC = 0.0;
+			TC += G1 * cx * cx;
+			TC += G2 * cx * cy;
+			TC += G3 * cx * cy;
+			TC += G4 * cy * cy;
+
+			cu2 = u*cx + v*cy;
+			f_eq = mean_nu * (chi_d[k] * prod_u_grad_rho + psi_d[k] * TC) + r *
+					(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
+
+			// calculate updated distribution function
+			f_CollPert = omega_eff*f_eq + (1-omega_eff) * f_d[ind + k * ms] + pert;
+
+			r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+			b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+		}
 	}
 }
 
@@ -899,8 +913,8 @@ __global__ void gpuCollMrt3D(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																																																																														+ (threadIdx.y * blockDim.x)
-																																																																																														+ threadIdx.x;
+		+ (threadIdx.y * blockDim.x)
+		+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], mEq2[19], m[19], collision[19], f[19];
@@ -1032,8 +1046,8 @@ __global__ void gpuCollMrt3D_short(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *
 	int blockId = blockIdx.x
 			+ blockIdx.y * gridDim.x;
 	int ind =  blockId * (blockDim.x * blockDim.y)
-																																																																																														+ (threadIdx.y * blockDim.x)
-																																																																																														+ threadIdx.x;
+		+ (threadIdx.y * blockDim.x)
+		+ threadIdx.x;
 
 	int ms = depth_d*length_d*height_d;
 	FLOAT_TYPE mEq[19], m[19], collision[19];
@@ -1049,51 +1063,51 @@ __global__ void gpuCollMrt3D_short(int* fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *
 
 
 		// m = Mf
-		for (int i=0; i<19; ++i)
-		{
-			m[i] = 0.;
-			for (int j=0; j<19; ++j)
-			{
-				m[i] += velMomMap3D_d[i*19+j] * f_d[ ind + j*ms	];
-			}
-		}
+				for (int i=0; i<19; ++i)
+				{
+					m[i] = 0.;
+					for (int j=0; j<19; ++j)
+					{
+						m[i] += velMomMap3D_d[i*19+j] * f_d[ ind + j*ms	];
+					}
+				}
 
 		// mEq = Mfeq
 
 
-		for (int i=0; i<19; ++i)
-		{
-			mEq[i] = 0.;
-			for (int j=0; j<19; ++j)
-			{
-				mEq[i] += velMomMap3D_d[i*19+j] * feqc3D(u, cx3D_d[ j ],
-						v, cy3D_d[ j ], w, cz3D_d[ j ], r, w3D_d[ j ]);
-			}
-		}
+				for (int i=0; i<19; ++i)
+				{
+					mEq[i] = 0.;
+					for (int j=0; j<19; ++j)
+					{
+						mEq[i] += velMomMap3D_d[i*19+j] * feqc3D(u, cx3D_d[ j ],
+								v, cy3D_d[ j ], w, cz3D_d[ j ], r, w3D_d[ j ]);
+					}
+				}
 
-		// Diff = M^-1 * S * (m - m^eq)
-		for (int i=0; i<19; ++i)
-		{
-			collision[i] = 0.;
-			for (int j=0; j<19; ++j)
-			{
-				collision[i] += momCollMtx3D_d[i*19+j] * (m[j] - mEq[j]);
-				//				if(ind == 0)printf("%f,",momCollMtx3D_d[i*19+j]);
-			}
-			//			if(ind == 0)printf("\n");
-		}
+				// Diff = M^-1 * S * (m - m^eq)
+				for (int i=0; i<19; ++i)
+				{
+					collision[i] = 0.;
+					for (int j=0; j<19; ++j)
+					{
+						collision[i] += momCollMtx3D_d[i*19+j] * (m[j] - mEq[j]);
+						//				if(ind == 0)printf("%f,",momCollMtx3D_d[i*19+j]);
+					}
+					//			if(ind == 0)printf("\n");
+				}
 
-		// fColl = f - M^-1 * S * (m - m^eq) >>> MRT equation
-		for (int i=0; i<19; ++i)
-		{
-			fColl_d[ind  +  i   *ms]  =  f_d[ ind + i*ms	]  -  collision[i];
-		}
-		if(ind==1123){
-			//        	printf("MRT f_coll f0: %.14f f1: %.14f f2: %.14f f3: %.14f f4: %.14f f5: %.14f f6: %.14f f7: %.14f f8: %.14f "
-			//					"f9: %.14f f10: %.14f f11: %.14f f12: %.14f f3: %.14f f4: %.14f f15: %.14f f16: %.14f f17: %.14f f18: %.14f\n",
-			//					  fColl_d[ind+ 0*ms],fColl_d[ind+ 1*ms],fColl_d[ind+ 2*ms],fColl_d[ind+ 3*ms],fColl_d[ind+ 4*ms],fColl_d[ind+ 5*ms],fColl_d[ind+ 6*ms],fColl_d[ind+ 7*ms], fColl_d[ind+ 8*ms], fColl_d[ind+ 9*ms],
-			//					fColl_d[ind+10*ms],fColl_d[ind+11*ms],fColl_d[ind+12*ms],fColl_d[ind+13*ms],fColl_d[ind+14*ms],fColl_d[ind+15*ms], fColl_d[ind+16*ms], fColl_d[ind+17*ms], fColl_d[ind+18*ms]);
+				// fColl = f - M^-1 * S * (m - m^eq) >>> MRT equation
+				for (int i=0; i<19; ++i)
+				{
+					fColl_d[ind  +  i   *ms]  =  f_d[ ind + i*ms	]  -  collision[i];
+				}
+				if(ind==1123){
+					//        	printf("MRT f_coll f0: %.14f f1: %.14f f2: %.14f f3: %.14f f4: %.14f f5: %.14f f6: %.14f f7: %.14f f8: %.14f "
+					//					"f9: %.14f f10: %.14f f11: %.14f f12: %.14f f3: %.14f f4: %.14f f15: %.14f f16: %.14f f17: %.14f f18: %.14f\n",
+					//					  fColl_d[ind+ 0*ms],fColl_d[ind+ 1*ms],fColl_d[ind+ 2*ms],fColl_d[ind+ 3*ms],fColl_d[ind+ 4*ms],fColl_d[ind+ 5*ms],fColl_d[ind+ 6*ms],fColl_d[ind+ 7*ms], fColl_d[ind+ 8*ms], fColl_d[ind+ 9*ms],
+					//					fColl_d[ind+10*ms],fColl_d[ind+11*ms],fColl_d[ind+12*ms],fColl_d[ind+13*ms],fColl_d[ind+14*ms],fColl_d[ind+15*ms], fColl_d[ind+16*ms], fColl_d[ind+17*ms], fColl_d[ind+18*ms]);
 
-		}
+				}
 	}
 }

@@ -1243,6 +1243,37 @@ FLOAT_TYPE getMaxYOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m,
 	return -aux_b / aux_m;
 }
 
+FLOAT_TYPE getMinYRT(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *nodeY){
+
+	int i, j_start, j;
+	if(n % 2 == 0)
+		i = n/2;
+	else
+		i = (n+1) / 2;
+
+	if(m % 2 == 0)
+		j_start = m/2;
+	else
+		j_start = (m+1) / 2;
+
+	FLOAT_TYPE rho;
+	for(j = j_start; j >= 0; j--){
+
+		rho = r_rho[j * n + i] + b_rho[j * n + i];
+		if((r_rho[j * n + i] - b_rho[j * n + i]) / rho < 0.0){
+			break;
+		}
+	}
+	FLOAT_TYPE phi1, phi2;
+	phi1 = (r_rho[j * n + i] - b_rho[j * n + i]) / rho;
+	rho = r_rho[(j+1) * n + i] + b_rho[(j+1) * n + i];
+	phi2 = (r_rho[(j+1) * n + i] - b_rho[(j+1) * n + i]) / rho;
+
+	FLOAT_TYPE aux_m = (phi1 - phi2) / (nodeY[j * n + i] - nodeY[(j + 1) * n + i]);
+	FLOAT_TYPE aux_b =  phi1 - aux_m * nodeY[j * n + i];
+	return -aux_b / aux_m;
+}
+
 FLOAT_TYPE validateOscilating(FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, int n, int m, FLOAT_TYPE *extremes, int size,
 		FLOAT_TYPE ST_predicted, FLOAT_TYPE r_density, FLOAT_TYPE b_density){
 	int j;
