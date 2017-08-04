@@ -189,7 +189,9 @@ __host__ void initConstants2D(Arguments *args,
 		cudaMemcpyToSymbol(b_viscosity_d, &args->b_viscosity, sizeof(FLOAT_TYPE));
 		cudaMemcpyToSymbol(external_force_d, &args->external_force, sizeof(bool));
 
-		FLOAT_TYPE hocg_w[25] = {0., 960., 960., 960., 960., 448., 448., 448., 448., 84., 32., 1., 32., 84., 32., 1., 32., 84., 32., 1., 32., 84., 32., 1., 32.};
+		FLOAT_TYPE hocg_w[25] = {0., 960. / 5040., 960. / 5040., 960. / 5040., 960. / 5040., 448. / 5040., 448. / 5040.,
+				448. / 5040., 448. / 5040., 84. / 5040., 32. / 5040., 1. / 5040., 32. / 5040., 84. / 5040., 32. / 5040.,
+				1. / 5040., 32. / 5040., 84. / 5040., 32. / 5040., 1. / 5040., 32. / 5040., 84. / 5040., 32. / 5040., 1. / 5040., 32. / 5040.};
 		cudaMemcpyToSymbol(hocg_w_d, hocg_w, 25 * sizeof(FLOAT_TYPE));
 		int hocg_cx[25] = {0,1,0,-1,0,1,-1,-1,1,0,1,2,2,2,2,2,1,0,-1,-2,-2,-2,-2,-2,-1};
 		cudaMemcpyToSymbol(hocg_cx_d, hocg_cx, 25 * sizeof(int));
