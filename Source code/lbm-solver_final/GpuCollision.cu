@@ -630,6 +630,7 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 			else{
 				// the perturbation terms are null
 				pert=0.0;
+				cosin=0.0;
 			}
 
 			TC = 0.0;

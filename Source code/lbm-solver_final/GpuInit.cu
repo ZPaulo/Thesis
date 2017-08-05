@@ -537,12 +537,12 @@ __global__ void initCGBubble3D(FLOAT_TYPE *x_d, FLOAT_TYPE *y_d, FLOAT_TYPE *z_d
 		FLOAT_TYPE *b_f_d, FLOAT_TYPE *f_d, int test_case){
 	int index =  (blockIdx.x + blockIdx.y * gridDim.x) * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x) + threadIdx.x;
 	int ms = depth_d*length_d*height_d;
-
 	if(index < ms){
 		int index_x, index_y, index_z, temp;
 		switch (test_case) {
-		case 1: //coalescence
+		case 1: //steady bubble
 			if( sqrt( (x_d[index]-0.5) * (x_d[index]-0.5) + (y_d[index]-0.5)*(y_d[index]-0.5) + (z_d[index]-0.5)*(z_d[index]-0.5)) <= bubble_radius_d){
+
 				r_rho_d[index] = r_density_d;
 				// initialise density
 				rho_d[index] = r_density_d;
@@ -1217,7 +1217,7 @@ __host__ int initBoundaryConditions3D(int *bcNodeIdX, int *bcNodeIdY,
 				if (bcMask[ind] & BC3D_MASK((unsigned long long)BC3D_ALL, dir_i)) {
 					bcMask[ind] &= ~(unsigned long long) BC3D_MASK(
 							(unsigned long long)BC3D_ALL, dir_i);
-					bcMask[ind] |= BC3D_MASK((unsigned long long)BC3D_CYCL,
+					bcMask[ind] |= BC3D_MASK((unsigned long long)BC3D_WALL,
 							dir_i);
 
 				}
