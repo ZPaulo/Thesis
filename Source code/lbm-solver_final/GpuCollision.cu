@@ -109,8 +109,8 @@ __device__ FLOAT_TYPE calculateColorGradientX(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b
 	return res;
 }
 
-__device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,FLOAT_TYPE *rho_d, int cg_dir_d, int index, FLOAT_TYPE *cg_x, FLOAT_TYPE *cg_y,
-		FLOAT_TYPE *gr_x, FLOAT_TYPE *gr_y){
+__device__ void calculateColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d,FLOAT_TYPE *rho_d, int cg_dir_d,
+		int index, FLOAT_TYPE *cg_x, FLOAT_TYPE *cg_y, FLOAT_TYPE *gr_x, FLOAT_TYPE *gr_y){
 	FLOAT_TYPE cgx = 0.0;
 	FLOAT_TYPE cgy = 0.0;
 	FLOAT_TYPE grx = 0.0;
@@ -606,9 +606,9 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 
 
 		color_gradient_norm = sqrt(cg_x * cg_x + cg_y * cg_y);
-		k_r=r_r/r;
-		k_b=b_r/r;
-		k_k= beta_d * r_r * b_r / r;
+		k_r = r_r / r;
+		k_b = b_r / r;
+		k_k = beta_d * r_r * b_r / r;
 
 		cu1 = u*u + v*v;
 
@@ -625,7 +625,7 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 					cosin=0.0;
 
 				// calculate perturbation terms
-				pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
+				pert = A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
 			}
 			else{
 				// the perturbation terms are null
@@ -644,10 +644,11 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 					(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
 
 			// calculate updated distribution function
-			f_CollPert = omega_eff*f_eq + (1-omega_eff) * f_d[ind + k * ms] + pert;
+			f_CollPert = omega_eff * f_eq + (1 - omega_eff) * f_d[ind + k * ms] + pert;
 
 			r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
 			b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+
 		}
 	}
 }
@@ -714,7 +715,7 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 				else
 					cosin=0.0;
 				// calculate perturbation terms
-				pert=0.5 * A_d * color_gradient_norm * (w3D_d[dir]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert3D_d[dir]);
+				pert = A_d * color_gradient_norm * (w3D_d[dir]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert3D_d[dir]);
 			}
 			else{
 				// the perturbation terms are null

@@ -282,10 +282,6 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 					b_f_d[ind + 17 * ms] +
 					b_f_d[ind + 18 * ms];
 
-			if(ind == 0){
-				if(r_r > 0.0)
-					printf("START ");
-			}
 			r_rho_d[ind] = r_r;
 			b_rho_d[ind] = b_r;
 

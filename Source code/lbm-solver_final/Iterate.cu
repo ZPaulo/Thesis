@@ -527,7 +527,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 				fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
 				//	printf("MAX diff "FLOAT_FORMAT"\n", fMaxDiff);
 				CHECK(cudaMemcpy(&h_divergence,d_divergence,sizeof(bool),cudaMemcpyDeviceToHost));
-				if (h_divergence || fMaxDiff != fMaxDiff) {
+				if (h_divergence || fMaxDiff != fMaxDiff || !isfinite(fMaxDiff)) {
 					fprintf(stderr, "\nDIVERGENCE!\n");
 					break;
 				}

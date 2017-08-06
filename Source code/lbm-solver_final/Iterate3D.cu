@@ -347,15 +347,11 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	int *bcIdx = createHostArrayInt(m * n * h, ARRAY_ZERO);
 
 	FLOAT_TYPE *u_d, *v_d, *w_d;
-	if(args->multiPhase){
-		u_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-		v_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-		w_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-	}else{
+
 		u_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, u1_d);
 		v_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, v1_d);
 		w_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, w1_d);
-	}
+
 
 
 	bool *stream = createHostArrayBool(18 * m * n * h, ARRAY_FILL, 1);
@@ -561,26 +557,26 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 #if !CUDA
 			peridicBoundaries3D(n, m, h,r_f, b_f, r_rho, b_rho);
 #else
-//			gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, r_f_d,
-//					u1_d, v1_d, w1_d, bcCount);
-//			gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, b_f_d,
-//					u1_d, v1_d, w1_d, bcCount);
-//			switch (args->bcwallmodel) {
-//			case SIMPLE:
-//				gpuBcSimpleWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
-//						bcMaskCollapsed_d, r_f_d, r_fColl_d, qCollapsed_d, bcCount);
-//				gpuBcSimpleWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
-//						bcMaskCollapsed_d, b_f_d, b_fColl_d, qCollapsed_d, bcCount);
-//
-//				break;
-//			case COMPLEX:
-//				gpuBcComplexWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
-//						bcMaskCollapsed_d, r_f_d, r_fColl_d, qCollapsed_d, bcCount);
-//				gpuBcComplexWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
-//						bcMaskCollapsed_d, b_f_d, b_fColl_d, qCollapsed_d, bcCount);
-//
-//				break;
-//			}
+			gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, r_f_d,
+					u1_d, v1_d, w1_d, bcCount);
+			gpuBcInlet3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, b_f_d,
+					u1_d, v1_d, w1_d, bcCount);
+			switch (args->bcwallmodel) {
+			case SIMPLE:
+				gpuBcSimpleWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
+						bcMaskCollapsed_d, r_f_d, r_fColl_d, qCollapsed_d, bcCount);
+				gpuBcSimpleWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
+						bcMaskCollapsed_d, b_f_d, b_fColl_d, qCollapsed_d, bcCount);
+
+				break;
+			case COMPLEX:
+				gpuBcComplexWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
+						bcMaskCollapsed_d, r_f_d, r_fColl_d, qCollapsed_d, bcCount);
+				gpuBcComplexWall3D<<<bpgB, tpb>>>(bcIdxCollapsed_d,
+						bcMaskCollapsed_d, b_f_d, b_fColl_d, qCollapsed_d, bcCount);
+
+				break;
+			}
 
 			gpuBcPeriodic3D<<<bpgB, tpb>>>(bcIdxCollapsed_d, bcMaskCollapsed_d, r_f_d,
 					bcCount);

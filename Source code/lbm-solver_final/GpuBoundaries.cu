@@ -2078,6 +2078,9 @@ __global__ void gpuBcPeriodic3D(int *bcIdx_d, unsigned long long *bcMask_d,
 					f_d[ind + 17 * ms] = f_d[ind + 17 * ms - offsetZ];
 					f_d[ind + 18 * ms] = f_d[ind + 18 * ms - offsetZ];
 				}
+				if (bcMask_d[bci] & BC3D_CORNER) {
+					printf("CORNER\n");
+				}
 			}
 		}
 	}
