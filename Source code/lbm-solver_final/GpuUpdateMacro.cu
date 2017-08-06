@@ -235,7 +235,7 @@ __global__ void gpuUpdateMacro3DCG(int *fluid_d, FLOAT_TYPE* rho_d,
 			num_in_d[ind] = 0;
 			num_out_d[ind] = 0;
 		}
-		if (fluid_d[ind] == 1) {
+		if (fluid_d[ind] == 1 && (!(((bcMask_d[ind] & BC3D_OUTL_B) ==BC3D_INLT_B))||updateInltOutl)) {
 
 			aux1 = r_rho_d[ind] / (rho_d[ind] * r_viscosity_d) + b_rho_d[ind] /(rho_d[ind] * b_viscosity_d);
 			mean_nu = 1.0/aux1;

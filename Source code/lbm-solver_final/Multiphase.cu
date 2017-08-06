@@ -12,13 +12,6 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 
 	FLOAT_TYPE cu1, cu2, r_CollPert, b_CollPert;
 	FLOAT_TYPE cosin;
-	FLOAT_TYPE chi;
-	FLOAT_TYPE r_omega_temp, b_omega_temp;
-	FLOAT_TYPE a1      =   2.0 * r_omega * b_omega/(r_omega+b_omega);
-	FLOAT_TYPE a2      =   2.0 * (r_omega - a1) / del;
-	FLOAT_TYPE a3      =   -a2 / (2.0 * del);
-	FLOAT_TYPE a4      =   2.0 * (a1 - b_omega) / del;
-	FLOAT_TYPE a5      =   a4 / (2.0 * del);
 	FLOAT_TYPE color_gradient_norm;
 	FLOAT_TYPE k_r, k_b, k_k;
 	FLOAT_TYPE norm_c;
@@ -69,8 +62,6 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 			aux1 = r_rho[index]/(rho[index]*r_nu) + b_rho[index]/(rho[index]*b_nu);
 			mean_nu = 1.0/aux1;
 			omega_eff = 1.0/(3.0*mean_nu+0.5);
-			r_omega_temp=omega_eff;
-			b_omega_temp=omega_eff;
 
 			// relaxation parameter to choose a proper omega at the interface
 			//			if (r_omega != b_omega){
@@ -134,8 +125,8 @@ void mp2DColl(int n, int m, FLOAT_TYPE *rho, FLOAT_TYPE *u,
 
 				index9 = i + j * n + k * m * n;
 				// calculate updated distribution function
-				r_CollPert = r_omega_temp*r_feq + (1-r_omega_temp)*r_f[index9]+r_pert;
-				b_CollPert = b_omega_temp*b_feq + (1-b_omega_temp)*b_f[index9]+b_pert;
+				r_CollPert = omega_eff*r_feq + (1-omega_eff)*r_f[index9]+r_pert;
+				b_CollPert = omega_eff*b_feq + (1-omega_eff)*b_f[index9]+b_pert;
 
 				fn05 = r_CollPert + b_CollPert;
 				//				// perform recolor step
@@ -606,7 +597,7 @@ void updateMacroMP3D(int n, int m, int h, FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TY
 
 void peridicBoundaries(int n, int m, FLOAT_TYPE *r_f, FLOAT_TYPE *b_f, FLOAT_TYPE *u, FLOAT_TYPE *v, FLOAT_TYPE *r_rho, FLOAT_TYPE *b_rho, FLOAT_TYPE *rho, int test_case){
 
-	int index_end, index_start, corner_index;
+	int index_end, index_start;
 	int jn = m-1;
 	int js = 0;
 	int ie = n-1;

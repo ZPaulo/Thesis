@@ -421,6 +421,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			r_rho_d, b_rho_d, r_f_d, b_f_d, r_fColl_d, b_fColl_d, cg_dir_d
 	};
 
+	void *mpTC1GpuArrays[] = {
+			p_in_d,	p_out_d, num_in_d, num_out_d
+	};
+
 	void *FDdifGpuArrays[] = {
 			fprev_d, f1_d
 	};
@@ -910,6 +914,8 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	if(args->multiPhase){
 #if CUDA
 		freeAllGpu(mpGpuArrays, sizeof(mpGpuArrays) / sizeof(mpGpuArrays[0]));
+		if(args->test_case == 1)
+			freeAllGpu(mpTC1GpuArrays, sizeof(mpTC1GpuArrays) / sizeof(mpTC1GpuArrays[0]));
 #else
 		freeAllHost(mpHostArrays, sizeof(mpHostArrays) / sizeof(mpHostArrays[0]));
 #endif

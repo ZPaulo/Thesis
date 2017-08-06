@@ -288,6 +288,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 	int ind, i, ms = length_d * depth_d;
 	switch (cg_dir_d) {
 	case 0:
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index - c3D_d[i];
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -303,6 +304,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 		}
 		break;
 	case 1: //NORTH
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] - abs(cy3D_d[i]) * length_d + cz3D_d[i] * ms;
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -316,6 +318,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 		}
 		break;
 	case 2: //SOUTH
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] + abs(cy3D_d[i]) * length_d + cz3D_d[i] * ms;
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -329,6 +332,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 		}
 		break;
 	case 3: //EAST
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index - abs(cx3D_d[i]) + cy3D_d[i] * length_d + cz3D_d[i] * ms;
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -342,6 +346,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 		}
 		break;
 	case 4: //WEST
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index + abs(cx3D_d[i]) + cy3D_d[i] * length_d + cz3D_d[i] * ms;
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -355,6 +360,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 		}
 		break;
 	case 5: // FRONT
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] + cy3D_d[i] * length_d - abs(cz3D_d[i]) * ms;
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -368,6 +374,7 @@ __device__ void calculateColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d,
 		}
 		break;
 	case 6: // BACK
+#pragma unroll 18
 		for(i = 1; i < 19; i++){
 			ind = index + cx3D_d[i] + cy3D_d[i] * length_d + abs(cz3D_d[i]) * ms;
 			aux1 = cg_w3D_d[i] * (r_rho_d[ind] - b_rho_d[ind]) / rho_d[ind];
@@ -672,13 +679,11 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 		k_b = b_r / r;
 		k_k = beta_d * r_r * b_r / r;
 
-		//		if((r_r / (r * r_viscosity_d ) + b_r / (r * b_viscosity_d)) == 0.0)
-		//			printf("index %d\n", ind);
-
 		mean_nu = 1.0 / (r_r / (r * r_viscosity_d ) + b_r / (r * b_viscosity_d));
 		omega_eff = 1.0/(3.0*mean_nu+0.5);
 		mean_alpha = r_alpha_d * r_r / r + b_alpha_d * b_r / r;
 
+#pragma unroll 19
 		for (int dir=0;dir < 19;dir++){
 			cx = cx3D_d[dir];
 			cy = cy3D_d[dir];
