@@ -348,9 +348,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 
 	FLOAT_TYPE *u_d, *v_d, *w_d;
 
-		u_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, u1_d);
-		v_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, v1_d);
-		w_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, w1_d);
+	u_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, u1_d);
+	v_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, v1_d);
+	w_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, w1_d);
 
 
 
@@ -496,7 +496,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						args->g_limit, args->A,r_fColl, b_fColl, weight, cx, cy, cz, f, args->r_viscosity,
 						args->b_viscosity, args->r_alpha, args->b_alpha, chi, phi, psi, teta, cg_w);
 #else
-				gpuCollBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
+				if(!args->enhanced_distrib)
+					gpuCollBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
+				else
+					gpuCollEnhancedBgkwGC3D<<<bpg1, tpb>>>(fluid_d, rho_d, r_rho_d, b_rho_d, u_d, v_d, w_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
 #endif
 			}
 			else{
@@ -529,8 +532,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 #if !CUDA
 			streamMP3D(n, m, h, r_f, b_f, r_fColl, b_fColl, stream);
 #else
-			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
-			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
+//			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
+//			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
+			gpuStreaming3DCG<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d, b_f_d, b_fColl_d);
 #endif
 		}
 		else{
@@ -821,7 +825,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						u, v, w, rho, nodeType, n, m, h, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																												/ CLOCKS_PER_SEC;
+																																																																																														/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////

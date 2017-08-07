@@ -646,6 +646,90 @@ __global__ void gpuCollBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TY
 	}
 }
 
+__global__ void gpuCollEnhancedBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
+		FLOAT_TYPE *v_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
+
+	int ind = blockIdx.x * blockDim.x + threadIdx.x;
+	int ms = depth_d*length_d;
+	int cx, cy;
+	FLOAT_TYPE r_r, b_r, r, u, v, cg_x, cg_y, gr_x, gr_y;
+	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, mean_nu, omega_eff;
+	FLOAT_TYPE prod_c_g, pert;
+	FLOAT_TYPE f_CollPert;
+	FLOAT_TYPE G1, G2, G3, G4, prod_u_grad_rho, mean_alpha, TC, cu1, cu2, f_eq;
+	if (ind < ms)
+	{
+		u =   u_d[ind];
+		v =   v_d[ind];
+		r_r = r_rho_d[ind];
+		b_r = b_rho_d[ind];
+		r = rho_d[ind];
+
+
+		if(high_order)
+			calculateHOColorGradient(r_rho_d,b_rho_d, rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &gr_x, &gr_y);
+		else{
+			calculateColorGradient(r_rho_d,b_rho_d, rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &gr_x, &gr_y);
+		}
+
+		G1 = 2.0 * u * gr_x;
+		G2 = u * gr_y + v*gr_x;
+		G3 = G2;
+		G4 = 2.0 * v * gr_y;
+
+		prod_u_grad_rho = u * gr_x + v * gr_y;
+
+		mean_nu = 1.0 / (r_r / (r * r_viscosity_d) + b_r /(r * b_viscosity_d));
+		omega_eff = 1.0 / (3.0 * mean_nu + 0.5);
+		mean_alpha = r_alpha_d * r_r / r + b_alpha_d * b_r / r;
+
+
+		color_gradient_norm = sqrt(cg_x * cg_x + cg_y * cg_y);
+		k_r=r_r/r;
+		k_b=b_r/r;
+		k_k= beta_d * r_r * b_r / r;
+
+		cu1 = u*u + v*v;
+
+#pragma unroll 9
+		for (int k=0;k<9;k++){
+			cx = cx2D_d[k];
+			cy = cy2D_d[k];
+			if (color_gradient_norm > g_limit_d){
+				prod_c_g=cx * cg_x + cy * cg_y;
+				if (k!=0){
+					cosin= prod_c_g / (color_gradient_norm*c_norms_d[k]);
+				}
+				else
+					cosin=0.0;
+
+				// calculate perturbation terms
+				pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
+			}
+			else{
+				// the perturbation terms are null
+				pert=0.0;
+			}
+
+			TC = 0.0;
+			TC += G1 * cx * cx;
+			TC += G2 * cx * cy;
+			TC += G3 * cx * cy;
+			TC += G4 * cy * cy;
+
+			cu2 = u*cx + v*cy;
+			f_eq = mean_nu * (chi_d[k] * prod_u_grad_rho + psi_d[k] * TC) + r *
+					(phi_d[k] + teta_d[k] * mean_alpha + w2D_d[k] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
+
+			// calculate updated distribution function
+			f_CollPert = omega_eff*f_eq + (1-omega_eff) * f_d[ind + k * ms] + pert;
+
+			r_fColl_d[ind + k * ms] = k_r * f_CollPert + k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+			b_fColl_d[ind + k * ms] = k_b * f_CollPert - k_k * cosin * (phi_d[k] + teta_d[k] * mean_alpha);
+		}
+	}
+}
+
 __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
 		FLOAT_TYPE *v_d, FLOAT_TYPE *w_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
 
@@ -706,6 +790,105 @@ __global__ void gpuCollBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_r
 			cu2 = u*cx + v*cy + w*cz;
 			// calculate equilibrium distribution function
 			f_eq = r * (phi3D_d[dir] + teta3D_d[dir] * mean_alpha + w3D_d[dir] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
+
+			// calculate updated distribution function
+			f_CollPert = omega_eff*f_eq + (1-omega_eff)*f_d[ind + dir * ms] + pert;
+
+
+			r_fColl_d[ind + dir * ms] = k_r * f_CollPert + k_k * cosin * (phi3D_d[dir] + teta3D_d[dir] * mean_alpha);
+			b_fColl_d[ind + dir * ms] = k_b * f_CollPert - k_k * cosin * (phi3D_d[dir] + teta3D_d[dir] * mean_alpha);
+		}
+	}
+
+}
+
+__global__ void gpuCollEnhancedBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
+		FLOAT_TYPE *v_d, FLOAT_TYPE *w_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order){
+
+	int ind =  (blockIdx.x + blockIdx.y * gridDim.x) * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x) + threadIdx.x;
+	int ms = depth_d*length_d*height_d;
+	FLOAT_TYPE r_r, b_r, r, u, v, w, cg_x, cg_y, cg_z, gr_x, gr_y, gr_z;
+	FLOAT_TYPE k_r, k_b, k_k, color_gradient_norm, cosin, mean_nu, omega_eff, TC, mean_alpha;
+	FLOAT_TYPE prod_c_g, pert, prod_u_grad_rho, cu1, cu2;
+	FLOAT_TYPE f_CollPert, f_eq;
+	FLOAT_TYPE G1, G2, G3, G4, G5, G6, G7, G8, G9;
+	int cx, cy, cz;
+	if (ind < ms)
+	{
+		u =   u_d[ind];
+		v =   v_d[ind];
+		w =   w_d[ind];
+		r_r = r_rho_d[ind];
+		b_r = b_rho_d[ind];
+		r = rho_d[ind];
+
+		if(high_order)
+			calculateHOColorGradient3D(rho_d, r_rho_d, b_rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &cg_z, &gr_x, &gr_y, &gr_z);
+		else
+			calculateColorGradient3D(rho_d, r_rho_d, b_rho_d, cg_dir_d[ind], ind, &cg_x, &cg_y, &cg_z, &gr_x, &gr_y, &gr_z);
+
+		G1 = 2.0 * u * gr_x;
+		G2 = u * gr_y + v*gr_x;
+		G3 = u * gr_z + w*gr_x;
+		G4 = G2;
+		G5 = 2.0 * v * gr_y;
+		G6 = v * gr_z + w * gr_y;
+		G7 = G3;
+		G8 = G6;
+		G9 = 2.0 * w * gr_z;
+
+		prod_u_grad_rho = u * gr_x + v * gr_y + w * gr_z;
+
+		cu1 = u*u + v*v + w * w;
+
+		// invariable quantities
+		color_gradient_norm = sqrt(cg_x * cg_x + cg_y * cg_y + cg_z * cg_z);
+
+		k_r = r_r / r;
+		k_b = b_r / r;
+		k_k = beta_d * r_r * b_r / r;
+
+		mean_nu = 1.0 / (r_r / (r * r_viscosity_d ) + b_r / (r * b_viscosity_d));
+		omega_eff = 1.0/(3.0*mean_nu+0.5);
+		mean_alpha = r_alpha_d * r_r / r + b_alpha_d * b_r / r;
+
+		for (int dir=0;dir < 19;dir++){
+			cx = cx3D_d[dir];
+			cy = cy3D_d[dir];
+			cz = cz3D_d[dir];
+			if (color_gradient_norm > g_limit_d){
+				prod_c_g = cx * cg_x + cy * cg_y + cz * cg_z;
+				if (dir != 0){
+					cosin = prod_c_g / (color_gradient_norm * c_norms3D_d[dir]);
+				}
+				else
+					cosin=0.0;
+				// calculate perturbation terms
+				pert=0.5 * A_d * color_gradient_norm * (w3D_d[dir]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert3D_d[dir]);
+			}
+			else{
+				// the perturbation terms are null
+				pert = 0.0;
+			}
+
+			// Auxiliar tensor: diadic product of the speed velcity:
+			//[cx,cy,cx]*[cx cy cz]
+			//Tensor contraction
+			TC = 0.0;
+			TC += G1 * cx * cx;
+			TC += G2 * cx * cy;
+			TC += G3 * cx * cz;
+			TC += G4 * cx * cy; // H = 1
+			TC += G5 * cy * cy;
+			TC += G6 * cy * cz;
+			TC += G7 * cx * cz; // H = 2
+			TC += G8 * cy * cz; // H= 5
+			TC += G9 * cz * cz;
+
+			cu2 = u*cx + v*cy + w*cz;
+			// calculate equilibrium distribution function
+			f_eq = mean_nu * (chi3D_d[dir] * prod_u_grad_rho + psi3D_d[dir] * TC) + r *
+					(phi3D_d[dir] + teta3D_d[dir] * mean_alpha + w3D_d[dir] * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
 
 			// calculate updated distribution function
 			f_CollPert = omega_eff*f_eq + (1-omega_eff)*f_d[ind + dir * ms] + pert;

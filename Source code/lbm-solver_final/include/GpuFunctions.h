@@ -462,10 +462,12 @@ __device__ void calculateHOColorGradient(FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_
 __host__ void initHOColorGradient(int *color_gradient_directions, int n, int m);
 
 __host__ void initHOColorGradient3D(int *color_gradient_directions, int n, int m, int h);
-// to be used in 2D inlet profile computation in gpuInitInletProfile3D
-//from: http://stackoverflow.com/questions/18455414/how-to-do-power-of-complex-number-in-cublas
-//__host__ __device__ FLOAT_TYPE  carg(const cuDoubleComplex& z) {return (FLOAT_TYPE )atan2(cuCimag(z), cuCreal(z));} // polar angle
-//__host__ __device__ FLOAT_TYPE  cabs(const cuDoubleComplex& z) {return (FLOAT_TYPE )cuCabs(z);}
-//__host__ __device__ cuDoubleComplex cpow(const cuDoubleComplex& z, const int &n) {return make_cuDoubleComplex((pow(cabs(z), n)*cos(n*carg(z))), (pow(cabs(z), n)*sin(n*carg(z))));}
 
+__global__ void gpuCollEnhancedBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
+		FLOAT_TYPE *v_d, FLOAT_TYPE *w_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order);
+
+__global__ void gpuCollEnhancedBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, FLOAT_TYPE *b_rho_d, FLOAT_TYPE *u_d,
+		FLOAT_TYPE *v_d, FLOAT_TYPE *f_d, FLOAT_TYPE *r_fColl_d, FLOAT_TYPE *b_fColl_d, int *cg_dir_d, bool high_order);
+
+__global__ void gpuStreaming3DCG(int* fluid_d, bool* stream_d, FLOAT_TYPE* r_f_d, FLOAT_TYPE* r_fColl_d, FLOAT_TYPE* b_f_d, FLOAT_TYPE* b_fColl_d);
 #endif

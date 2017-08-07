@@ -125,6 +125,7 @@ typedef struct arg
     int test_case;
     bool external_force;
     bool high_order;
+    bool enhanced_distrib;
 
     //Bubble case
     FLOAT_TYPE bubble_radius;

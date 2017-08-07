@@ -394,7 +394,10 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						r_omega, b_omega, args->control_param, args->del, args->beta,
 						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
 #else
-				gpuCollBgkwGC2D<<<bpg1, tpb>>>(rho_d, r_rho_d, b_rho_d, u_d, v_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
+				if(!args->enhanced_distrib)
+					gpuCollBgkwGC2D<<<bpg1, tpb>>>(rho_d, r_rho_d, b_rho_d, u_d, v_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
+				else
+					gpuCollEnhancedBgkwGC2D<<<bpg1, tpb>>>(rho_d, r_rho_d, b_rho_d, u_d, v_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
 #endif
 			}else{
 				gpuCollBgkw2D<<<bpg1, tpb>>>(fluid_d, rho_d, u_d, v_d, f_d,
@@ -606,7 +609,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																																																								/ CLOCKS_PER_SEC;
+																																																																																																																																																																																										/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
