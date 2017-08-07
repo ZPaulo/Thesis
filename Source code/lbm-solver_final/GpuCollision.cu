@@ -852,6 +852,7 @@ __global__ void gpuCollEnhancedBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_T
 		omega_eff = 1.0/(3.0*mean_nu+0.5);
 		mean_alpha = r_alpha_d * r_r / r + b_alpha_d * b_r / r;
 
+#pragma unroll 19
 		for (int dir=0;dir < 19;dir++){
 			cx = cx3D_d[dir];
 			cy = cy3D_d[dir];
