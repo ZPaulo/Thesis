@@ -16,4 +16,6 @@
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime for Cavity\_128 and Cavity\_256\relax }}{32}
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Code profiling for the run-times of Cavity\_128 with MacroDiff residuals\relax }}{33}
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Overall time comparison using three different threads per block configuration\relax }}{34}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Setup file for the LBM solver\relax }}{36}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Initial arguments for the Color Gradient model\relax }}{37}
 \addvspace {10\p@ }

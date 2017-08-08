@@ -525,31 +525,6 @@ __device__ void calculateHOColorGradient3D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_
 	(*gr_z) = grz;
 }
 
-__device__ FLOAT_TYPE calcPerturb2D(FLOAT_TYPE cg_norm, FLOAT_TYPE w, FLOAT_TYPE prod_c_g, FLOAT_TYPE w_pert){
-	if(cg_norm > g_limit_d)
-		return 0.5 * A_d * cg_norm * (w * (prod_c_g *prod_c_g) / (cg_norm * cg_norm) - w_pert);
-	else
-		return 0.0;
-}
-
-__device__ FLOAT_TYPE calcCosin2D(FLOAT_TYPE cg_norm, FLOAT_TYPE c_norm, FLOAT_TYPE prod_c_g){
-	if(cg_norm > g_limit_d)
-		return prod_c_g / (cg_norm * c_norm);
-	else
-		return 0.0;
-}
-
-__device__ FLOAT_TYPE calcTC(int cx, int cy, FLOAT_TYPE G1, FLOAT_TYPE G2,FLOAT_TYPE G3,FLOAT_TYPE G4){
-	return G1 * cx * cx + G2 * cx * cy + G3 * cx * cy + G4 * cy * cy;
-}
-
-__device__ FLOAT_TYPE feq2DCG(FLOAT_TYPE u, FLOAT_TYPE v, int cx, int cy, FLOAT_TYPE chi, FLOAT_TYPE psi, FLOAT_TYPE teta, FLOAT_TYPE phi,
-		FLOAT_TYPE TC, FLOAT_TYPE prod_u_grad_rho, FLOAT_TYPE r, FLOAT_TYPE mean_alpha, FLOAT_TYPE w, FLOAT_TYPE cu1, FLOAT_TYPE mean_nu){
-	FLOAT_TYPE cu2 = u*cx + v*cy;
-	return mean_nu * (chi * prod_u_grad_rho + psi * TC) + r *
-			(phi + teta * mean_alpha + w * (3. * cu2 + 4.5 * cu2 * cu2 - 1.5 * cu1));
-}
-
 __global__ void gpuCollBgkw2D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_TYPE *u_d,
 		FLOAT_TYPE *v_d, FLOAT_TYPE *f_d, FLOAT_TYPE *fColl_d)
 {

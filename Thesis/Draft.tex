@@ -16,6 +16,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{amsmath}
+\raggedbottom
 
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 % By default, LaTeX uses a serif font - these are traditionally thought to be
@@ -263,7 +264,7 @@ From Eq. \ref{eq:boltzEq}, we can define the macroscopic values for density and 
 \rho (r,t) u(r,t) = \int  mcf(r,c,t)dc
 \end{equation}
 where $m$ represents the molecular mass.
-\section{Color Gradient Model}
+\section{Color Gradient Model}\label{sec:cgModel}
 Models implementing multiphase flows for the Lattice Boltzmann method can generally be classified into several different categories. For the purpose of this thesis, we will focus on the Rothman-Keller methods, specifically on the model proposed by Reis and Phillips \textcolor{red}{cite}, modified using Latva-Kokko's recoloring operator, as proposed by Leclaire et al. \textcolor{red}{cite leclaire}. \par
 In this model, two immiscible fluids are simulated under the LBM, a red fluid and a blue fluid, that only interact with each other in the interface between them. These fluids are associated to their own distribution functions, which implies that the total memory used by the in-house solver is likely to increase. Furthermore, the collision step will need to be created from scratch since this step introduces two new operators, while the standard collision step will also suffer some changes to account for the two fluids. \par
 The fluid's distribution function now becomes
@@ -421,6 +422,64 @@ Figure \ref{fig:timesThreads} shows that the initial configuration (16x16) provi
 \subsection{Validation}
 Now that the received code has been validated to perform under the same conditions as the final version used by the previous authors, we now have to verify whether the results that the received version is producing are the same as the final one. The validation of the results obtained throughout this project will be under the responsibility of Antonio González. As such, the details for this initial validation can be found in his thesis \cite{antonioThesis}.
 \par This initial validation is essential for the development of a multiphase flow using the in-house solver. Without it, there would be no way of telling whether the solver would be functioning incorrectly due to a faulty algorithm implemented by us or if the solver was already producing wrong results. By doing so we can be sure that our code behaves correctly and that a proper result is achieved.
+
+\section{Developing the Color Gradient model}
+After making sure that the code we received was producing correct results, we could start implementing the Color Gradient (CG) model in the in-house LBM solver. Since there are two people working on this project, a proper separation of responsibilities  was vital for a successful adaption of the solver. To this end, Antonio González \cite{antonioThesis} was in charge of the physical aspects of the model whilst I was in charge of the software side. \par
+We first decided to implement the CG model in a serial fashion so as to easily and quickly find potential errors in the code. Antonio would then develop a working script of the model in Matlab and, after validating it, I would take that script and patch it into the LBM solver. After making sure that the model was working in full integration with the LBM solver, I could then start parallelising the algorithms and finally validate the final, parallel results. We felt that this process, while extensive and time consuming, presented the best way of correctly implementing the model, since it was easier to track bugs, and so was repeated for the 3D model.
+\subsection{Initial arguments}
+The LBM solver depends on some initial parameters to initialize the required variables correctly. To do so, a SetUpData.ini file needs to be filled with the desired values. Figure \ref{fig:setupLBM} shows the initial arguments on which the LBM solver depends upon.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{Resources/Images/setup.png}
+	\caption{Setup file for the LBM solver}
+	\label{fig:setupLBM}
+\end{figure}
+ However, the CG model requires several additional parameters. These parameters had to be added to the solver and can be viewed in Fig. \ref{fig:setupCG}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{Resources/Images/setupCG.png}
+	\caption{Initial arguments for the Color Gradient model}
+	\label{fig:setupCG}
+\end{figure}
+
+This model is supposed to be an addition to the original solver. As such, we need to keep the non-multiphase approach interchangeable with the new model. This was taken into account throughout the development of the code and so the user is provided with a way to easily switch between approaches. \par
+The number of new parameters further shows how much the complexity of the solver will increase due to the new model. A higher complexity translates into more computations being performed, which in turn means that the CG model will hinder the original solver's performance. I will try to mitigate these effects during the parallelization of the solver, which I describe in more detail in Section \ref{sec:performance}. Also, two new distribution functions need to be added to the solver (one per fluid), as well as two new densities. All of this needs to be taken into account when developing the new solver.
+
+\subsection{2D model}
+After initializing all the parameters, we need to initialize the new distribution functions and the new densities. This is done depending on the test case to be used, where each distribution function and density array are initialized according to the initial parameters and to the region of the fluid. The test cases are explained in more detail in Section \ref{sec:testcases}. \par
+As mentioned in Section \ref{sec:cgModel}, the Color Gradient model imposes some changes on the sub-steps of the LBM solver. The most noticeable of theses changes happen in the collision sub-step. First, we need to calculate the color gradient of each node. Since this color gradient is the result of a sum of interactions from the 9 directions of the speed model, we need a separate loop before being able to use this array in the computation of the perturbation operator. However, the color gradient calculation depends on the orientation of the node, that is whether the node is in the north, south, east, west or middle of the mesh. We can then calculate the appropriate collision frequency and afterwards compute the perturbation, collision and recoloring operators by looping between the 9 directions. For the most part of this sub-step, parallelization is implemented by following the example of the solver's previous collision sub-step. Each node will have it's own thread to perform calculations, and since each node does not depend on it's neighbors we do not have to worry about conflicted access to memory. However, each thread needs to know it's orientation for the color gradient calculation. Instead of having each thread reverse calculate it's index in an x,y format, a new array was created and initialized in the initialization section of the solver. This array has an element per node and it's value represents the orientation of the node in the following manner:
+\begin{itemize}
+	\item 1 - North
+	\item 2 - South 
+	\item 3 - East 
+	\item 4 - West 
+	\item 0 - Middle
+	\item -1 - Corner    
+\end{itemize}
+This way each thread simply needs to access this array with it's index to discover which orientation it needs to take into account. \par
+The streaming step behaves like the original solver's streaming. We now have to stream not just one distribution function but both of them, as each fluid's changes are specific to it's own function. However, the 2D model was not behaving correctly when nodes near the boundary needed to be updated. This could be fixed by analyzing the mesh interpolation and how the stream array is built, which specifies whether a direction of the speed model should be updated or not. Since there was not enough time to perform this analysis, I used the same array as the one used in the color gradient to find out the orientation of node. Then I simply needed to specify how the streaming should work for each orientation.   
+
+\subsection{3D model}
+\section{Verification and Validation}
+\section{Test cases}\label{sec:testcases}
+\section{Memory usage}
+\section{Performance of the parallel code}\label{sec:performance}
+\subsection{2D model}
+\subsubsection{Normal distribution function v1.0}
+\subsubsection{Enhanced distribution function v2.0}
+\subsubsection{Optimizations v2.1}
+\subsubsection{Loop unrolling v2.2}
+\subsubsection{Final version v2.3}
+\subsubsection{High order color gradient}
+\subsubsection{CUDA compute capability}
+\subsection{3D model}
+\subsubsection{Enhanced distribution function v1.0}
+\subsubsection{Final version v1.1}
+\subsubsection{High order color gradient}
+\subsubsection{CUDA compute capability}
+\subsection{Hardware}
+\subsection{Double vs Single}
 \chapter{Conclusions}
 
 %% Back matter

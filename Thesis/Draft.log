@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  18 JUL 2017 17:41
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  8 AUG 2017 19:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -566,19 +566,19 @@ LaTeX Info: Redefining \] on input line 2736.
 ) (./Draft.aux)
 \openout1 = `Draft.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 37.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 38.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -684,20 +684,20 @@ Package caption Info: End \AtBeginDocument code.
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 48.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 49.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <17.28> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 48.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 49.
  [3] [4
 
 ]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <24.88> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 51.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 53.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 54.
  [5
 
 ] [6
@@ -733,20 +733,19 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 9.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 9.
-)
+ [7
+
+])
 \tf@toc=\write3
 \openout3 = `Draft.toc'.
 
- [7
-
-] [8
-
-]
+ [8]
 (./Draft.lof)
 \tf@lof=\write4
 \openout4 = `Draft.lof'.
 
  [9
+
 
 ] [10
 
@@ -771,48 +770,40 @@ Chapter 1.
 ]
 Chapter 2.
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 93.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 94.
 [3]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 112.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 113.
  [4] <Resources/Images/d2q9.png, id=70, 361.35pt x 352.31625pt>
 File: Resources/Images/d2q9.png Graphic file (type png)
 
 <use Resources/Images/d2q9.png>
-Package pdftex.def Info: Resources/Images/d2q9.png used on input line 127.
+Package pdftex.def Info: Resources/Images/d2q9.png used on input line 128.
 (pdftex.def)             Requested size: 128.0387pt x 124.83928pt.
-
-Underfull \vbox (badness 4886) has occurred while \output is active []
-
  [5]
-<Resources/Images/d3q19.png, id=74, 568.1225pt x 439.6425pt>
+<Resources/Images/d3q19.png, id=74, 677.53125pt x 557.83406pt>
 File: Resources/Images/d3q19.png Graphic file (type png)
 
 <use Resources/Images/d3q19.png>
-Package pdftex.def Info: Resources/Images/d3q19.png used on input line 134.
-(pdftex.def)             Requested size: 128.0387pt x 99.083pt.
- [6 <./Resources/Images/d2q9.png (PNG copy)> <./Resources/Images/d3q19.png (PNG
- copy)>]
-<Resources/Images/moore120.png, id=78, 1284.8pt x 901.3675pt>
+Package pdftex.def Info: Resources/Images/d3q19.png used on input line 135.
+(pdftex.def)             Requested size: 128.0387pt x 105.41927pt.
+ [6 <./Resources/Images/d2q9.png (PNG copy)> <./Resources/Images/d3q19.png>]
+<Resources/Images/moore120.png, id=80, 1284.8pt x 901.3675pt>
 File: Resources/Images/moore120.png Graphic file (type png)
 
 <use Resources/Images/moore120.png>
-Package pdftex.def Info: Resources/Images/moore120.png used on input line 155.
+Package pdftex.def Info: Resources/Images/moore120.png used on input line 156.
 (pdftex.def)             Requested size: 256.07741pt x 179.65138pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [7]
-[8 <./Resources/Images/moore120.png>]
-<Resources/Images/amdahl.png, id=87, 468.24937pt x 379.4175pt>
+ [7] [8 <./Resources/Images/moore120.png>]
+<Resources/Images/amdahl.png, id=88, 468.24937pt x 379.4175pt>
 File: Resources/Images/amdahl.png Graphic file (type png)
 
 <use Resources/Images/amdahl.png>
-Package pdftex.def Info: Resources/Images/amdahl.png used on input line 167.
+Package pdftex.def Info: Resources/Images/amdahl.png used on input line 168.
 (pdftex.def)             Requested size: 256.07741pt x 207.505pt.
  [9 <./Resources/Images/amdahl.png>] [10]
 [11]
-Overfull \hbox (0.68112pt too wide) in paragraph at lines 190--190
+Overfull \hbox (0.68112pt too wide) in paragraph at lines 191--191
 \OT1/ptm/m/n/12 shared mem-ory to com-pute the so-lu-tion. How-ever, the au-tho
 r ver-i-fied that a lo-cal memory-
  []
@@ -821,47 +812,29 @@ r ver-i-fied that a lo-cal memory-
 
 ]
 Chapter 3.
-
-Underfull \vbox (badness 2384) has occurred while \output is active []
-
- [15]
-Underfull \vbox (badness 1264) has occurred while \output is active []
-
- [16]
-<Resources/Images/streaming.png, id=119, 2434.09375pt x 1193.45876pt>
+[15] [16]
+<Resources/Images/streaming.png, id=120, 2434.09375pt x 1193.45876pt>
 File: Resources/Images/streaming.png Graphic file (type png)
 
 <use Resources/Images/streaming.png>
-Package pdftex.def Info: Resources/Images/streaming.png used on input line 220.
+Package pdftex.def Info: Resources/Images/streaming.png used on input line 221.
 
 (pdftex.def)             Requested size: 341.43437pt x 167.39267pt.
  [17 <./Resources/Images/streaming.png>]
-Underfull \vbox (badness 2460) has occurred while \output is active []
-
- [18]
-[19]
-Underfull \vbox (badness 2189) has occurred while \output is active []
-
- [20]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [21]
-[22] <Resources/Images/threadmapping.png, id=142, 574.145pt x 679.53876pt>
+[18] [19] [20] [21] [22]
+<Resources/Images/threadmapping.png, id=143, 574.145pt x 679.53876pt>
 File: Resources/Images/threadmapping.png Graphic file (type png)
 
 <use Resources/Images/threadmapping.png>
 Package pdftex.def Info: Resources/Images/threadmapping.png used on input line 
-318.
+321.
 (pdftex.def)             Requested size: 256.07741pt x 303.0937pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [23]
-<Resources/Images/cudaMemory.png, id=146, 423.08063pt x 411.78844pt>
+<Resources/Images/cudaMemory.png, id=147, 423.08063pt x 411.78844pt>
 File: Resources/Images/cudaMemory.png Graphic file (type png)
 
 <use Resources/Images/cudaMemory.png>
-Package pdftex.def Info: Resources/Images/cudaMemory.png used on input line 329
+Package pdftex.def Info: Resources/Images/cudaMemory.png used on input line 332
 .
 (pdftex.def)             Requested size: 341.43437pt x 332.3341pt.
  [24 <./Resources/Images/threadmapping.png>] [25 <./Resources/Images/cudaMemory
@@ -869,60 +842,60 @@ Package pdftex.def Info: Resources/Images/cudaMemory.png used on input line 329
 Chapter 4.
 [29
 
-] <Resources/Images/CodeFlowchart.png, id=167, 289.08pt x 595.47469pt>
+] <Resources/Images/CodeFlowchart.png, id=168, 289.08pt x 595.47469pt>
 File: Resources/Images/CodeFlowchart.png Graphic file (type png)
 
 <use Resources/Images/CodeFlowchart.png>
 Package pdftex.def Info: Resources/Images/CodeFlowchart.png used on input line 
-364.
+367.
 (pdftex.def)             Requested size: 213.39568pt x 439.57219pt.
  [30 <./Resources/Images/CodeFlowchart.png>] [31]
 
 pdfTeX warning: /usr/bin/pdflatex (file ./Resources/Images/compareTimes.pdf): P
 DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<Resources/Images/compareTimes.pdf, id=174, 845.07718pt x 597.55246pt>
+<Resources/Images/compareTimes.pdf, id=175, 845.07718pt x 597.55246pt>
 File: Resources/Images/compareTimes.pdf Graphic file (type pdf)
 
 <use Resources/Images/compareTimes.pdf>
 Package pdftex.def Info: Resources/Images/compareTimes.pdf used on input line 3
-84.
+87.
 (pdftex.def)             Requested size: 384.1096pt x 271.60414pt.
  [32 <./Resources/Images/compareTimes.pdf>]
 
 pdfTeX warning: /usr/bin/pdflatex (file ./Resources/Images/initialProfiling.pdf
 ): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<Resources/Images/initialProfiling.pdf, id=187, 845.07718pt x 597.55246pt>
+<Resources/Images/initialProfiling.pdf, id=188, 845.07718pt x 597.55246pt>
 File: Resources/Images/initialProfiling.pdf Graphic file (type pdf)
 
 <use Resources/Images/initialProfiling.pdf>
 Package pdftex.def Info: Resources/Images/initialProfiling.pdf used on input li
-ne 394.
+ne 397.
 (pdftex.def)             Requested size: 384.1096pt x 271.60414pt.
  [33 <./Resources/Images/initialProfiling.pdf>]
 
 pdfTeX warning: /usr/bin/pdflatex (file ./Resources/Images/timesThreads128.pdf)
 : PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<Resources/Images/timesThreads128.pdf, id=200, 845.07718pt x 597.55246pt>
+<Resources/Images/timesThreads128.pdf, id=201, 845.07718pt x 597.55246pt>
 File: Resources/Images/timesThreads128.pdf Graphic file (type pdf)
 
 <use Resources/Images/timesThreads128.pdf>
 Package pdftex.def Info: Resources/Images/timesThreads128.pdf used on input lin
-e 405.
+e 408.
 (pdftex.def)             Requested size: 209.1301pt x 147.87418pt.
 
 
 pdfTeX warning: /usr/bin/pdflatex (file ./Resources/Images/timesThreads256.pdf)
 : PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<Resources/Images/timesThreads256.pdf, id=201, 845.07718pt x 597.55246pt>
+<Resources/Images/timesThreads256.pdf, id=202, 845.07718pt x 597.55246pt>
 File: Resources/Images/timesThreads256.pdf Graphic file (type pdf)
 
 <use Resources/Images/timesThreads256.pdf>
 Package pdftex.def Info: Resources/Images/timesThreads256.pdf used on input lin
-e 409.
+e 412.
 (pdftex.def)             Requested size: 209.1301pt x 147.87418pt.
 
 
-LaTeX Warning: Citation `antonioThesis' on page 34 undefined on input line 420.
+LaTeX Warning: Citation `antonioThesis' on page 34 undefined on input line 423.
 
 
 [34 <./Resources/Images/timesThreads128.pdf> <./Resources/Images/timesThreads25
@@ -930,25 +903,48 @@ LaTeX Warning: Citation `antonioThesis' on page 34 undefined on input line 420.
 
 pdfTeX warning: /usr/bin/pdflatex (file ./Resources/Images/timesThreads256.pdf)
 : PDF inclusion: multiple pdfs with page group included in a single page
->] [35] [36
+>]
 
-]
+LaTeX Warning: Citation `antonioThesis' on page 35 undefined on input line 427.
+
+
+[35] <Resources/Images/setup.png, id=224, 593.21625pt x 415.5525pt>
+File: Resources/Images/setup.png Graphic file (type png)
+
+<use Resources/Images/setup.png>
+Package pdftex.def Info: Resources/Images/setup.png used on input line 434.
+(pdftex.def)             Requested size: 384.1096pt x 269.0787pt.
+
+<Resources/Images/setupCG.png, id=225, 597.23125pt x 329.23pt>
+File: Resources/Images/setupCG.png Graphic file (type png)
+
+<use Resources/Images/setupCG.png>
+Package pdftex.def Info: Resources/Images/setupCG.png used on input line 441.
+(pdftex.def)             Requested size: 384.1096pt x 211.74637pt.
+ [36 <./Resources/Images/setup.png>] [37 <./Resources/Images/setupCG.png>] [38]
+ [39]
+Overfull \vbox (110.5257pt too high) has occurred while \output is active []
+
+
+[40]
 Chapter 5.
-(./Draft.bbl [37] [38
+(./Draft.bbl [41
 
-] [39] [40]) [41] (./Draft.aux)
+] [42
+
+] [43] [44]) [45] (./Draft.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4946 strings out of 494953
- 71072 string characters out of 6180977
- 141621 words of memory out of 5000000
- 8094 multiletter control sequences out of 15000+600000
+ 4961 strings out of 494953
+ 71425 string characters out of 6180977
+ 141699 words of memory out of 5000000
+ 8108 multiletter control sequences out of 15000+600000
  35273 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 38i,8n,39p,926b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,8n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist
@@ -959,10 +955,10 @@ pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmri8a.pfb>
-Output written on Draft.pdf (57 pages, 1698050 bytes).
+Output written on Draft.pdf (61 pages, 1830910 bytes).
 PDF statistics:
- 278 PDF objects out of 1000 (max. 8388607)
- 187 compressed objects within 2 object streams
+ 296 PDF objects out of 1000 (max. 8388607)
+ 196 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 71 words of extra memory for PDF output out of 10000 (max. 10000000)
 
