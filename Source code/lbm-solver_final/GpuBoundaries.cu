@@ -1903,6 +1903,7 @@ __global__ void gpuBcPeriodic2D(int *bcIdx_d, int *bcMask_d,
 				r_rho_d[ind] = r_temp;
 				b_rho_d[ind] = b_temp;
 				rho_d[ind] = r_temp + b_temp;
+
 			}
 			else if(test_case == 6){
 				r_f_d[ind + 4 * ms] = r_f_d[ind + 2 * ms];

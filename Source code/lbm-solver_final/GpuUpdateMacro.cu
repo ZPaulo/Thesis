@@ -59,79 +59,76 @@ __global__ void gpuUpdateMacro2DCG(FLOAT_TYPE* rho_d,
 			num_out_d[ind] = 0;
 		}
 
-		if (cg_direction[ind] == 0 || (test_case != 2 && test_case != 6) || (cg_direction[ind] == 3 || cg_direction[ind] == 4)) {
+		aux1 = r_rho_d[ind] / (rho_d[ind] * r_viscosity_d) + b_rho_d[ind] /(rho_d[ind] * b_viscosity_d);
+		mean_nu = 1.0/aux1;
+		omega_eff = 1.0/(3.0*mean_nu+0.5);
 
-			aux1 = r_rho_d[ind] / (rho_d[ind] * r_viscosity_d) + b_rho_d[ind] /(rho_d[ind] * b_viscosity_d);
-			mean_nu = 1.0/aux1;
-			omega_eff = 1.0/(3.0*mean_nu+0.5);
+		r_r = b_r = u = v = 0.0;
+		r_r = r_f_d[ind] +
+				r_f_d[ind + ms] +
+				r_f_d[ind + 2 * ms] +
+				r_f_d[ind + 3 * ms] +
+				r_f_d[ind + 4 * ms] +
+				r_f_d[ind + 5 * ms] +
+				r_f_d[ind + 6 * ms]	+
+				r_f_d[ind + 7 * ms] +
+				r_f_d[ind + 8 * ms];
+		b_r = b_f_d[ind] +
+				b_f_d[ind + ms] +
+				b_f_d[ind + 2 * ms] +
+				b_f_d[ind + 3 * ms] +
+				b_f_d[ind + 4 * ms] +
+				b_f_d[ind + 5 * ms] +
+				b_f_d[ind + 6 * ms] +
+				b_f_d[ind + 7 * ms] +
+				b_f_d[ind + 8 * ms];
 
-			r_r = b_r = u = v = 0.0;
-			r_r = r_f_d[ind] +
-					r_f_d[ind + ms] +
-					r_f_d[ind + 2 * ms] +
-					r_f_d[ind + 3 * ms] +
-					r_f_d[ind + 4 * ms] +
-					r_f_d[ind + 5 * ms] +
-					r_f_d[ind + 6 * ms]	+
-					r_f_d[ind + 7 * ms] +
-					r_f_d[ind + 8 * ms];
-			b_r = b_f_d[ind] +
-					b_f_d[ind + ms] +
-					b_f_d[ind + 2 * ms] +
-					b_f_d[ind + 3 * ms] +
-					b_f_d[ind + 4 * ms] +
-					b_f_d[ind + 5 * ms] +
-					b_f_d[ind + 6 * ms] +
-					b_f_d[ind + 7 * ms] +
-					b_f_d[ind + 8 * ms];
+		f_d[ind] = r_f_d[ind] + b_f_d[ind];
+		f_d[ind + 1 * ms] = r_f_d[ind + 1 * ms] + b_f_d[ind + 1 * ms];
+		f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms];
+		f_d[ind + 3 * ms] = r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms];
+		f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms];
+		f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms];
+		f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms];
+		f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms];
+		f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms];
 
-			f_d[ind] = r_f_d[ind] + b_f_d[ind];
-			f_d[ind + 1 * ms] = r_f_d[ind + 1 * ms] + b_f_d[ind + 1 * ms];
-			f_d[ind + 2 * ms] = r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms];
-			f_d[ind + 3 * ms] = r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms];
-			f_d[ind + 4 * ms] = r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms];
-			f_d[ind + 5 * ms] = r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms];
-			f_d[ind + 6 * ms] = r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms];
-			f_d[ind + 7 * ms] = r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms];
-			f_d[ind + 8 * ms] = r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms];
-
-			r_rho_d[ind] = r_r;
-			b_rho_d[ind] = b_r;
-			r = r_r + b_r;
-			rho_d[ind] = r;
+		r_rho_d[ind] = r_r;
+		b_rho_d[ind] = b_r;
+		r = r_r + b_r;
+		rho_d[ind] = r;
 
 
 
-			u = (r_f_d[ind + ms] + b_f_d[ind + ms]) -
-					(r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms]) +
-					(r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms]) -
-					(r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms]) -
-					(r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms]) +
-					(r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms]);
+		u = (r_f_d[ind + ms] + b_f_d[ind + ms]) -
+				(r_f_d[ind + 3 * ms] + b_f_d[ind + 3 * ms]) +
+				(r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms]) -
+				(r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms]) -
+				(r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms]) +
+				(r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms]);
 
-			v = (r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms]) -
-					(r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms]) +
-					(r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms]) +
-					(r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms]) -
-					(r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms]) -
-					(r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms]);
+		v = (r_f_d[ind + 2 * ms] + b_f_d[ind + 2 * ms]) -
+				(r_f_d[ind + 4 * ms] + b_f_d[ind + 4 * ms]) +
+				(r_f_d[ind + 5 * ms] + b_f_d[ind + 5 * ms]) +
+				(r_f_d[ind + 6 * ms] + b_f_d[ind + 6 * ms]) -
+				(r_f_d[ind + 7 * ms] + b_f_d[ind + 7 * ms]) -
+				(r_f_d[ind + 8 * ms] + b_f_d[ind + 8 * ms]);
 
 
-			u_d[ind] = u / r + external_force_d * g_d / (r * omega_eff);
-			v_d[ind] = v / r + (1-external_force_d) * g_d / omega_eff;
+		u_d[ind] = u / r + external_force_d * g_d / (r * omega_eff);
+		v_d[ind] = v / r + (1-external_force_d) * g_d / omega_eff;
 
-			if(test_case == 1){
-				// p_in and p_out for the surface tension
-				chi=(r_r-b_r)/r;
+		if(test_case == 1){
+			// p_in and p_out for the surface tension
+			chi=(r_r-b_r)/r;
 
-				if (chi >= control_param_d){
-					num_in_d[ind] = 1;
-					p_in_d[ind] = r_r;
-				}
-				else if (chi <= -control_param_d){
-					num_out_d[ind] = 1;
-					p_out_d[ind] = b_r;
-				}
+			if (chi >= control_param_d){
+				num_in_d[ind] = 1;
+				p_in_d[ind] = r_r;
+			}
+			else if (chi <= -control_param_d){
+				num_out_d[ind] = 1;
+				p_out_d[ind] = b_r;
 			}
 		}
 	}
@@ -144,7 +141,7 @@ __global__ void gpuUpdateMacro3D(int *fluid_d, FLOAT_TYPE* rho_d,
 {
 	int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 	int ind = blockId * (blockDim.x * blockDim.y) + (threadIdx.y * blockDim.x)
-																																									+ threadIdx.x;
+																																											+ threadIdx.x;
 	int ms = depth_d * length_d * height_d;
 
 	FLOAT_TYPE r, rU, rV, rW;

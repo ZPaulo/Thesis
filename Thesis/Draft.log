@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  8 AUG 2017 19:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  9 AUG 2017 23:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -923,25 +923,30 @@ Package pdftex.def Info: Resources/Images/setupCG.png used on input line 441.
 (pdftex.def)             Requested size: 384.1096pt x 211.74637pt.
  [36 <./Resources/Images/setup.png>] [37 <./Resources/Images/setupCG.png>] [38]
  [39]
-Overfull \vbox (110.5257pt too high) has occurred while \output is active []
+
+LaTeX Warning: Citation `antonioThesis' on page 40 undefined on input line 471.
 
 
-[40]
+[40] [41]
+Overfull \vbox (17.18576pt too high) has occurred while \output is active []
+
+
+[42]
 Chapter 5.
-(./Draft.bbl [41
+(./Draft.bbl [43
 
-] [42
+] [44
 
-] [43] [44]) [45] (./Draft.aux)
+] [45] [46]) [47] (./Draft.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4961 strings out of 494953
- 71425 string characters out of 6180977
- 141699 words of memory out of 5000000
- 8108 multiletter control sequences out of 15000+600000
+ 4962 strings out of 494953
+ 71435 string characters out of 6180977
+ 141703 words of memory out of 5000000
+ 8109 multiletter control sequences out of 15000+600000
  35273 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  38i,8n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -955,10 +960,10 @@ pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmri8a.pfb>
-Output written on Draft.pdf (61 pages, 1830910 bytes).
+Output written on Draft.pdf (63 pages, 1834099 bytes).
 PDF statistics:
- 296 PDF objects out of 1000 (max. 8388607)
- 196 compressed objects within 2 object streams
+ 302 PDF objects out of 1000 (max. 8388607)
+ 200 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  71 words of extra memory for PDF output out of 10000 (max. 10000000)
 

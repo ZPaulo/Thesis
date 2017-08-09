@@ -52,23 +52,23 @@
 \contentsline {subsection}{\numberline {4.2.1}Initial arguments}{36}
 \contentsline {subsection}{\numberline {4.2.2}2D model}{38}
 \contentsline {subsection}{\numberline {4.2.3}3D model}{40}
-\contentsline {section}{\numberline {4.3}Verification and Validation}{40}
-\contentsline {section}{\numberline {4.4}Test cases}{40}
-\contentsline {section}{\numberline {4.5}Memory usage}{40}
-\contentsline {section}{\numberline {4.6}Performance of the parallel code}{40}
-\contentsline {subsection}{\numberline {4.6.1}2D model}{40}
-\contentsline {subsubsection}{Normal distribution function v1.0}{40}
-\contentsline {subsubsection}{Enhanced distribution function v2.0}{40}
-\contentsline {subsubsection}{Optimizations v2.1}{40}
-\contentsline {subsubsection}{Loop unrolling v2.2}{40}
-\contentsline {subsubsection}{Final version v2.3}{40}
-\contentsline {subsubsection}{High order color gradient}{40}
-\contentsline {subsubsection}{CUDA compute capability}{40}
-\contentsline {subsection}{\numberline {4.6.2}3D model}{40}
-\contentsline {subsubsection}{Enhanced distribution function v1.0}{40}
-\contentsline {subsubsection}{Final version v1.1}{40}
-\contentsline {subsubsection}{High order color gradient}{40}
-\contentsline {subsubsection}{CUDA compute capability}{40}
-\contentsline {subsection}{\numberline {4.6.3}Hardware}{40}
-\contentsline {subsection}{\numberline {4.6.4}Double vs Single}{40}
-\contentsline {chapter}{\numberline {5}Conclusions}{41}
+\contentsline {section}{\numberline {4.3}Validation}{41}
+\contentsline {section}{\numberline {4.4}Test cases}{42}
+\contentsline {section}{\numberline {4.5}Memory usage}{42}
+\contentsline {section}{\numberline {4.6}Performance of the parallel code}{42}
+\contentsline {subsection}{\numberline {4.6.1}2D model}{42}
+\contentsline {subsubsection}{Normal distribution function v1.0}{42}
+\contentsline {subsubsection}{Enhanced distribution function v2.0}{42}
+\contentsline {subsubsection}{Optimizations v2.1}{42}
+\contentsline {subsubsection}{Loop unrolling v2.2}{42}
+\contentsline {subsubsection}{Final version v2.3}{42}
+\contentsline {subsubsection}{High order color gradient}{42}
+\contentsline {subsubsection}{CUDA compute capability}{42}
+\contentsline {subsection}{\numberline {4.6.2}3D model}{42}
+\contentsline {subsubsection}{Enhanced distribution function v1.0}{42}
+\contentsline {subsubsection}{Final version v1.1}{42}
+\contentsline {subsubsection}{High order color gradient}{42}
+\contentsline {subsubsection}{CUDA compute capability}{42}
+\contentsline {subsection}{\numberline {4.6.3}Hardware}{42}
+\contentsline {subsection}{\numberline {4.6.4}Double vs Single}{42}
+\contentsline {chapter}{\numberline {5}Conclusions}{43}

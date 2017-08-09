@@ -679,11 +679,12 @@ __global__ void gpuCollEnhancedBgkwGC2D(FLOAT_TYPE *rho_d, FLOAT_TYPE *r_rho_d, 
 					cosin=0.0;
 
 				// calculate perturbation terms
-				pert=0.5 * A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
+				pert= A_d * color_gradient_norm * (w2D_d[k]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert_d[k]);
 			}
 			else{
 				// the perturbation terms are null
 				pert=0.0;
+				cosin=0.0;
 			}
 
 			TC = 0.0;
@@ -840,11 +841,12 @@ __global__ void gpuCollEnhancedBgkwGC3D(int *fluid_d, FLOAT_TYPE *rho_d, FLOAT_T
 				else
 					cosin=0.0;
 				// calculate perturbation terms
-				pert=0.5 * A_d * color_gradient_norm * (w3D_d[dir]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert3D_d[dir]);
+				pert= A_d * color_gradient_norm * (w3D_d[dir]* (prod_c_g *prod_c_g) / (color_gradient_norm * color_gradient_norm) - w_pert3D_d[dir]);
 			}
 			else{
 				// the perturbation terms are null
 				pert = 0.0;
+				cosin = 0.0;
 			}
 
 			// Auxiliar tensor: diadic product of the speed velcity:
