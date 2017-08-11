@@ -206,9 +206,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	}
 	FLOAT_TYPE *u_prev_d, *v_prev_d, *w_prev_d, *rho_prev_d, *f_prev_d;
 	if (args->TypeOfResiduals == MacroDiff) {
-		if(args->multiPhase)
-			f_prev_d = createGpuArrayFlt(m * n * h * 19, ARRAY_ZERO);
-		else{
+		if(!args->multiPhase){
 			u_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 			v_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 			w_prev_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
@@ -303,7 +301,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *f_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	FLOAT_TYPE *f1_d, *fprev_d;
-	if (args->TypeOfResiduals == FdRelDiff) {
+	if (args->TypeOfResiduals == FdRelDiff || args->multiPhase) {
 		fprev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	}
 
@@ -331,26 +329,33 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	}
 
 	FLOAT_TYPE *temp19a_d, *temp19b_d;
-	if(args->multiPhase){
+	if (args->TypeOfResiduals != MacroDiff || args->multiPhase) {
 		temp19a_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 		temp19b_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	}
-	else if (args->TypeOfResiduals != MacroDiff) {
-		temp19a_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
-		temp19b_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
+	FLOAT_TYPE *tempA_d, *tempB_d;
+	if (args->TypeOfResiduals == MacroDiff) {
+		if(!args->multiPhase){
+			tempA_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+			tempB_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+		}
 	}
-	FLOAT_TYPE *tempA_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
-	FLOAT_TYPE *tempB_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
 
 	int *mask = createHostArrayInt(m * n * h, ARRAY_ZERO);
 	unsigned long long *bcMask = createHostArrayLongLong(m * n * h, ARRAY_ZERO);
 	int *bcIdx = createHostArrayInt(m * n * h, ARRAY_ZERO);
 
 	FLOAT_TYPE *u_d, *v_d, *w_d;
-
-	u_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, u1_d);
-	v_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, v1_d);
-	w_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, w1_d);
+	if(args->multiPhase){
+		u_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+		v_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+		w_d = createGpuArrayFlt(m * n * h, ARRAY_ZERO);
+	}
+	else{
+		u_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, u1_d);
+		v_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, v1_d);
+		w_d = createGpuArrayFlt(m * n * h, ARRAY_CPYD, 0, w1_d);
+	}
 
 
 
@@ -532,8 +537,8 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 #if !CUDA
 			streamMP3D(n, m, h, r_f, b_f, r_fColl, b_fColl, stream);
 #else
-//			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
-//			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
+			//			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d);
+			//			gpuStreaming3D<<<bpg1, tpb>>>(fluid_d, stream_d, b_f_d, b_fColl_d);
 			gpuStreaming3DCG<<<bpg1, tpb>>>(fluid_d, stream_d, r_f_d, r_fColl_d, b_f_d, b_fColl_d);
 #endif
 		}
@@ -825,7 +830,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 						u, v, w, rho, nodeType, n, m, h, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																														/ CLOCKS_PER_SEC;
+																																																																																																		/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////

@@ -471,8 +471,152 @@ One of the most significant improvements from implementing the 3D model was that
 The validation of the results was performed by Antonio González \cite{antonioThesis}. To do so, every test case was implemented according to their specific needs. Almost every case was based on the same mesh, a simple square or cube depending on the dimension. The only exception was the Rayleigh-Taylor instability where a rectangular mesh was used. Appendix \textcolor{red}{Ref appendix validation} shows that the model produces correct results for every test case. \par
 The solver has the option of producing results in different formats, .dat, .vti and .csv. .VTI files were the addition of last year's authors and can be read using Paraview \cite{paraview}. The main advantage of these files is that they require significantly less memory than the other formats. Because of this, we are able to save time by transferring the results from Cranfield's HPC center faster and also by making post-processing analysis less time consuming. For this reason, we extended the creation of these files to use the new multiphase model arrays.
 \section{Test cases}\label{sec:testcases}
-The validation of the CG model depends not only on the analysis of the actual result of the simulation, but also in type of test case used. Each test case had different requirements in the software since they depended on different arrays and each used their own type of verification. Because of this, I added the option to change between test 
+The validation of the CG model depends not only on the analysis of the actual result of the simulation, but also in the type of test case used. Each test case had different requirements in the software since they depended on different arrays and each used their own type of verification. Because of this, I added the option to change between test cases as an argument in the setup file. During the execution of the solver, this options allows for a correct initialization of the densities and distribution functions, as well as adequately storing information when needed.
+A total of 6 test cases were implemented for the 2D model and 4 for the 3D model.
+\subsection{Steady bubble} 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/steadyBubble.png}
+		\caption{2D model}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/steadyBubble3d.png}
+		\caption{3D model}
+	\end{subfigure} 
+	\caption{Red fluid density for the Steady bubble case}
+	\label{fig:steady}
+\end{figure} 
+This test aims to simulate a stationary bubble of an immiscible fluid inside another immiscible fluid. Although this test is the simplest physically, it is one the most computationally expensive tests to perform. To validate this test, we need to store the evolution of the surface tension over time. This entails calculating the pressure difference inside and outside the bubble, resulting in 4 additional reduce operations in every iteration. Reduce operations are very expensive in GPUs since these are operations that are dominated by memory access, requesting a heavy amount of memory access inside the GPU as well as when transferring information between the CPU and GPU. We are likely to see an increase in performance when running simulations with other, less computationally demanding test cases. 
+\subsection{Deforming bubble}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/square.png}
+		\caption{2D model}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/square3D.png}
+		\caption{3D model}
+	\end{subfigure} 
+	\caption{Blue fluid density for the deforming bubble case}
+	\label{fig:deforming}
+\end{figure} 
+This test simulates a fluid that starts as a deformed bubble, a square, and eventually converges into a steady, stable bubble. This test is much less computationally expensive. The only verification needed is the difference between the final bubble radius and the predicted radius, which is only done once, at the end of the simulation.  
+
+\subsection{Coalescing bubbles}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/coal.png}
+		\caption{2D model}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/coal3d.png}
+		\caption{3D model}
+	\end{subfigure} 
+	\caption{Blue fluid density for the coalescing bubbles case}
+	\label{fig:coalescence}
+\end{figure} 
+This test simulates the coalescence of two bubbles of the same fluid inside another fluid. The bubbles start by having only a small point of contact between each other and then eventually coalesce into a bigger, steady bubble. As was the case with the deforming bubble test, in this scenario we only need to compare the final radius of the bubble with a predicted one, making this test also less computationally demanding. 
+
+\subsection{Oscillating bubble}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{Resources/Images/oscil.png}
+	\caption{Blue fluid density for the 2D oscillating bubble}
+	\label{fig:oscil}
+\end{figure}
+In this test, a bubble following an ellipsoid is created inside another fluid. The bubble then starts oscillating vertically and horizontally until it stabilizes into a steady bubble. For this test case, we need to find out the maximum height in y of the interface between the two fluids. This implies more computations and memory accesses per iteration which will hinder the solver's performance. This is needed so we can obtain a profile of the bubble's oscillation which will later be post-processed at the end of the simulation.  
+
+
+\subsection{Couette flow}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/couette.png}
+		\caption{2D model}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\includegraphics[width=\linewidth]{Resources/Images/couette3D.png}
+		\caption{3D model}
+	\end{subfigure} 
+	\caption{X velocity with a few iterations using the Couette flow case.}
+	\label{fig:couette}
+\end{figure} 
+All of the previous tests were not fully using all the initial parameters, they were tests where the external conditions were of no great importance. To fully test our new model, we decided to test conditions where the boundaries of the mesh were not all periodic, and so we decided to test the Couette flow. In this case, the north boundary is an inlet with a constant velocity in x, while the south boundary is a wall where the fluid bounces back from. Once again, this test is also less computationally demanding since we only need to verify the profile of the velocity once at the end of the simulation. 
+
+\subsection{Rayleigh-Taylor instability}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\linewidth]{Resources/Images/rt.png}
+	\caption{Blue fluid density for the 2D Rayleigh-Taylor instability}
+	\label{fig:rt}
+\end{figure}
+In this test, a bubble following an ellipsoid is created inside another fluid. The bubble then starts oscillating vertically and horizontally until it stabilizes into a steady bubble. The needs for this case are similar to the oscillating bubble case, but instead of calculating the maximum height of the interface we calculate the minimum. Because of the same memory access and number of computations, this is the third most computationally expensive test in the new LBM solver.
+
 \section{Memory usage}
+The amount of memory used is a crucial factor when performing large scale simulations. Even more so if we want the results to mimic real-word scenarios. For this reason, I have performed an analysis on the amount of memory that the new Color Gradient model requires on the LBM solver from the GPU. Tables \ref{tab:2dmem} and \ref{tab:3dmem} show the amount of memory used by the 2D and 3D mesh containing 128 nodes in each direction.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Variables}              & \textbf{Variable size}   & \textbf{Memory (MB)} \\ \hline
+		\textbf{Initialization}         & $3 * m * n$              & 0.1875               \\ \hline
+		\textbf{BC initialization}      & $7 * N_{Conn}$           & 0.0399475098         \\ \hline
+		\textbf{Macroscopic values}     & $9 * m * n$              & 0.5625               \\ \hline
+		\textbf{Boundary conditions}    & $16 * N_{BC}$            & 0.0302734375         \\ \hline
+		\textbf{Distribution functions} & $6 * 9 * m * n$          & 3.375                \\ \hline
+		\textbf{Residuals}              & $3 * 9 * m * n$          & 1.6875               \\ \hline
+		\textbf{Temporary values}       & $5 * m * n$              & 0.3125               \\ \hline
+		\textbf{Temporary values 2}     & $8 * m * n $        	   & 0.5                    \\ \hline
+		\textbf{Sum}                    &                          & ~6.7         \\ \hline
+	\end{tabular}	
+	\caption{2D memory usage for Cavity 128 with Single precision}
+	\label{tab:2dmem}
+\end{table}
+
+For the 2D model, we see that the solver requires a small amount of memory, which is normal since a 128x128 is considered a coarse mesh for 2D problems. We could easily increase the number of nodes computed without affecting the required memory in a significant manner. 
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Variables}              & \textbf{Variable size}   & \textbf{Memory (MB)} \\ \hline
+		\textbf{Initialization}         & $4 * m * n * h$          & 32                   \\ \hline
+		\textbf{BC initialization}      & $8 * N_{Conn}$           & 14.953125            \\ \hline
+		\textbf{Macroscopic values}     & $9 * m * n * h$          & 72                   \\ \hline
+		\textbf{Boundary conditions}    & $3 * N_{BC}$             & 0.0115356445         \\ \hline
+		\textbf{Distribution functions} & $6 * 19 * m * n * h$     & 912                  \\ \hline
+		\textbf{Residuals}              & $3 * 19 * m * n * h$     & 456                  \\ \hline
+		\textbf{Temporary values}       & $5 * m * n * h$          & 40                   \\ \hline
+		\textbf{Temporary values 2}     & $18 * m * n * h$         & 144                  \\ \hline
+		\textbf{Sum}                    &                          & ~1562.964      \\ \hline
+	\end{tabular}
+	\caption{3D memory usage for Cavity 128 with Single precision}
+	\label{tab:3dmem}
+\end{table}
+
+In the 3D model, the memory usage is on a completely different scale. We now see that for the same mesh as in Table \ref{tab:2dmem}, extended to another direction, the used memory increases approximately 233 times. This makes the memory used by the 2D model almost insignificant when compared with the 3D version.\par
+To further analyze what this increase in memory means, I have prepared Table \ref{tab:memCG} showing the different memory requirements for both single and double precision and comparing between a 128 and 256 sized mesh.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		\textbf{Type}    & \textbf{Nodes} & \textbf{Single precision} & \textbf{Double precision} \\ \hline
+		\textbf{2D\_128} & 16384          & 6.32                      & 11.7                      \\ \hline
+		\textbf{2D\_256} & 65536          & 24                        & 46.57                     \\ \hline
+		\textbf{3D\_128} & 2097152        & 1563                      & 3026                      \\ \hline
+		\textbf{3D\_256} & 16777216       & 12336                     & 24054                     \\ \hline
+	\end{tabular}
+	\caption{Memory usage for the Color Gradient model in MB}
+	\label{tab:memCG}
+\end{table}
+
+We can now clearly see how the memory used by the solver is one of the most important aspects to take into account. In fact, the memory requirements are so big in some cases (for the 3D, 256 sized mesh) that we cannot test the solver against this type of mesh since the maximum available global memory in a Cranfield's GPU is 11440 MBytes. \par
+There were some ways to decrease this memory requirement. We could eliminate one of the distribution functions (and add more calculations to compensate) or change the residuals calculation to be based on the macroscopic variables instead of the distribution function. However, we found that these changes would imply a decrease in the solver's accuracy and stability, for which we chose to not implement these "improvements" in the final version of the solver.
+
 \section{Performance of the parallel code}\label{sec:performance}
 \subsection{2D model}
 \subsubsection{Normal distribution function v1.0}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  9 AUG 2017 23:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  11 AUG 2017 02:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -927,29 +927,100 @@ Package pdftex.def Info: Resources/Images/setupCG.png used on input line 441.
 LaTeX Warning: Citation `antonioThesis' on page 40 undefined on input line 471.
 
 
-[40] [41]
-Overfull \vbox (17.18576pt too high) has occurred while \output is active []
+[40] <Resources/Images/steadyBubble.png, id=244, 720.6925pt x 608.2725pt>
+File: Resources/Images/steadyBubble.png Graphic file (type png)
 
+<use Resources/Images/steadyBubble.png>
+Package pdftex.def Info: Resources/Images/steadyBubble.png used on input line 4
+80.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
 
-[42]
+<Resources/Images/steadyBubble3d.png, id=245, 720.6925pt x 608.2725pt>
+File: Resources/Images/steadyBubble3d.png Graphic file (type png)
+
+<use Resources/Images/steadyBubble3d.png>
+Package pdftex.def Info: Resources/Images/steadyBubble3d.png used on input line
+ 484.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+ [41]
+<Resources/Images/square.png, id=249, 720.6925pt x 608.2725pt>
+File: Resources/Images/square.png Graphic file (type png)
+
+<use Resources/Images/square.png>
+Package pdftex.def Info: Resources/Images/square.png used on input line 495.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+
+<Resources/Images/square3D.png, id=250, 720.6925pt x 608.2725pt>
+File: Resources/Images/square3D.png Graphic file (type png)
+
+<use Resources/Images/square3D.png>
+Package pdftex.def Info: Resources/Images/square3D.png used on input line 499.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+ [42 <./Resources/Images/steadyBubble.png> <./Resources/Images/steadyBubble3d.p
+ng>]
+<Resources/Images/coal.png, id=256, 720.6925pt x 608.2725pt>
+File: Resources/Images/coal.png Graphic file (type png)
+
+<use Resources/Images/coal.png>
+Package pdftex.def Info: Resources/Images/coal.png used on input line 511.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+
+<Resources/Images/coal3d.png, id=257, 720.6925pt x 608.2725pt>
+File: Resources/Images/coal3d.png Graphic file (type png)
+
+<use Resources/Images/coal3d.png>
+Package pdftex.def Info: Resources/Images/coal3d.png used on input line 515.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+ [43 <./Resources/Images/square.png> <./Resources/Images/square3D.png>]
+<Resources/Images/oscil.png, id=263, 720.6925pt x 608.2725pt>
+File: Resources/Images/oscil.png Graphic file (type png)
+
+<use Resources/Images/oscil.png>
+Package pdftex.def Info: Resources/Images/oscil.png used on input line 526.
+(pdftex.def)             Requested size: 384.1096pt x 324.19278pt.
+ [44 <./Resources/Images/coal.png> <./Resources/Images/coal3d.png>]
+<Resources/Images/couette.png, id=269, 720.6925pt x 608.2725pt>
+File: Resources/Images/couette.png Graphic file (type png)
+
+<use Resources/Images/couette.png>
+Package pdftex.def Info: Resources/Images/couette.png used on input line 537.
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+
+<Resources/Images/couette3D.png, id=270, 720.6925pt x 608.2725pt>
+File: Resources/Images/couette3D.png Graphic file (type png)
+
+<use Resources/Images/couette3D.png>
+Package pdftex.def Info: Resources/Images/couette3D.png used on input line 541.
+
+(pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
+ [45 <./Resources/Images/oscil.png>]
+<Resources/Images/rt.png, id=276, 497.86pt x 793.96625pt>
+File: Resources/Images/rt.png Graphic file (type png)
+
+<use Resources/Images/rt.png>
+Package pdftex.def Info: Resources/Images/rt.png used on input line 552.
+(pdftex.def)             Requested size: 213.39568pt x 340.3206pt.
+ [46 <./Resources/Images/couette.png> <./Resources/Images/couette3D.png>] [47 <
+./Resources/Images/rt.png>] [48] [49] [50]
+[51] [52
+
+]
 Chapter 5.
-(./Draft.bbl [43
+(./Draft.bbl [53] [54
 
-] [44
-
-] [45] [46]) [47] (./Draft.aux)
+] [55] [56]) [57] (./Draft.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4962 strings out of 494953
- 71435 string characters out of 6180977
- 141703 words of memory out of 5000000
- 8109 multiletter control sequences out of 15000+600000
+ 5023 strings out of 494953
+ 73005 string characters out of 6180977
+ 144805 words of memory out of 5000000
+ 8160 multiletter control sequences out of 15000+600000
  35273 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 38i,8n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,11n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist
@@ -960,10 +1031,10 @@ pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmri8a.pfb>
-Output written on Draft.pdf (63 pages, 1834099 bytes).
+Output written on Draft.pdf (73 pages, 2101780 bytes).
 PDF statistics:
- 302 PDF objects out of 1000 (max. 8388607)
- 200 compressed objects within 2 object streams
+ 356 PDF objects out of 1000 (max. 8388607)
+ 223 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 71 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 121 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -289,7 +289,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 	int *stream_d = createGpuArrayInt(8 * m * n, ARRAY_COPY, 0, stream);
 
-
+	printf("Boundary %d %d\n",numConns, bcCount);
 
 	if(args->multiPhase && args->test_case == 2) //only for couette
 	{

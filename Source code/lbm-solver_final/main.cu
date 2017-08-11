@@ -52,14 +52,14 @@ int main(int argc, char* argv[]) {
 	args.multiPhase = 1;
 	if(args.multiPhase){
 		args.r_density = 1.0;
-		args.gamma = 100.0;
+		args.gamma = 1.0;
 		args.kappa = 1.0;
 		args.b_alpha = 4.0 / 9.0;
-		args.r_viscosity = 1. / 30.;
+		args.r_viscosity = 0.5;
 		//args.b_viscosity = args.r_viscosity / args.kappa * args.gamma;
-		args.b_viscosity = 1. / 30.;
+		args.b_viscosity = 0.5;
 		args.beta = 0.99;
-		args.A = 0.01875;
+		args.A = 0.001;
 		args.control_param = 0.9;
 		args.g_limit = 0;
 		args.bubble_radius = 18.0;

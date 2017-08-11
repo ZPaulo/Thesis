@@ -18,4 +18,10 @@
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Overall time comparison using three different threads per block configuration\relax }}{34}
 \contentsline {figure}{\numberline {4.5}{\ignorespaces Setup file for the LBM solver\relax }}{36}
 \contentsline {figure}{\numberline {4.6}{\ignorespaces Initial arguments for the Color Gradient model\relax }}{37}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Red fluid density for the Steady bubble case\relax }}{42}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Blue fluid density for the deforming bubble case\relax }}{43}
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Blue fluid density for the coalescing bubbles case\relax }}{44}
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Blue fluid density for the 2D oscillating bubble\relax }}{45}
+\contentsline {figure}{\numberline {4.11}{\ignorespaces X velocity with a few iterations using the Couette flow case.\relax }}{46}
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Blue fluid density for the 2D Rayleigh-Taylor instability\relax }}{47}
 \addvspace {10\p@ }
