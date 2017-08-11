@@ -618,6 +618,24 @@ We can now clearly see how the memory used by the solver is one of the most impo
 There were some ways to decrease this memory requirement. We could eliminate one of the distribution functions (and add more calculations to compensate) or change the residuals calculation to be based on the macroscopic variables instead of the distribution function. However, we found that these changes would imply a decrease in the solver's accuracy and stability, for which we chose to not implement these "improvements" in the final version of the solver.
 
 \section{Performance of the parallel code}\label{sec:performance}
+In this section, we will analyze and discuss the performance obtained throughout the various stages of development of the code. We will first compare optimizations techniques employed, followed by the usage of different code and compiler features. We will then compare the different hardware used and finally the impact in performance between using double and single precision. 
+\subsection{GPU specification}
+To perform the tests, we first need the hardware on which to perform the tests on. Since we are using CUDA, we must obviously use machines with NVIDIA GPUs. Table \ref{tab:specs} shows the specification of the characteristics of each machine's GPU. GRID and Delta are a part of Cranfield's HPC center, while the laptop is my own personal laptop with a less powerful GPU.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|c|c|c|}
+		\hline
+		\multicolumn{1}{|c|}{\textbf{}} & \textbf{GRID} & \textbf{Delta} & \textbf{Personal laptop} \\ \hline
+		\textbf{GPU}                    & Tesla K40m    & Tesla K80      & GeForce GTX 850M         \\ \hline
+		\textbf{Memory}                 & 12288 MB      & 11440 MB       & 4044 MB                  \\ \hline
+		\textbf{CUDA capability}        & 3.5           & 3.7            & 5.0                       \\ \hline
+		\textbf{CUDA cores}             & 2880          & 2496           & 640                      \\ \hline
+		\textbf{GPU clock rate}         & 745 MHz       & 824 MHz        & 902 MHz                  \\ \hline
+		\textbf{Mem. clock rate}        & 3004 MHz      & 2505 MHz       & 1001 MHz                 \\ \hline
+	\end{tabular}
+	\caption{Specification of the used GPUs}
+	\label{tab:specs}
+\end{table}
 \subsection{2D model}
 \subsubsection{Normal distribution function v1.0}
 \subsubsection{Enhanced distribution function v2.0}
