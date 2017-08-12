@@ -553,7 +553,7 @@ All of the previous tests were not fully using all the initial parameters, they 
 	\caption{Blue fluid density for the 2D Rayleigh-Taylor instability}
 	\label{fig:rt}
 \end{figure}
-In this test, a bubble following an ellipsoid is created inside another fluid. The bubble then starts oscillating vertically and horizontally until it stabilizes into a steady bubble. The needs for this case are similar to the oscillating bubble case, but instead of calculating the maximum height of the interface we calculate the minimum. Because of the same memory access and number of computations, this is the third most computationally expensive test in the new LBM solver.
+Finally, we chose to implement the Rayleigh-Taylor instability since in this test we can adequately test the functionalities of our CG model. Here, a heavy fluid is set on top of another, lighter fluid. Then the heavier fluid starts descending with the force of gravity and eventually starts creating vortices in the other fluid. The needs for this case are similar to the oscillating bubble case, but instead of calculating the maximum height of the interface we calculate the minimum. Because of the same memory access and number of computations, this is the third most computationally expensive test in the new LBM solver.
 
 \section{Memory usage}
 The amount of memory used is a crucial factor when performing large scale simulations. Even more so if we want the results to mimic real-word scenarios. For this reason, I have performed an analysis on the amount of memory that the new Color Gradient model requires on the LBM solver from the GPU. Tables \ref{tab:2dmem} and \ref{tab:3dmem} show the amount of memory used by the 2D and 3D mesh containing 128 nodes in each direction.

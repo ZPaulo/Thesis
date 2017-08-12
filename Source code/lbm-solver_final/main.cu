@@ -59,11 +59,11 @@ int main(int argc, char* argv[]) {
 		//args.b_viscosity = args.r_viscosity / args.kappa * args.gamma;
 		args.b_viscosity = 0.5;
 		args.beta = 0.99;
-		args.A = 0.001;
+		args.A = 0.0001;
 		args.control_param = 0.9;
 		args.g_limit = 0;
 		args.bubble_radius = 18.0;
-		args.test_case = 5;
+		args.test_case = 1;
 		args.external_force = 0; //0 is gravity, 1 for pressure difference
 		args.high_order = 0; // order of color gradient
 		args.enhanced_distrib = 0; // 1 to use enhanced

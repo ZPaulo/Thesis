@@ -300,9 +300,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 
 	FLOAT_TYPE *f_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
-	FLOAT_TYPE *f1_d, *fprev_d;
+	FLOAT_TYPE *f1_d;
 	if (args->TypeOfResiduals == FdRelDiff || args->multiPhase) {
-		fprev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
+		f_prev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	}
 
 #if CUDA
@@ -431,7 +431,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	};
 
 	void *FDdifGpuArrays[] = {
-			fprev_d, f1_d
+			f_prev_d, f1_d
 	};
 
 	void *nonMacroDiffGpuArrays[] = {
@@ -676,7 +676,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 				if (args->TypeOfResiduals == FdRelDiff) {
 					if(args->multiPhase){
 #if !CUDA
-						CHECK(cudaMemcpy(f_d,r_f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+						CHECK(cudaMemcpy(f_d,f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
 #endif
 					}
 
@@ -686,10 +686,10 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 								f_d);
 
 					}
-					r = computeNewResidual3D(f_d, fprev_d, f1_d, temp19a_d,
+					r = computeNewResidual3D(f_d, f_prev_d, f1_d, temp19a_d,
 							temp19b_d, m, n, h);
-					CHECK(cudaFree(fprev_d));
-					fprev_d = createGpuArrayFlt(19 * n * m * h, ARRAY_CPYD, 0,
+					CHECK(cudaFree(f_prev_d));
+					f_prev_d = createGpuArrayFlt(19 * n * m * h, ARRAY_CPYD, 0,
 							f_d);
 
 				} else {
@@ -736,8 +736,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 					}
 
 					if(args->multiPhase){
-						CHECK(cudaFree(f_prev_d));
-						f_prev_d = createGpuArrayFlt(n * m * h * 19, ARRAY_CPYD, 0, f_d);
+						CHECK(cudaMemcpy(f_prev_d,f_d,SIZEFLT(m*n*h*19),cudaMemcpyDeviceToDevice));
 					}else{
 						writeMacroDiffs(iter + 1, uMaxDiff, vMaxDiff, wMaxDiff,	rhoMaxDiff);
 						CHECK(cudaFree(u_prev_d));
