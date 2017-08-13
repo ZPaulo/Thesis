@@ -65,21 +65,21 @@
 \contentsline {subsection}{\numberline {4.6.1}GPU specification}{51}
 \contentsline {subsection}{\numberline {4.6.2}2D model}{51}
 \contentsline {subsubsection}{Normal distribution function v1.0}{51}
-\contentsline {subsubsection}{Enhanced distribution function v2.0}{53}
-\contentsline {subsubsection}{Optimizations v2.1}{54}
-\contentsline {subsubsection}{Loop unrolling v2.2}{55}
-\contentsline {subsubsection}{Final version v2.3}{57}
-\contentsline {subsubsection}{High order color gradient}{58}
-\contentsline {subsubsection}{CUDA compute capability}{59}
-\contentsline {subsection}{\numberline {4.6.3}3D model}{60}
-\contentsline {subsubsection}{Enhanced distribution function v1.0}{61}
-\contentsline {subsubsection}{Final version v1.1}{62}
-\contentsline {subsubsection}{High order color gradient}{63}
-\contentsline {subsubsection}{CUDA compute capability}{63}
-\contentsline {subsection}{\numberline {4.6.4}Hardware}{63}
-\contentsline {subsection}{\numberline {4.6.5}Double vs Single}{63}
-\contentsline {chapter}{\numberline {5}Conclusions}{65}
-\contentsline {chapter}{Appendix}{71}
-\contentsline {section}{\numberline {.1}Performance}{71}
-\contentsline {section}{\numberline {.2}Validation}{71}
-\contentsline {section}{\numberline {.3}Code}{71}
+\contentsline {subsubsection}{Enhanced distribution function v2.0}{54}
+\contentsline {subsubsection}{Optimizations v2.1}{55}
+\contentsline {subsubsection}{Loop unrolling v2.2}{56}
+\contentsline {subsubsection}{Final version v2.3}{58}
+\contentsline {subsubsection}{High order color gradient}{60}
+\contentsline {subsubsection}{CUDA compute capability}{61}
+\contentsline {subsection}{\numberline {4.6.3}3D model}{62}
+\contentsline {subsubsection}{Enhanced distribution function v1.0}{63}
+\contentsline {subsubsection}{Final version v1.1}{64}
+\contentsline {subsubsection}{High order color gradient}{66}
+\contentsline {subsubsection}{CUDA compute capability}{67}
+\contentsline {subsection}{\numberline {4.6.4}Hardware}{68}
+\contentsline {subsection}{\numberline {4.6.5}Serial vs Parallel}{69}
+\contentsline {chapter}{\numberline {5}Conclusions}{73}
+\contentsline {chapter}{Appendix}{79}
+\contentsline {section}{\numberline {.1}Performance}{79}
+\contentsline {section}{\numberline {.2}Validation}{79}
+\contentsline {section}{\numberline {.3}Code}{79}

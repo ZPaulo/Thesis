@@ -24,7 +24,8 @@
 % following line.
 %\renewcommand{\familydefault}{\sfdefault}
 
-\title{Development of Physics or HPC Optimisation of a parallel 2D lattice Boltzmann solver using GPUs/CUDA}
+\title{Multiphase implementation on a parallel 2D/3D Lattice Boltzmann solver
+	using GPGPUs}
 \author{José Oliveira}
 \date{August 2017}
 \school{Aerospace, Transport and Manufacturing}
@@ -544,7 +545,7 @@ In this test, a bubble following an ellipsoid is created inside another fluid. T
 	\caption{X velocity with a few iterations using the Couette flow case.}
 	\label{fig:couette}
 \end{figure} 
-All of the previous tests were not fully using all the initial parameters, they were tests where the external conditions were of no great importance. To fully test our new model, we decided to test conditions where the boundaries of the mesh were not all periodic, and so we decided to test the Couette flow. In this case, the north boundary is an inlet with a constant velocity in x, while the south boundary is a wall where the fluid bounces back from. Once again, this test is also less computationally demanding since we only need to verify the profile of the velocity once at the end of the simulation. 
+All of the previous tests were not fully using the initial parameters, they were tests where the external conditions were of no great importance. To fully test our new model, we decided to test conditions where the boundaries of the mesh were not all periodic, and so we decided to test the Couette flow. In this case, the north boundary is an inlet with a constant velocity in x, while the south boundary is a wall where the fluid bounces back from. Once again, this test is also less computationally demanding since we only need to verify the profile of the velocity once at the end of the simulation. 
 
 \subsection{Rayleigh-Taylor instability}
 \begin{figure}[H]
@@ -637,8 +638,10 @@ To perform the tests, we first need the hardware on which to perform the tests o
 	\caption{Specification of the used GPUs}
 	\label{tab:specs}
 \end{table}
+
 \subsection{2D model}
 We will now present the results obtained in the major stages of the implementation. Each result was executed using a square mesh containing 128 nodes in both directions. We choose to display the results using this mesh since it was the mesh used for every test case and also the most commonly used in the 2D model.
+
 \subsubsection{Normal distribution function v1.0}
 This version of the code was the first parallel version using the Color Gradient model. In it, we specify the collision frequency to be used in the collision step in the initialization of the solver. Also, we calculate the perturbation operator for each distribution function, as well as the single phase collision step and recoloring operator.
   
@@ -651,7 +654,17 @@ This version of the code was the first parallel version using the Color Gradient
   
   In this version, the personal laptop displays the expected results. Double precision takes longer to compute than the single precision and both are acceptable times for 10000 iterations using a mesh containing $128x128$ nodes. \par
   In the Delta machine results follow a different trend. Although it displays a better performance than the laptop for double precision, this does not happen for single precision. Furthermore, the difference in performance was very small, which should not happen with different precisions. However, this can be explained due to Delta's different GPU configuration. This machine is essentially two K40's joined together through shared memory and a common PCI bus, each card containing 2 GPUs. Also, Delta has extensive hardware power management, meaning that the GPU will take longer to start warming up. Small problems, like most using 2D models, might be too small too notice the better performance of this GPU. Another explanation can be the fact that Delta is a newly implemented machine in Cranfield's HPC center. Some optimizations techniques might not be lacking to fully exploit the machine's performance.\par
-  In the Grid, we encountered some portability issues, where the solver was diverging when using single precision, most likely due to a memory access that behaves differently on this machine and eventually produces NaN values. However, we can clearly see that this machine obtains better performance that the others using double precision, making it a potentially better candidate for running the CG simulations, provided that the single precision issue disappears.  
+  In the Grid, we encountered some portability issues, where the solver was diverging when using single precision, most likely due to a memory access that behaves differently on this machine and eventually produces NaN values. However, we can clearly see that this machine obtains better performance that the others using double precision, making it a potentially better candidate for running the CG simulations, provided that the single precision issue disappears.\par
+  To optimize code, we need to have a clear understanding of where the solver is spending most of it's time. As mentioned before, the solver is composed of an initialization stage, the iteration stage and the final stage where we write our solution to file. It is in the iterations stage that the solver spends almost 97\% of it's time, making it the obvious candidate for improvements. However, we still need to know which part of the iteration to focus on. 
+  
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/v1profile.png}
+    	\caption{Code profiling for v1.0 using single precision in the laptop}
+    	\label{fig:v1profile}
+    \end{figure}
+    
+    Figure \ref{fig:v1profile} shows the main steps of the iteration. Here we can see that the solver spends more time per iteration in the collision, residuals and macroscopic step. The residuals are already optimize, all the reductions are built in the most efficient way and so the only alternative to reduce time spent in this stage is by calculating the residuals on variables other than the distribution function, which would not display the correct convergence for our case. The Macroscopic step is also very straight-forward, there is not much we can do apart from selecting a different test case. This leaves us with the collision step, which is where we will focus our optimization efforts.
   
 \subsubsection{Enhanced distribution function v2.0}
 After validating version 1.0, we decided that it would be best if we could increase the numerical accuracy of the solver, which would help in validating some test cases. We also wanted to increase the solver's performance, and so we decided to implement an enhanced version of the equilibrium distribution function, which should help achieve both goals. This version would replace the calculation of the collision frequency to make it being updated in every iteration and eliminate the need for calculating the perturbation and single phase collision operator for both distribution functions. We would only need to calculate them for another distribution function that would be the sum of both fluids.\par
@@ -711,6 +724,16 @@ Finally, we decided to make one last effort to increase the code's performance a
   \end{figure}
   
   Again we can see a slight improvement in the solver's performance, except for Delta's double precision, but again, this can be explained to a higher overhead time. Although small, these changes will be propagated to the 3D model where we will hopefully see a bigger difference.
+  
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/vfvprofile.png}
+  	\caption{Code profiling for the final version using single precision in the laptop}
+  	\label{fig:vfvprofile}
+  \end{figure}
+  
+  By analyzing the code's profiling again, we can confirm that the optimization was successful. Although the final run-times shows little difference in regards to the previous version, we can see that there was a reduction of about 44\% in the collision step, which was where our optimization efforts took place.
+  
 \subsubsection{High order color gradient}
 To further analyze the influence of the calculation of the color gradient in the solver's performance, we have implemented a higher order version of this phase of the collision step. A higher order color gradient means more accuracy in the final solution, at the cost of degrading the system's performance.\par
 It is important to see how the collision step affects the total runtime of the iteration, since this is where the order of the color gradient will have most impact. To avoid analyzing a complicated chart, the chart containing the run-times for all machines can be found in the Appendix, Section \ref{app:perfo}.
@@ -749,7 +772,17 @@ Unlike in the 2D model, in the 3D version we decided to start the implementation
   	\label{fig:v13d}
   \end{figure}
  
- However, this version suffered from portability issues in Delta, most likely due to faulty memory accesses. Figure \ref{fig:v13d} shows the run-times for version 1.0 in the Grid. We now have much bigger run-times since the scale of the program has also increased. Now, the difference between double and single precision is much more noticeable, and so will, hopefully, the changes between optimizations. 
+ However, this version suffered from portability issues in Delta, most likely due to faulty memory accesses. Figure \ref{fig:v13d} shows the run-times for version 1.0 in the Grid. We now have much bigger run-times since the scale of the program has also increased. Now, the difference between double and single precision is much more noticeable, and so will, hopefully, the changes between optimizations. \par
+ Before optimizing, we need to follow the same procedure to find out what part of the code deserves more attention in order to produce the best results.
+ 
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/v13dprofile.png}
+    	\caption{Code profiling for v1.0 using single precision in the Grid}
+    	\label{fig:v13dprofile}
+    \end{figure}
+ 
+ From Figure \ref{fig:v13dprofile} we can easily see that the 3D model's iteration is dominated by the collision step, occupying almost 50\% of each iteration's time. We will focus our efforts increasing the performance of this sub-step, which will, hopefully, have a positive impact on the solver's overall run-time.
  
 \subsubsection{Final version v1.1}
 We then applied the same changes that were applied in the 2D model. We unrolled the loops inside the kernel calls and improved the way that the distribution function was being calculated. All of these changes were done together since we knew from the 2D model that they had a positive effect on the final result. In this version, we did not test the manually unrolled loops. No matter how good the performance could be (which should be a couple of seconds more), Figure \ref{fig:unrollComp} shows how much worse the code gets when this technique is used for this model, even more so if we take into account that from 2D to 3D the loops increase from 9 iterations to 19, making it even harder to manually unroll them.
@@ -761,10 +794,70 @@ We then applied the same changes that were applied in the 2D model. We unrolled 
   	\label{fig:vfv3d}
   \end{figure}
   
+  We can easily that the optimization was a success. The difference between versions is also much more noticeable than in the 2D model, which is normal for bigger problems. Furthermore, Delta's portability issue was also fixed when creating the final version of the solver, making it now possible to also use this machine to run the LBM solver.
+  
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/vfv3dprofile.png}
+    	\caption{Code profiling for the final version using single precision in the Grid}
+    	\label{fig:vfv3dprofile}
+    \end{figure}
+  
+  Figure \ref{fig:vfv3dprofile} further shows that the optimizations had a big impact on the computation of the collision step. All the other sub-steps remained roughly the same, while in the collision step was reduced by about 44\%, just like in the 2D model. However, since the 3D model was dominated by the collision step, this reduction had a much bigger impact on the solver's final runtime, making it perform much faster. 
+  
 \subsubsection{High order color gradient}
+As we did for the 2D model, we also studied the effect of the higher order color gradient on the 3D model. Since this model is dominated by the collision step, we expect to see a much bigger decrease in performance than we did in the 2D model.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/highgrid.png}
+  	\caption{Runtime comparison between low and high order color gradient in the Grid}
+  	\label{fig:highgrid}
+  \end{figure}
+  
+  Using a high order color gradient presented yet another portability issue, since the solution was diverging in Delta, therefore we can only show the results obtained in the Grid. Once again, performance gets worse when using the higher order color gradient. The time spent per collision more than doubles, having a big impact on the final run-time of the solution. We consider this higher order to having more disadvantages than advantages, but once again we leave the option to execute the solver using the higher order color gradient.
+
+
 \subsubsection{CUDA compute capability}
+Finally, we will also compute the final version using the correct compute capability on each machine to study how this affects the solver's performance.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/cc3d.png}
+  	\caption{Runtime comparison for the C. capability version with the final version}
+  	\label{fig:cc3d}
+  \end{figure}
+  
+  Although the compute capability has almost no effect in the final performance, this is not the case for Delta's Double precision. In fact, we can now confirm that Delta is a machine more oriented to fine precision tuning, where the configurations of the compiler will have a bigger impact on the final performance. It is because of this that we can see such a big difference in the final run-times, making it obvious that one should always use the GPU's proper compute capability.
+
 \subsection{Hardware}
-\subsection{Double vs Single}
+After analyzing all of the obtained results and comparing them with one another, we feel that the choice of the hardware is deeply connected with the type of problem to compute. If, for example, the problems being executed are small (around 16384 nodes), the user would benefit more by using a commercial GPU. While still producing fast results, the major downside from using these types of GPUs is the amount of global memory available. Double precision is also not optimal, but this is easily offset by how cheap one these GPUs can be. Overall, for the 2D problems, the laptop's GPU was perfectly adequate, even more so if we consider how much time one spends by developing code on one system but testing it on another. \par
+This is not the case for the 3D model. In 3D, we have much more nodes to compute, meaning that it will not be just time that we will need to spend, but also memory. In these cases, the laptop simply is not powerful enough to justify using it over the faster, better HPC GPU's. But between Delta and Grid, we would have to recommend using Grid. Although Delta has a newer, faster GPU cluster, we could not replicate these factors in our solver. In almost every case, Delta performs worse than the Grid. However, this can be because of the precise tuning required by Delta. Also, if one would change the solver to take advantage of not just one, but multiple GPU cards, then it is very likely that we would be able to see Delta's potential and prefer using it over the Grid.
+\subsection{Serial vs Parallel}
+Finally, we will present the increase in performance after going from serial to parallel, both in 2D and in 3D. The results will be shown solely using the Delta machine. This is because there were some problems getting the serial code to work on the Grid and it is not feasible to run the 3D serial code in the laptop. Furthermore, the solver was set to run with 1000 iterations, as these are more than enough to see the advantages of going parallel. \par 
+The final version of the code still contains the serial implementation as it may be useful in the future if this project is continued to have access to a "sandbox" area, where modifications and tests can be made without affecting the actual solver.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/serialDelta.png}
+  	\caption{Runtime comparison between serial and parallel 2D model for 1000 iterations}
+  	\label{fig:serial}
+  \end{figure}
+  
+  Figure \ref{fig:serial} shows that our parallelization was indeed successful. The serial code's final run-time was upgraded in almost 20 times to the parallel version. Note that the 2D serial version was fast enough to be able to perform tests on it.
+  
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=0.8\linewidth]{Resources/Images/serialDelta3D.png}
+    	\caption{Runtime comparison between serial and parallel 3D model for 1000 iterations}
+    	\label{fig:serial3d}
+    \end{figure}
+    
+    Figure \ref{fig:serial3d} shows the full potential of going from a serial to parallel version. It was impossible to perform meaningful tests on the 3D serial version. For a smallish mesh, running for only 1000 iterations, the serial version took almost 2 hours. Performing tests and validating the model under these conditions would take far too long to complete. However, by parallelizing the workload, we were able to reduce the runtime in about 176 times. The same 2 hours now only took about 40 seconds to complete, meaning that we could now perform modifications, tests and validations as desired.
+
+\subsection{2D vs 3D}
+We conclude this chapter by comparing the performance of the 2D model against the 3D model. A new metric must be defined to accurately show this, since it is obvious that under the same conditions the 3D model would take longer to process. We will show the results using MLUPS instead of seconds. MLUPS stands for Millions of nodes Updated Per Second. 
+
 \chapter{Conclusions}
 
 %% Back matter

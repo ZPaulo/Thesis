@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  13 AUG 2017 15:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  13 AUG 2017 19:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -566,19 +566,19 @@ LaTeX Info: Redefining \] on input line 2736.
 ) (./Draft.aux)
 \openout1 = `Draft.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 38.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 39.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -684,20 +684,20 @@ Package caption Info: End \AtBeginDocument code.
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 49.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 50.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <17.28> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 49.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 50.
  [3] [4
 
 ]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <24.88> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 53.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 54.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 55.
  [5
 
 ] [6
@@ -740,14 +740,14 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
 \openout3 = `Draft.toc'.
 
  [8]
-(./Draft.lof)
+(./Draft.lof [9
+
+
+])
 \tf@lof=\write4
 \openout4 = `Draft.lof'.
 
- [9
-
-
-] [10] (./Draft.lot)
+ [10] (./Draft.lot)
 \tf@lot=\write5
 \openout5 = `Draft.lot'.
 
@@ -769,40 +769,40 @@ Chapter 1.
 ]
 Chapter 2.
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 94.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 95.
 [3]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 113.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 114.
  [4] <Resources/Images/d2q9.png, id=70, 361.35pt x 352.31625pt>
 File: Resources/Images/d2q9.png Graphic file (type png)
 
 <use Resources/Images/d2q9.png>
-Package pdftex.def Info: Resources/Images/d2q9.png used on input line 128.
+Package pdftex.def Info: Resources/Images/d2q9.png used on input line 129.
 (pdftex.def)             Requested size: 128.0387pt x 124.83928pt.
  [5]
 <Resources/Images/d3q19.png, id=74, 677.53125pt x 557.83406pt>
 File: Resources/Images/d3q19.png Graphic file (type png)
 
 <use Resources/Images/d3q19.png>
-Package pdftex.def Info: Resources/Images/d3q19.png used on input line 135.
+Package pdftex.def Info: Resources/Images/d3q19.png used on input line 136.
 (pdftex.def)             Requested size: 128.0387pt x 105.41927pt.
  [6 <./Resources/Images/d2q9.png (PNG copy)> <./Resources/Images/d3q19.png>]
 <Resources/Images/moore120.png, id=80, 1284.8pt x 901.3675pt>
 File: Resources/Images/moore120.png Graphic file (type png)
 
 <use Resources/Images/moore120.png>
-Package pdftex.def Info: Resources/Images/moore120.png used on input line 156.
+Package pdftex.def Info: Resources/Images/moore120.png used on input line 157.
 (pdftex.def)             Requested size: 256.07741pt x 179.65138pt.
  [7] [8 <./Resources/Images/moore120.png>]
 <Resources/Images/amdahl.png, id=88, 468.24937pt x 379.4175pt>
 File: Resources/Images/amdahl.png Graphic file (type png)
 
 <use Resources/Images/amdahl.png>
-Package pdftex.def Info: Resources/Images/amdahl.png used on input line 168.
+Package pdftex.def Info: Resources/Images/amdahl.png used on input line 169.
 (pdftex.def)             Requested size: 256.07741pt x 207.505pt.
  [9 <./Resources/Images/amdahl.png>] [10]
 [11]
-Overfull \hbox (0.68112pt too wide) in paragraph at lines 191--191
+Overfull \hbox (0.68112pt too wide) in paragraph at lines 192--192
 \OT1/ptm/m/n/12 shared mem-ory to com-pute the so-lu-tion. How-ever, the au-tho
 r ver-i-fied that a lo-cal memory-
  []
@@ -816,7 +816,7 @@ Chapter 3.
 File: Resources/Images/streaming.png Graphic file (type png)
 
 <use Resources/Images/streaming.png>
-Package pdftex.def Info: Resources/Images/streaming.png used on input line 221.
+Package pdftex.def Info: Resources/Images/streaming.png used on input line 222.
 
 (pdftex.def)             Requested size: 341.43437pt x 167.39267pt.
  [17 <./Resources/Images/streaming.png>]
@@ -826,14 +826,14 @@ File: Resources/Images/threadmapping.png Graphic file (type png)
 
 <use Resources/Images/threadmapping.png>
 Package pdftex.def Info: Resources/Images/threadmapping.png used on input line 
-321.
+322.
 (pdftex.def)             Requested size: 256.07741pt x 303.0937pt.
  [23]
 <Resources/Images/cudaMemory.png, id=147, 423.08063pt x 411.78844pt>
 File: Resources/Images/cudaMemory.png Graphic file (type png)
 
 <use Resources/Images/cudaMemory.png>
-Package pdftex.def Info: Resources/Images/cudaMemory.png used on input line 332
+Package pdftex.def Info: Resources/Images/cudaMemory.png used on input line 333
 .
 (pdftex.def)             Requested size: 341.43437pt x 332.3341pt.
  [24 <./Resources/Images/threadmapping.png>] [25 <./Resources/Images/cudaMemory
@@ -846,7 +846,7 @@ File: Resources/Images/CodeFlowchart.png Graphic file (type png)
 
 <use Resources/Images/CodeFlowchart.png>
 Package pdftex.def Info: Resources/Images/CodeFlowchart.png used on input line 
-367.
+368.
 (pdftex.def)             Requested size: 213.39568pt x 439.57219pt.
  [30 <./Resources/Images/CodeFlowchart.png>] [31]
 
@@ -857,7 +857,7 @@ File: Resources/Images/compareTimes.pdf Graphic file (type pdf)
 
 <use Resources/Images/compareTimes.pdf>
 Package pdftex.def Info: Resources/Images/compareTimes.pdf used on input line 3
-87.
+88.
 (pdftex.def)             Requested size: 384.1096pt x 271.60414pt.
  [32 <./Resources/Images/compareTimes.pdf>]
 
@@ -868,7 +868,7 @@ File: Resources/Images/initialProfiling.pdf Graphic file (type pdf)
 
 <use Resources/Images/initialProfiling.pdf>
 Package pdftex.def Info: Resources/Images/initialProfiling.pdf used on input li
-ne 397.
+ne 398.
 (pdftex.def)             Requested size: 384.1096pt x 271.60414pt.
  [33 <./Resources/Images/initialProfiling.pdf>]
 
@@ -879,7 +879,7 @@ File: Resources/Images/timesThreads128.pdf Graphic file (type pdf)
 
 <use Resources/Images/timesThreads128.pdf>
 Package pdftex.def Info: Resources/Images/timesThreads128.pdf used on input lin
-e 408.
+e 409.
 (pdftex.def)             Requested size: 209.1301pt x 147.87418pt.
 
 
@@ -890,11 +890,11 @@ File: Resources/Images/timesThreads256.pdf Graphic file (type pdf)
 
 <use Resources/Images/timesThreads256.pdf>
 Package pdftex.def Info: Resources/Images/timesThreads256.pdf used on input lin
-e 412.
+e 413.
 (pdftex.def)             Requested size: 209.1301pt x 147.87418pt.
 
 
-LaTeX Warning: Citation `antonioThesis' on page 34 undefined on input line 423.
+LaTeX Warning: Citation `antonioThesis' on page 34 undefined on input line 424.
 
 
 [34 <./Resources/Images/timesThreads128.pdf> <./Resources/Images/timesThreads25
@@ -904,26 +904,26 @@ pdfTeX warning: /usr/bin/pdflatex (file ./Resources/Images/timesThreads256.pdf)
 : PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-LaTeX Warning: Citation `antonioThesis' on page 35 undefined on input line 427.
+LaTeX Warning: Citation `antonioThesis' on page 35 undefined on input line 428.
 
 
 [35] <Resources/Images/setup.png, id=224, 593.21625pt x 415.5525pt>
 File: Resources/Images/setup.png Graphic file (type png)
 
 <use Resources/Images/setup.png>
-Package pdftex.def Info: Resources/Images/setup.png used on input line 434.
+Package pdftex.def Info: Resources/Images/setup.png used on input line 435.
 (pdftex.def)             Requested size: 384.1096pt x 269.0787pt.
 
 <Resources/Images/setupCG.png, id=225, 597.23125pt x 329.23pt>
 File: Resources/Images/setupCG.png Graphic file (type png)
 
 <use Resources/Images/setupCG.png>
-Package pdftex.def Info: Resources/Images/setupCG.png used on input line 441.
+Package pdftex.def Info: Resources/Images/setupCG.png used on input line 442.
 (pdftex.def)             Requested size: 384.1096pt x 211.74637pt.
  [36 <./Resources/Images/setup.png>] [37 <./Resources/Images/setupCG.png>] [38]
  [39]
 
-LaTeX Warning: Citation `antonioThesis' on page 40 undefined on input line 471.
+LaTeX Warning: Citation `antonioThesis' on page 40 undefined on input line 472.
 
 
 [40] <Resources/Images/steadyBubble.png, id=244, 720.6925pt x 608.2725pt>
@@ -931,7 +931,7 @@ File: Resources/Images/steadyBubble.png Graphic file (type png)
 
 <use Resources/Images/steadyBubble.png>
 Package pdftex.def Info: Resources/Images/steadyBubble.png used on input line 4
-80.
+81.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
 
 <Resources/Images/steadyBubble3d.png, id=245, 720.6925pt x 608.2725pt>
@@ -939,21 +939,21 @@ File: Resources/Images/steadyBubble3d.png Graphic file (type png)
 
 <use Resources/Images/steadyBubble3d.png>
 Package pdftex.def Info: Resources/Images/steadyBubble3d.png used on input line
- 484.
+ 485.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
  [41]
 <Resources/Images/square.png, id=249, 720.6925pt x 608.2725pt>
 File: Resources/Images/square.png Graphic file (type png)
 
 <use Resources/Images/square.png>
-Package pdftex.def Info: Resources/Images/square.png used on input line 495.
+Package pdftex.def Info: Resources/Images/square.png used on input line 496.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
 
 <Resources/Images/square3D.png, id=250, 720.6925pt x 608.2725pt>
 File: Resources/Images/square3D.png Graphic file (type png)
 
 <use Resources/Images/square3D.png>
-Package pdftex.def Info: Resources/Images/square3D.png used on input line 499.
+Package pdftex.def Info: Resources/Images/square3D.png used on input line 500.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
  [42 <./Resources/Images/steadyBubble.png> <./Resources/Images/steadyBubble3d.p
 ng>]
@@ -961,35 +961,35 @@ ng>]
 File: Resources/Images/coal.png Graphic file (type png)
 
 <use Resources/Images/coal.png>
-Package pdftex.def Info: Resources/Images/coal.png used on input line 511.
+Package pdftex.def Info: Resources/Images/coal.png used on input line 512.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
 
 <Resources/Images/coal3d.png, id=257, 720.6925pt x 608.2725pt>
 File: Resources/Images/coal3d.png Graphic file (type png)
 
 <use Resources/Images/coal3d.png>
-Package pdftex.def Info: Resources/Images/coal3d.png used on input line 515.
+Package pdftex.def Info: Resources/Images/coal3d.png used on input line 516.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
  [43 <./Resources/Images/square.png> <./Resources/Images/square3D.png>]
 <Resources/Images/oscil.png, id=263, 720.6925pt x 608.2725pt>
 File: Resources/Images/oscil.png Graphic file (type png)
 
 <use Resources/Images/oscil.png>
-Package pdftex.def Info: Resources/Images/oscil.png used on input line 526.
+Package pdftex.def Info: Resources/Images/oscil.png used on input line 527.
 (pdftex.def)             Requested size: 384.1096pt x 324.19278pt.
  [44 <./Resources/Images/coal.png> <./Resources/Images/coal3d.png>]
 <Resources/Images/couette.png, id=269, 720.6925pt x 608.2725pt>
 File: Resources/Images/couette.png Graphic file (type png)
 
 <use Resources/Images/couette.png>
-Package pdftex.def Info: Resources/Images/couette.png used on input line 537.
+Package pdftex.def Info: Resources/Images/couette.png used on input line 538.
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
 
 <Resources/Images/couette3D.png, id=270, 720.6925pt x 608.2725pt>
 File: Resources/Images/couette3D.png Graphic file (type png)
 
 <use Resources/Images/couette3D.png>
-Package pdftex.def Info: Resources/Images/couette3D.png used on input line 541.
+Package pdftex.def Info: Resources/Images/couette3D.png used on input line 542.
 
 (pdftex.def)             Requested size: 209.1301pt x 176.50589pt.
  [45 <./Resources/Images/oscil.png>]
@@ -997,7 +997,7 @@ Package pdftex.def Info: Resources/Images/couette3D.png used on input line 541.
 File: Resources/Images/rt.png Graphic file (type png)
 
 <use Resources/Images/rt.png>
-Package pdftex.def Info: Resources/Images/rt.png used on input line 552.
+Package pdftex.def Info: Resources/Images/rt.png used on input line 553.
 (pdftex.def)             Requested size: 213.39568pt x 340.3206pt.
  [46 <./Resources/Images/couette.png> <./Resources/Images/couette3D.png>] [47 <
 ./Resources/Images/rt.png>] [48] [49] [50]
@@ -1005,105 +1005,169 @@ Package pdftex.def Info: Resources/Images/rt.png used on input line 552.
 File: Resources/Images/v1.png Graphic file (type png)
 
 <use Resources/Images/v1.png>
-Package pdftex.def Info: Resources/Images/v1.png used on input line 647.
+Package pdftex.def Info: Resources/Images/v1.png used on input line 650.
 (pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
  [52 <./Resources/Images/v1.png (PNG copy)>]
-<Resources/Images/v2.png, id=303, 566.115pt x 299.61937pt>
+<Resources/Images/v1profile.png, id=303, 455.45157pt x 255.95625pt>
+File: Resources/Images/v1profile.png Graphic file (type png)
+
+<use Resources/Images/v1profile.png>
+Package pdftex.def Info: Resources/Images/v1profile.png used on input line 662.
+
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [53 <./Resources/Images/v1profile.png (PNG copy)>] <Resources/Images/v2.png, i
+d=307, 566.115pt x 299.61937pt>
 File: Resources/Images/v2.png Graphic file (type png)
 
 <use Resources/Images/v2.png>
-Package pdftex.def Info: Resources/Images/v2.png used on input line 662.
+Package pdftex.def Info: Resources/Images/v2.png used on input line 675.
 (pdftex.def)             Requested size: 426.79135pt x 225.88893pt.
- [53]
-<Resources/Images/v21.png, id=307, 566.115pt x 299.61937pt>
+ [54]
+<Resources/Images/v21.png, id=311, 566.115pt x 299.61937pt>
 File: Resources/Images/v21.png Graphic file (type png)
 
 <use Resources/Images/v21.png>
-Package pdftex.def Info: Resources/Images/v21.png used on input line 675.
+Package pdftex.def Info: Resources/Images/v21.png used on input line 688.
 (pdftex.def)             Requested size: 426.79135pt x 225.88893pt.
- [54 <./Resources/Images/v2.png (PNG copy)>]
-<Resources/Images/v22.png, id=311, 549.55313pt x 316.93407pt>
+ [55 <./Resources/Images/v2.png (PNG copy)>]
+<Resources/Images/v22.png, id=315, 549.55313pt x 316.93407pt>
 File: Resources/Images/v22.png Graphic file (type png)
 
 <use Resources/Images/v22.png>
-Package pdftex.def Info: Resources/Images/v22.png used on input line 687.
+Package pdftex.def Info: Resources/Images/v22.png used on input line 700.
 (pdftex.def)             Requested size: 426.79135pt x 246.14365pt.
- [55 <./Resources/Images/v21.png (PNG copy)>]
-<Resources/Images/unrollcode.png, id=315, 1898.09125pt x 932.48375pt>
+ [56 <./Resources/Images/v21.png (PNG copy)>]
+<Resources/Images/unrollcode.png, id=319, 1898.09125pt x 932.48375pt>
 File: Resources/Images/unrollcode.png Graphic file (type png)
 
 <use Resources/Images/unrollcode.png>
-Package pdftex.def Info: Resources/Images/unrollcode.png used on input line 697
+Package pdftex.def Info: Resources/Images/unrollcode.png used on input line 710
 .
 (pdftex.def)             Requested size: 469.47308pt x 230.63037pt.
 
-Overfull \hbox (42.68173pt too wide) in paragraph at lines 697--698
+Overfull \hbox (42.68173pt too wide) in paragraph at lines 710--711
  [][] 
  []
 
-[56 <./Resources/Images/v22.png (PNG copy)>]
-<Resources/Images/vfv.png, id=319, 533.74406pt x 299.61937pt>
+[57 <./Resources/Images/v22.png (PNG copy)>]
+<Resources/Images/vfv.png, id=324, 533.74406pt x 299.61937pt>
 File: Resources/Images/vfv.png Graphic file (type png)
 
 <use Resources/Images/vfv.png>
-Package pdftex.def Info: Resources/Images/vfv.png used on input line 708.
+Package pdftex.def Info: Resources/Images/vfv.png used on input line 721.
 (pdftex.def)             Requested size: 426.79135pt x 239.59067pt.
- [57 <./Resources/Images/unrollcode.png>]
-<Resources/Images/highlap.png, id=325, 455.45157pt x 255.95625pt>
+ [58 <./Resources/Images/unrollcode.png>]
+<Resources/Images/vfvprofile.png, id=329, 455.45157pt x 255.95625pt>
+File: Resources/Images/vfvprofile.png Graphic file (type png)
+
+<use Resources/Images/vfvprofile.png>
+Package pdftex.def Info: Resources/Images/vfvprofile.png used on input line 730
+.
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [59 <./Resources/Images/vfv.png (PNG copy)>] <Resources/Images/highlap.png, id
+=333, 529.98pt x 278.54062pt>
 File: Resources/Images/highlap.png Graphic file (type png)
 
 <use Resources/Images/highlap.png>
-Package pdftex.def Info: Resources/Images/highlap.png used on input line 720.
-(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
- [58 <./Resources/Images/vfv.png (PNG copy)>] <Resources/Images/cc.png, id=329,
- 542.77782pt x 314.67563pt>
+Package pdftex.def Info: Resources/Images/highlap.png used on input line 743.
+(pdftex.def)             Requested size: 426.79135pt x 224.31186pt.
+ [60 <./Resources/Images/vfvprofile.png (PNG copy)>] <Resources/Images/cc.png, 
+id=337, 542.77782pt x 314.67563pt>
 File: Resources/Images/cc.png Graphic file (type png)
 
 <use Resources/Images/cc.png>
-Package pdftex.def Info: Resources/Images/cc.png used on input line 733.
+Package pdftex.def Info: Resources/Images/cc.png used on input line 756.
 (pdftex.def)             Requested size: 426.79135pt x 247.44344pt.
- [59 <./Resources/Images/highlap.png (PNG copy)>]
-[60 <./Resources/Images/cc.png (PNG copy)>]
-<Resources/Images/v13d.png, id=336, 455.45157pt x 255.95625pt>
+ [61 <./Resources/Images/highlap.png (PNG copy)>]
+[62 <./Resources/Images/cc.png (PNG copy)>]
+<Resources/Images/v13d.png, id=344, 455.45157pt x 255.95625pt>
 File: Resources/Images/v13d.png Graphic file (type png)
 
 <use Resources/Images/v13d.png>
-Package pdftex.def Info: Resources/Images/v13d.png used on input line 747.
+Package pdftex.def Info: Resources/Images/v13d.png used on input line 770.
 (pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
- [61 <./Resources/Images/v13d.png (PNG copy)>]
-<Resources/Images/vfv3d.png, id=340, 561.59813pt x 342.5297pt>
+
+<Resources/Images/v13dprofile.png, id=345, 455.45157pt x 255.95625pt>
+File: Resources/Images/v13dprofile.png Graphic file (type png)
+
+<use Resources/Images/v13dprofile.png>
+Package pdftex.def Info: Resources/Images/v13dprofile.png used on input line 78
+0.
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [63 <./Resources/Images/v13d.png (PNG copy)>] <Resources/Images/vfv3d.png, id=
+350, 561.59813pt x 342.5297pt>
 File: Resources/Images/vfv3d.png Graphic file (type png)
 
 <use Resources/Images/vfv3d.png>
-Package pdftex.def Info: Resources/Images/vfv3d.png used on input line 759.
+Package pdftex.def Info: Resources/Images/vfv3d.png used on input line 792.
 (pdftex.def)             Requested size: 426.79135pt x 260.30959pt.
- [62 <./Resources/Images/vfv3d.png (PNG copy)>] [63] [64
+ [64 <./Resources/Images/v13dprofile.png (PNG copy)>] <Resources/Images/vfv3dpr
+ofile.png, id=354, 455.45157pt x 255.95625pt>
+File: Resources/Images/vfv3dprofile.png Graphic file (type png)
+
+<use Resources/Images/vfv3dprofile.png>
+Package pdftex.def Info: Resources/Images/vfv3dprofile.png used on input line 8
+01.
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [65 <./Resources/Images/vfv3d.png (PNG copy)>] <Resources/Images/highgrid.png,
+ id=358, 529.98pt x 278.54062pt>
+File: Resources/Images/highgrid.png Graphic file (type png)
+
+<use Resources/Images/highgrid.png>
+Package pdftex.def Info: Resources/Images/highgrid.png used on input line 813.
+(pdftex.def)             Requested size: 426.79135pt x 224.31186pt.
+ [66 <./Resources/Images/vfv3dprofile.png (PNG copy)>] <Resources/Images/cc3d.p
+ng, id=362, 565.36218pt x 323.70938pt>
+File: Resources/Images/cc3d.png Graphic file (type png)
+
+<use Resources/Images/cc3d.png>
+Package pdftex.def Info: Resources/Images/cc3d.png used on input line 826.
+(pdftex.def)             Requested size: 426.79135pt x 244.37192pt.
+ [67 <./Resources/Images/highgrid.png (PNG copy)>] [68 <./Resources/Images/cc3d
+.png (PNG copy)>]
+<Resources/Images/serialDelta.png, id=369, 455.45157pt x 255.95625pt>
+File: Resources/Images/serialDelta.png Graphic file (type png)
+
+<use Resources/Images/serialDelta.png>
+Package pdftex.def Info: Resources/Images/serialDelta.png used on input line 84
+2.
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [69]
+<Resources/Images/serialDelta3D.png, id=374, 447.92343pt x 255.95625pt>
+File: Resources/Images/serialDelta3D.png Graphic file (type png)
+
+<use Resources/Images/serialDelta3D.png>
+Package pdftex.def Info: Resources/Images/serialDelta3D.png used on input line 
+851.
+(pdftex.def)             Requested size: 341.43437pt x 195.11069pt.
+ [70 <./Resources/Images/serialDelta.png (PNG copy)> <./Resources/Images/serial
+Delta3D.png (PNG copy)>] [71] [72
 
 ]
 Chapter 5.
-[65] [66
+[73] [74
 
-] (./Draft.bbl [67
+] (./Draft.bbl [75
 
-] [68]) [69] [70
+] [76]) [77] [78
 
 ]
-<Resources/Images/highComp.png, id=370, 953.81343pt x 528.47438pt>
+<Resources/Images/highComp.png, id=404, 953.81343pt x 528.47438pt>
 File: Resources/Images/highComp.png Graphic file (type png)
 
 <use Resources/Images/highComp.png>
-Package pdftex.def Info: Resources/Images/highComp.png used on input line 780.
+Package pdftex.def Info: Resources/Images/highComp.png used on input line 870.
 (pdftex.def)             Requested size: 426.79135pt x 236.47267pt.
- [71 <./Resources/Images/highComp.png (PNG copy)>] (./Draft.aux)
+ [79 <./Resources/Images/highComp.png (PNG copy)>] (./Draft.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 5090 strings out of 494953
- 74562 string characters out of 6180977
- 144955 words of memory out of 5000000
- 8217 multiletter control sequences out of 15000+600000
+ 5138 strings out of 494953
+ 75924 string characters out of 6180977
+ 145034 words of memory out of 5000000
+ 8257 multiletter control sequences out of 15000+600000
  35273 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  38i,11n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1117,10 +1181,10 @@ pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmri8a.pfb>
-Output written on Draft.pdf (87 pages, 2439875 bytes).
+Output written on Draft.pdf (95 pages, 2594043 bytes).
 PDF statistics:
- 412 PDF objects out of 1000 (max. 8388607)
- 253 compressed objects within 3 object streams
+ 445 PDF objects out of 1000 (max. 8388607)
+ 270 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 176 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 216 words of extra memory for PDF output out of 10000 (max. 10000000)
 

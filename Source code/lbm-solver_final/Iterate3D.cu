@@ -25,7 +25,7 @@
 #include "Multiphase.h"
 
 
-#define CUDA 0
+#define CUDA 1
 
 int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	// Time measurement: declaration, begin
