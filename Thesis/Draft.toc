@@ -74,12 +74,12 @@
 \contentsline {subsection}{\numberline {4.6.3}3D model}{60}
 \contentsline {subsubsection}{Enhanced distribution function v1.0}{61}
 \contentsline {subsubsection}{Final version v1.1}{62}
-\contentsline {subsubsection}{High order color gradient}{62}
-\contentsline {subsubsection}{CUDA compute capability}{62}
-\contentsline {subsection}{\numberline {4.6.4}Hardware}{62}
-\contentsline {subsection}{\numberline {4.6.5}Double vs Single}{62}
-\contentsline {chapter}{\numberline {5}Conclusions}{63}
-\contentsline {chapter}{Appendix}{69}
-\contentsline {section}{\numberline {.1}Performance}{69}
-\contentsline {section}{\numberline {.2}Validation}{69}
-\contentsline {section}{\numberline {.3}Code}{69}
+\contentsline {subsubsection}{High order color gradient}{63}
+\contentsline {subsubsection}{CUDA compute capability}{63}
+\contentsline {subsection}{\numberline {4.6.4}Hardware}{63}
+\contentsline {subsection}{\numberline {4.6.5}Double vs Single}{63}
+\contentsline {chapter}{\numberline {5}Conclusions}{65}
+\contentsline {chapter}{Appendix}{71}
+\contentsline {section}{\numberline {.1}Performance}{71}
+\contentsline {section}{\numberline {.2}Validation}{71}
+\contentsline {section}{\numberline {.3}Code}{71}

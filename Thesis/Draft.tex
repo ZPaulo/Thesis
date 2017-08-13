@@ -752,6 +752,15 @@ Unlike in the 2D model, in the 3D version we decided to start the implementation
  However, this version suffered from portability issues in Delta, most likely due to faulty memory accesses. Figure \ref{fig:v13d} shows the run-times for version 1.0 in the Grid. We now have much bigger run-times since the scale of the program has also increased. Now, the difference between double and single precision is much more noticeable, and so will, hopefully, the changes between optimizations. 
  
 \subsubsection{Final version v1.1}
+We then applied the same changes that were applied in the 2D model. We unrolled the loops inside the kernel calls and improved the way that the distribution function was being calculated. All of these changes were done together since we knew from the 2D model that they had a positive effect on the final result. In this version, we did not test the manually unrolled loops. No matter how good the performance could be (which should be a couple of seconds more), Figure \ref{fig:unrollComp} shows how much worse the code gets when this technique is used for this model, even more so if we take into account that from 2D to 3D the loops increase from 9 iterations to 19, making it even harder to manually unroll them.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/vfv3d.png}
+  	\caption{Runtime comparison between the final version and version 1.0}
+  	\label{fig:vfv3d}
+  \end{figure}
+  
 \subsubsection{High order color gradient}
 \subsubsection{CUDA compute capability}
 \subsection{Hardware}
