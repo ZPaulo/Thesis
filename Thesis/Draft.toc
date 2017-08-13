@@ -61,20 +61,25 @@
 \contentsline {subsection}{\numberline {4.4.5}Couette flow}{46}
 \contentsline {subsection}{\numberline {4.4.6}Rayleigh-Taylor instability}{47}
 \contentsline {section}{\numberline {4.5}Memory usage}{48}
-\contentsline {section}{\numberline {4.6}Performance of the parallel code}{51}
-\contentsline {subsection}{\numberline {4.6.1}2D model}{51}
+\contentsline {section}{\numberline {4.6}Performance of the parallel code}{50}
+\contentsline {subsection}{\numberline {4.6.1}GPU specification}{51}
+\contentsline {subsection}{\numberline {4.6.2}2D model}{51}
 \contentsline {subsubsection}{Normal distribution function v1.0}{51}
-\contentsline {subsubsection}{Enhanced distribution function v2.0}{51}
-\contentsline {subsubsection}{Optimizations v2.1}{51}
-\contentsline {subsubsection}{Loop unrolling v2.2}{51}
-\contentsline {subsubsection}{Final version v2.3}{51}
-\contentsline {subsubsection}{High order color gradient}{51}
-\contentsline {subsubsection}{CUDA compute capability}{51}
-\contentsline {subsection}{\numberline {4.6.2}3D model}{51}
-\contentsline {subsubsection}{Enhanced distribution function v1.0}{51}
-\contentsline {subsubsection}{Final version v1.1}{51}
-\contentsline {subsubsection}{High order color gradient}{51}
-\contentsline {subsubsection}{CUDA compute capability}{51}
-\contentsline {subsection}{\numberline {4.6.3}Hardware}{51}
-\contentsline {subsection}{\numberline {4.6.4}Double vs Single}{51}
-\contentsline {chapter}{\numberline {5}Conclusions}{53}
+\contentsline {subsubsection}{Enhanced distribution function v2.0}{53}
+\contentsline {subsubsection}{Optimizations v2.1}{54}
+\contentsline {subsubsection}{Loop unrolling v2.2}{55}
+\contentsline {subsubsection}{Final version v2.3}{57}
+\contentsline {subsubsection}{High order color gradient}{58}
+\contentsline {subsubsection}{CUDA compute capability}{59}
+\contentsline {subsection}{\numberline {4.6.3}3D model}{60}
+\contentsline {subsubsection}{Enhanced distribution function v1.0}{61}
+\contentsline {subsubsection}{Final version v1.1}{61}
+\contentsline {subsubsection}{High order color gradient}{61}
+\contentsline {subsubsection}{CUDA compute capability}{61}
+\contentsline {subsection}{\numberline {4.6.4}Hardware}{61}
+\contentsline {subsection}{\numberline {4.6.5}Double vs Single}{61}
+\contentsline {chapter}{\numberline {5}Conclusions}{63}
+\contentsline {chapter}{Appendix}{69}
+\contentsline {section}{\numberline {.1}Performance}{69}
+\contentsline {section}{\numberline {.2}Validation}{69}
+\contentsline {section}{\numberline {.3}Code}{69}

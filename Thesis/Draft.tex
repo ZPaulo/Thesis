@@ -618,7 +618,8 @@ We can now clearly see how the memory used by the solver is one of the most impo
 There were some ways to decrease this memory requirement. We could eliminate one of the distribution functions (and add more calculations to compensate) or change the residuals calculation to be based on the macroscopic variables instead of the distribution function. However, we found that these changes would imply a decrease in the solver's accuracy and stability, for which we chose to not implement these "improvements" in the final version of the solver.
 
 \section{Performance of the parallel code}\label{sec:performance}
-In this section, we will analyze and discuss the performance obtained throughout the various stages of development of the code. We will first compare optimizations techniques employed, followed by the usage of different code and compiler features. We will then compare the different hardware used and finally the impact in performance between using double and single precision. 
+In this section, we will analyze and discuss the performance obtained throughout the various stages of development of the code. We will first compare optimizations techniques employed, followed by the usage of different code and compiler features. We will then compare the different hardware used and finally the impact in performance between using double and single precision. \par
+For the performance analysis, the tests will be performed using 10000 iterations. Running until convergence is achieved is not necessary since the times spent per iteration are very similar with each other. This means that we should run the solver for some iterations so as to disperse the initial warming up of the machine but that we do not have to run the simulation until the convergence criteria is met since 10000 iterations is enough to show the effects of the parallelization techniques.
 \subsection{GPU specification}
 To perform the tests, we first need the hardware on which to perform the tests on. Since we are using CUDA, we must obviously use machines with NVIDIA GPUs. Table \ref{tab:specs} shows the specification of the characteristics of each machine's GPU. GRID and Delta are a part of Cranfield's HPC center, while the laptop is my own personal laptop with a less powerful GPU.
 \begin{table}[H]
@@ -637,14 +638,107 @@ To perform the tests, we first need the hardware on which to perform the tests o
 	\label{tab:specs}
 \end{table}
 \subsection{2D model}
+We will now present the results obtained in the major stages of the implementation. Each result was executed using a square mesh containing 128 nodes in both directions. We choose to display the results using this mesh since it was the mesh used for every test case and also the most commonly used in the 2D model.
 \subsubsection{Normal distribution function v1.0}
+This version of the code was the first parallel version using the Color Gradient model. In it, we specify the collision frequency to be used in the collision step in the initialization of the solver. Also, we calculate the perturbation operator for each distribution function, as well as the single phase collision step and recoloring operator.
+  
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/v1.png}
+  	\caption{Runtime comparison for v1.0}
+  	\label{fig:v1}
+  \end{figure}
+  
+  In this version, the personal laptop displays the expected results. Double precision takes longer to compute than the single precision and both are acceptable times for 10000 iterations using a mesh containing $128x128$ nodes. \par
+  In the Delta machine results follow a different trend. Although it displays a better performance than the laptop for double precision, this does not happen for single precision. Furthermore, the difference in performance was very small, which should not happen with different precisions. However, this can be explained due to Delta's different GPU configuration. This machine is essentially two K40's joined together through shared memory and a common PCI bus, each card containing 2 GPUs. Also, Delta has extensive hardware power management, meaning that the GPU will take longer to start warming up. Small problems, like most using 2D models, might be too small too notice the better performance of this GPU. Another explanation can be the fact that Delta is a newly implemented machine in Cranfield's HPC center. Some optimizations techniques might not be lacking to fully exploit the machine's performance.\par
+  In the Grid, we encountered some portability issues, where the solver was diverging when using single precision, most likely due to a memory access that behaves differently on this machine and eventually produces NaN values. However, we can clearly see that this machine obtains better performance that the others using double precision, making it a potentially better candidate for running the CG simulations, provided that the single precision issue disappears.  
+  
 \subsubsection{Enhanced distribution function v2.0}
+After validating version 1.0, we decided that it would be best if we could increase the numerical accuracy of the solver, which would help in validating some test cases. We also wanted to increase the solver's performance, and so we decided to implement an enhanced version of the equilibrium distribution function, which should help achieve both goals. This version would replace the calculation of the collision frequency to make it being updated in every iteration and eliminate the need for calculating the perturbation and single phase collision operator for both distribution functions. We would only need to calculate them for another distribution function that would be the sum of both fluids.\par
+  Figure \ref{fig:v2} shows some interesting results. Overall the new version performed in the same way for all of the machines. While the performance improved for single precision, this did not happen with the double precision. Our base assumption that by reducing the perturbation operator the performance would increase was correct. However, to do so we had to impose more calculations and memory accesses for the collision frequency computation, which had a bigger effect on double precision than on single precision. 
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/v2.png}
+  	\caption{Runtime comparison for v2.0 with v1.0}
+  	\label{fig:v2}
+  \end{figure}
+  
+
+  In this version, we were also able to fix the Grid's portability issue in single precision. This bug was probably being caused by a memory access that was not behaving as expected in this machine which eventually was fixed by changing the calculation of the distribution function.
+
 \subsubsection{Optimizations v2.1}
+Hoping that we could still increase the performance obtained in version 2.0, we tried implementing some optimizations on the way that the collision step was being calculated. Loop unrolling is a commonly used technique to boost performance when the number of iterations in a loop inside a kernel is known beforehand. If we can tell the compiler that the loop will run for a certain number of times, then the compiler will not need to waste time in performing an if statement to check if the loop is at the end of it's iterations. To this end, we used CUDA's MACRO \#pragma loop unroll n to perform the loop unrolling for us. Also, we noticed that some verifications for the collision frequency could be done beforehand, effectively removing an inefficient if statement in every iteration.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/v21.png}
+  	\caption{Runtime comparison for v2.1 with v2.0}
+  	\label{fig:v21}
+  \end{figure}
+  
+ We can see that overall the performance increased, the exception being for Delta under double precision. Although small, the difference indicates that we are on the right track since, hopefully, the results will show a larger difference for bigger problems, such as in the 3D case.
+ 
 \subsubsection{Loop unrolling v2.2}
+We decided to try manually unrolling every loop so as to not only eliminate the completeness verification in every loop, but also to eliminate some memory accesses inside the actual loop.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/v22.png}
+  	\caption{Runtime comparison for v2.2 with v2.1}
+  	\label{fig:v22}
+  \end{figure}
+  
+  In Figure \ref{fig:v22} we get some unexpected results. Although the solver takes fewer seconds to execute in general, Delta's single precision now takes longer to compute than it's double precision. This can be explained by overhead times, since the machine might take longer to initialize in some instances. Furthermore, the laptop's performance got worse with version 2.2, possibly due to the compiler already loading the needed constant arrays into cache, making the manually unrolled loops introduce some unnecessary overhead into the solver.\par
+  Also, manually unrolling the loops means making the code less maintainable. We need a bigger amount of lines of code in order to perform this, which makes the code much less readable and hard to modify.
+  
+   \begin{figure}[H]
+   	\centering
+   	\includegraphics[width=1.1\linewidth]{Resources/Images/unrollcode.png}
+   	\caption{Code comparison between CUDA unroll and manual unroll}
+   	\label{fig:unrollComp}
+   \end{figure}
+
+Figure \ref{fig:unrollComp} shows how much the code is affected with both unrolls, with the code on the left belonging to CUDA's macro unroll and the one on the right to the manual unroll. Note that the image for the code with the manual unroll is only showing 4 out of 9 iterations. For these reasons, we decided to discard v2.2 and continue upgrading the code from version 2.1.
 \subsubsection{Final version v2.3}
+Finally, we decided to make one last effort to increase the code's performance and usability. We added in an option to allow the user to choose between the normal and enhanced distribution functions, as well as using a different equilibrium function, based on the enhanced one but mimicking the effects of the normal distribution function. 
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/vfv.png}
+  	\caption{Runtime comparison for the final version with v2.1}
+  	\label{fig:vfv}
+  \end{figure}
+  
+  Again we can see a slight improvement in the solver's performance, except for Delta's double precision, but again, this can be explained to a higher overhead time. Although small, these changes will be propagated to the 3D model where we will hopefully see a bigger difference.
 \subsubsection{High order color gradient}
+To further analyze the influence of the calculation of the color gradient in the solver's performance, we have implemented a higher order version of this phase of the collision step. A higher order color gradient means more accuracy in the final solution, at the cost of degrading the system's performance.\par
+It is important to see how the collision step affects the total runtime of the iteration, since this is where the order of the color gradient will have most impact. To avoid analyzing a complicated chart, the chart containing the run-times for all machines can be found in the Appendix, Section \ref{app:perfo}.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/highlap.png}
+  	\caption{Runtime comparison between low and high order color gradient in the laptop}
+  	\label{fig:highLap}
+  \end{figure}
+  
+  In Figure \ref{fig:highLap} we can see the degradation in performance introduced by the higher order color gradient. The time taken for the collision step doubles, severely impacting the performance of the solver. We decided that the trade-off is not advantageous in this case, but kept the option to compute the higher order version, if the user desires to do so. 
+
 \subsubsection{CUDA compute capability}
+
+All of these tests were performed using the same CUDA compute capability for every machine, so as to obtain a fair comparison between them. However, every GPU is optimized for it's own CUDA capability, making it very important to also show the final results using each machine's adequate compute capability.
+
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/cc.png}
+  	\caption{Runtime comparison for the C. capability version with the final version}
+  	\label{fig:cc}
+  \end{figure}
+  
+  However, the run-times remain almost the same between both versions, although Delta's single precision performs worse when computed with it's 3.5 compute capability. This is, nonetheless, the proper way to run the solver in each GPU, for which the user must take the machine's capability into account when compiling the program.
+ 
 \subsection{3D model}
+Similarly to the previous Section, we will now present the results obtained using the 3D model. Each result was obtained using a Cube-like mesh containing 128 nodes in all directions. Although this was not the mesh used when developing the solver, it is the one where we can best see the effects of our parallelization. However, using this mesh takes long amounts of time to compute under 10000 iterations. For this reason, the following tests were obtained using only Delta and Grid. 
 \subsubsection{Enhanced distribution function v1.0}
 \subsubsection{Final version v1.1}
 \subsubsection{High order color gradient}
@@ -654,11 +748,21 @@ To perform the tests, we first need the hardware on which to perform the tests o
 \chapter{Conclusions}
 
 %% Back matter
-%
-% This is where we include appendices and references
-
-\appendix
-
+\backmatter
 \bibliography{AllBib}{}
 \bibliographystyle{plain}
+
+\appendix
+\chapter{Appendix}
+\section{Performance}\label{app:perfo}
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/highComp.png}
+  	\caption{Runtime comparison between low and high order color gradient}
+  	\label{fig:highComp}
+  \end{figure}
+\section{Validation}
+\section{Code}
+
+
 \end{document}

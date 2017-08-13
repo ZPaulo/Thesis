@@ -24,4 +24,14 @@
 \contentsline {figure}{\numberline {4.10}{\ignorespaces Blue fluid density for the 2D oscillating bubble\relax }}{45}
 \contentsline {figure}{\numberline {4.11}{\ignorespaces X velocity with a few iterations using the Couette flow case.\relax }}{46}
 \contentsline {figure}{\numberline {4.12}{\ignorespaces Blue fluid density for the 2D Rayleigh-Taylor instability\relax }}{47}
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Runtime comparison for v1.0\relax }}{52}
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Runtime comparison for v2.0 with v1.0\relax }}{54}
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Runtime comparison for v2.1 with v2.0\relax }}{55}
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Runtime comparison for v2.2 with v2.1\relax }}{56}
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Code comparison between CUDA unroll and manual unroll\relax }}{57}
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Runtime comparison for the final version with v2.1\relax }}{58}
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Runtime comparison between low and high order color gradient in the laptop\relax }}{59}
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Runtime comparison for the C. capability version with the final version\relax }}{60}
 \addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1}{\ignorespaces Runtime comparison between low and high order color gradient\relax }}{69}

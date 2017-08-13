@@ -25,7 +25,7 @@
 #include "Multiphase.h"
 
 
-#define CUDA 1
+#define CUDA 0
 
 int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	// Time measurement: declaration, begin
@@ -301,9 +301,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 	FLOAT_TYPE *f_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	FLOAT_TYPE *fColl_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
 	FLOAT_TYPE *f1_d;
-	if (args->TypeOfResiduals == FdRelDiff || args->multiPhase) {
-		f_prev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_ZERO);
-	}
+
 
 #if CUDA
 	FLOAT_TYPE p_in_mean;
@@ -326,6 +324,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 		CHECK(cudaMemcpy(b_rho_d,b_rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
 		CHECK(cudaMemcpy(rho_d,rho,SIZEFLT(m*n*h),cudaMemcpyHostToDevice));
 #endif
+	}
+	if (args->TypeOfResiduals == FdRelDiff || args->multiPhase) {
+		f_prev_d = createGpuArrayFlt(19 * m * n * h, ARRAY_COPY,0, f_d);
 	}
 
 	FLOAT_TYPE *temp19a_d, *temp19b_d;
@@ -665,7 +666,7 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 			if (args->TypeOfResiduals == L2) {
 				if(args->multiPhase){
 #if !CUDA
-					CHECK(cudaMemcpy(f_d,r_f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+					CHECK(cudaMemcpy(f_d,f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
 					CHECK(cudaMemcpy(fColl_d,r_fColl,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
 #endif
 				}
@@ -697,6 +698,9 @@ int Iterate3D(InputFilenames *inFn, Arguments *args) {
 					CHECK(cudaMalloc(&d_divergence,sizeof(bool)));
 					CHECK(cudaMemcpy(d_divergence,&h_divergence,sizeof(bool),cudaMemcpyHostToDevice));
 					if(args->multiPhase){
+#if !CUDA
+						CHECK(cudaMemcpy(f_d,f,SIZEFLT(m*n*h*19),cudaMemcpyHostToDevice));
+#endif
 						gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp19a_d, n * m * h * 19, d_divergence);
 						fMaxDiff = gpu_max_h(temp19a_d, temp19b_d, n * m * h * 19);
 					}

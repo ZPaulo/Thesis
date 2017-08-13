@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  11 AUG 2017 02:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  13 AUG 2017 03:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1002,22 +1002,95 @@ Package pdftex.def Info: Resources/Images/rt.png used on input line 552.
 (pdftex.def)             Requested size: 213.39568pt x 340.3206pt.
  [46 <./Resources/Images/couette.png> <./Resources/Images/couette3D.png>] [47 <
 ./Resources/Images/rt.png>] [48] [49] [50]
-[51] [52
+[51] <Resources/Images/v1.png, id=299, 455.45157pt x 255.95625pt>
+File: Resources/Images/v1.png Graphic file (type png)
+
+<use Resources/Images/v1.png>
+Package pdftex.def Info: Resources/Images/v1.png used on input line 647.
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [52 <./Resources/Images/v1.png (PNG copy)>]
+<Resources/Images/v2.png, id=303, 566.115pt x 299.61937pt>
+File: Resources/Images/v2.png Graphic file (type png)
+
+<use Resources/Images/v2.png>
+Package pdftex.def Info: Resources/Images/v2.png used on input line 662.
+(pdftex.def)             Requested size: 426.79135pt x 225.88893pt.
+ [53]
+<Resources/Images/v21.png, id=307, 566.115pt x 299.61937pt>
+File: Resources/Images/v21.png Graphic file (type png)
+
+<use Resources/Images/v21.png>
+Package pdftex.def Info: Resources/Images/v21.png used on input line 675.
+(pdftex.def)             Requested size: 426.79135pt x 225.88893pt.
+ [54 <./Resources/Images/v2.png (PNG copy)>]
+<Resources/Images/v22.png, id=311, 549.55313pt x 316.93407pt>
+File: Resources/Images/v22.png Graphic file (type png)
+
+<use Resources/Images/v22.png>
+Package pdftex.def Info: Resources/Images/v22.png used on input line 687.
+(pdftex.def)             Requested size: 426.79135pt x 246.14365pt.
+ [55 <./Resources/Images/v21.png (PNG copy)>]
+<Resources/Images/unrollcode.png, id=315, 1898.09125pt x 932.48375pt>
+File: Resources/Images/unrollcode.png Graphic file (type png)
+
+<use Resources/Images/unrollcode.png>
+Package pdftex.def Info: Resources/Images/unrollcode.png used on input line 697
+.
+(pdftex.def)             Requested size: 469.47308pt x 230.63037pt.
+
+Overfull \hbox (42.68173pt too wide) in paragraph at lines 697--698
+ [][] 
+ []
+
+[56 <./Resources/Images/v22.png (PNG copy)>]
+<Resources/Images/vfv.png, id=319, 533.74406pt x 299.61937pt>
+File: Resources/Images/vfv.png Graphic file (type png)
+
+<use Resources/Images/vfv.png>
+Package pdftex.def Info: Resources/Images/vfv.png used on input line 708.
+(pdftex.def)             Requested size: 426.79135pt x 239.59067pt.
+ [57 <./Resources/Images/unrollcode.png>]
+<Resources/Images/highlap.png, id=325, 455.45157pt x 255.95625pt>
+File: Resources/Images/highlap.png Graphic file (type png)
+
+<use Resources/Images/highlap.png>
+Package pdftex.def Info: Resources/Images/highlap.png used on input line 720.
+(pdftex.def)             Requested size: 426.79135pt x 239.85294pt.
+ [58 <./Resources/Images/vfv.png (PNG copy)>] <Resources/Images/cc.png, id=329,
+ 542.77782pt x 314.67563pt>
+File: Resources/Images/cc.png Graphic file (type png)
+
+<use Resources/Images/cc.png>
+Package pdftex.def Info: Resources/Images/cc.png used on input line 733.
+(pdftex.def)             Requested size: 426.79135pt x 247.44344pt.
+ [59 <./Resources/Images/highlap.png (PNG copy)>]
+[60 <./Resources/Images/cc.png (PNG copy)>] [61] [62
 
 ]
 Chapter 5.
-(./Draft.bbl [53] [54
+[63] [64
 
-] [55] [56]) [57] (./Draft.aux)
+] (./Draft.bbl [65
+
+] [66]) [67] [68
+
+]
+<Resources/Images/highComp.png, id=361, 953.81343pt x 528.47438pt>
+File: Resources/Images/highComp.png Graphic file (type png)
+
+<use Resources/Images/highComp.png>
+Package pdftex.def Info: Resources/Images/highComp.png used on input line 760.
+(pdftex.def)             Requested size: 426.79135pt x 236.47267pt.
+ [69 <./Resources/Images/highComp.png (PNG copy)>] (./Draft.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 5023 strings out of 494953
- 73005 string characters out of 6180977
- 144805 words of memory out of 5000000
- 8160 multiletter control sequences out of 15000+600000
+ 5078 strings out of 494953
+ 74282 string characters out of 6180977
+ 144931 words of memory out of 5000000
+ 8207 multiletter control sequences out of 15000+600000
  35273 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  38i,11n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1031,10 +1104,10 @@ pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmri8a.pfb>
-Output written on Draft.pdf (73 pages, 2101780 bytes).
+Output written on Draft.pdf (85 pages, 2407829 bytes).
 PDF statistics:
- 356 PDF objects out of 1000 (max. 8388607)
- 223 compressed objects within 3 object streams
+ 404 PDF objects out of 1000 (max. 8388607)
+ 249 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 121 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 166 words of extra memory for PDF output out of 10000 (max. 10000000)
 

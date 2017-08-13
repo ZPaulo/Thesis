@@ -69,10 +69,12 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	clock_t tIterStart, tIterEnd; // Time measurement points: main loop
 
 	// cuda time measurement variables
-	cudaEvent_t start, stop;
+	cudaEvent_t start, stop, test1, test2;
 	float cudatime;
 	CHECK(cudaEventCreate(&start));
 	CHECK(cudaEventCreate(&stop));
+	CHECK(cudaEventCreate(&test1));
+	CHECK(cudaEventCreate(&test2));
 
 	numNodes = readNodeFile(inFn->node, &nodeIdX, &nodeIdY, &tempi, &nodeX,
 			&nodeY, &temp, &nodeType,args->TypeOfProblem);
@@ -261,9 +263,10 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 		initCGBubble<<<bpg1,tpb>>>(coordX_d,coordY_d,r_rho_d, b_rho_d, rho_d, r_f_d, b_f_d, f_d, args->test_case);
 	}
 
-	FLOAT_TYPE *f_prev_d = createGpuArrayFlt(9 * m * n, ARRAY_COPY,0,r_f_d);
 
 #endif
+	CHECK(cudaMemcpy(f_d, r_f, SIZEFLT(m*n * 9), cudaMemcpyHostToDevice));
+	FLOAT_TYPE *f_prev_d = createGpuArrayFlt(9 * m * n, ARRAY_COPY,0,f_d);
 	int *mask = createHostArrayInt(m * n, ARRAY_ZERO);
 	int *bcMask = createHostArrayInt(m * n, ARRAY_ZERO);
 	int *bcIdx = createHostArrayInt(m * n, ARRAY_ZERO);
@@ -382,6 +385,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 	while (iter < args->iterations) {
 
 		CHECK(cudaThreadSynchronize());
+		CHECK(cudaEventRecord(test1, 0));
 		CHECK(cudaEventRecord(start, 0)); // Start measuring time
 		switch (args->collisionModel) {
 
@@ -391,8 +395,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 
 #if !CUDA
 				mp2DColl(n, m, rho, u, v, r_f, b_f, r_rho, b_rho, r_phi, b_phi, w_pert, color_gradient,
-						r_omega, b_omega, args->control_param, args->del, args->beta,
-						args->g_limit, args->r_A, args->b_A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
+						omega_eff, omega_eff, args->control_param, 0.1, args->beta,
+						args->g_limit, args->A, args->A, r_fColl, b_fColl, weight, cx, cy, args->r_viscosity, args->b_viscosity);
 #else
 				if(!args->enhanced_distrib)
 					gpuCollBgkwGC2D<<<bpg1, tpb>>>(rho_d, r_rho_d, b_rho_d, u_d, v_d, f_d, r_fColl_d, b_fColl_d, cg_dir_d, args->high_order);
@@ -526,6 +530,9 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 			FLOAT_TYPE r;
 			if(args->multiPhase){
 				//				gpu_abs_sub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
+#if !CUDA
+				CHECK(cudaMemcpy(f_d, r_f, SIZEFLT(m*n * 9), cudaMemcpyHostToDevice));
+#endif
 				gpu_abs_relSub<<<bpg1, tpb>>>(f_d, f_prev_d, temp9a_d, n * m * 9, d_divergence);
 				fMaxDiff = gpu_max_h(temp9a_d, temp9b_d, n * m * 9);
 				//	printf("MAX diff "FLOAT_FORMAT"\n", fMaxDiff);
@@ -538,8 +545,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 					printf("simulation converged!\n");
 					break;
 				}
-				CHECK(cudaFree(f_prev_d));
-				f_prev_d = createGpuArrayFlt(n * m * 9, ARRAY_CPYD, 0, f_d);
+				CHECK(cudaMemcpy(f_prev_d, f_d, SIZEFLT(m*n * 9), cudaMemcpyDeviceToDevice));
 
 			}else{
 				r = computeResidual2D(f_d, fColl_d, temp9a_d, temp9b_d, m,n);
@@ -576,6 +582,10 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 				(FLOAT_TYPE) (iter + 1) * 100
 				/ (FLOAT_TYPE) (args->iterations), fMaxDiff);
 
+		CHECK(cudaEventRecord(test2, 0));
+		CHECK(cudaEventSynchronize(test2));
+		CHECK(cudaEventElapsedTime(&cudatime, test1, test2));
+		st_error[iter] = cudatime / 1000;
 		iter++; // update loop variable
 		////////////// Autosave ///////////////
 
@@ -609,7 +619,7 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 						nodeType, n, m, 1, args->outputFormat);
 				tInstant2 = clock();
 				taskTime[T_WRIT] += (FLOAT_TYPE) (tInstant2 - tInstant1)
-																																																																																																																																																																																										/ CLOCKS_PER_SEC;
+																																																																																																																																																																																														/ CLOCKS_PER_SEC;
 			}
 		}
 	}     ////////////// END OF MAIN WHILE CYCLE! ///////////////
@@ -659,7 +669,8 @@ int Iterate2D(InputFilenames *inFn, Arguments *args) {
 #if CUDA
 			printf("Pressure inside "FLOAT_FORMAT" Pressure outside "FLOAT_FORMAT" ST_predicted "FLOAT_FORMAT"\n", p_in_mean, p_out_mean, st_predicted);
 #endif
-			WriteArray("surface tension",st_error, args->iterations,1);
+			writeOscilatingSolution("Oscilating_frequency", st_error, args->iterations);
+			//WriteArray("surface tension",st_error, args->iterations,1);
 			break;
 		case 2:
 			if(args->g == 0.0){
