@@ -13,52 +13,55 @@ Warning--entry type for "jozsa_thesis" isn't style-file defined
 --line 69 of file AllBib.bib
 Warning--entry type for "szoke_thesis" isn't style-file defined
 --line 76 of file AllBib.bib
-Warning--I didn't find a database entry for "antonioThesis"
+Warning--entry type for "antonioThesis" isn't style-file defined
+--line 199 of file AllBib.bib
+Warning--entry type for "abbru" isn't style-file defined
+--line 313 of file AllBib.bib
 Warning--to sort, need author or key in moore
 Warning--to sort, need author or key in amdahl
 Warning--to sort, need author or key in paraview
 Warning--empty booktitle in aircraft_cfd
 Warning--empty publisher in lbm_springer
 Warning--empty booktitle in america_cup
-You've used 24 entries,
+You've used 39 entries,
             2118 wiz_defined-function locations,
-            631 strings with 7647 characters,
-and the built_in function-call counts, 6679 in all, are:
-= -- 623
-> -- 302
+            715 strings with 9848 characters,
+and the built_in function-call counts, 11236 in all, are:
+= -- 1053
+> -- 517
 < -- 1
-+ -- 124
-- -- 98
-* -- 407
-:= -- 1104
-add.period$ -- 68
-call.type$ -- 24
-change.case$ -- 118
++ -- 211
+- -- 168
+* -- 732
+:= -- 1870
+add.period$ -- 111
+call.type$ -- 39
+change.case$ -- 198
 chr.to.int$ -- 0
-cite$ -- 30
-duplicate$ -- 245
-empty$ -- 584
-format.name$ -- 98
-if$ -- 1413
+cite$ -- 45
+duplicate$ -- 389
+empty$ -- 963
+format.name$ -- 168
+if$ -- 2355
 int.to.chr$ -- 0
-int.to.str$ -- 24
-missing$ -- 18
-newline$ -- 119
-num.names$ -- 42
-pop$ -- 177
+int.to.str$ -- 39
+missing$ -- 28
+newline$ -- 192
+num.names$ -- 72
+pop$ -- 268
 preamble$ -- 1
-purify$ -- 97
+purify$ -- 162
 quote$ -- 0
-skip$ -- 181
+skip$ -- 290
 stack$ -- 0
-substring$ -- 331
-swap$ -- 35
+substring$ -- 631
+swap$ -- 50
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 90
+type$ -- 150
 warning$ -- 6
-while$ -- 55
-width$ -- 26
-write$ -- 237
-(There were 12 warnings)
+while$ -- 95
+width$ -- 41
+write$ -- 390
+(There were 13 warnings)

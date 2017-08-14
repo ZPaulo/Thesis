@@ -5,7 +5,7 @@
 % This document is an example of the use of the unofficial "cranfieldthesis" 
 % LaTeX style file.  I hope it's useful, and good like.
 
-\documentclass[12pt]{book}
+\documentclass[12pt, openany]{book}
 
 \usepackage[utf8]{inputenc}
 % Use the custom "cranfieldthesis" LaTeX style file. 
@@ -39,11 +39,6 @@
 \begin{document}
 
 
-%% Front matter
-%
-% This is where we do the title page, etc.
-%
-
 \frontmatter
 
 % Standard-Form Title Pages
@@ -51,9 +46,8 @@
 
 % Abstract and Keywords
 \begin{abstract}
-    Type your abstract here.
-    \section*{Keywords}
-    Keyword 1; keyword 2; keyword 3.
+  This thesis aims to extend the functionalities of the in-house Lattice Boltzmann Method solver to include the processing of Multiphase flows, both in 2D and 3D. An in-depth analysis was performed on the previous solver in terms of software architecture, results validation and performance obtained. Then, a serial implementation of the Color Gradient model, derived from a Matlab implementation, was built using C code into the solver. After validating these results, the serial C code was parallelized using the CUDA platform. Once these results were validated, the process was then repeated for the 3D model. Finally, the implemented Color Gradient model was optimized to further improve the solver's performance. \par
+  All of the implemented test cases were successful and the validation proved the model to be working, both in 2D and 3D. The overall run-times were reduced in 20 times for 2D and 176 times for 3D when adapting the code from the serial to the parallel version. The final parallel version's run-times were improved up to 18\% between the initial and final parallel implementation.  
 \end{abstract}
 
 % Table of Contents
@@ -158,7 +152,7 @@ This way we can reap the advantages of both the macro and microscale approaches 
 Multiphase flows represent the simultaneous flow of materials in different states (phases). As such, multiphase flows have an enormous spectrum of representation and stand for interactions between gas/solid flows, liquid/solid flows or even liquid/liquid flows with different chemical properties \cite{multiphase}.\par
 These simulations present challenging problems because of inherent difficulties during modelling and the importance of engineering applications. However, the Lattice Boltzmann method provides an alternative for these simulations due to it's relative simplicity when compared with traditional Navier-Stokes equation \cite{chenDoolenMP}.
 \par These flows have several applications in the scientific and industrial community, ranging from pourous media fluid interactions \cite{pourous} to flows containing gas bubbles dispersed in liquids \cite{gasBubble}. Furthermore, almost every processing technology must take multiphase flows into account, including cavitating pumps, papermaking and many others \cite{multiphase}.
-\par Several implementation strategies exist for Multiphase flows, however, for the purpose of this thesis, we will first follow the simple ''two-color'' approach first proposed by Gunstensen et al \cite{gunstensen} \textcolor{red}{This is wrong, refer to RK. Also, explain the history and how to method was developed}.
+\par Several implementation strategies exist for Multiphase flows, however, for the purpose of this thesis, we will follow the Color Gradient model approach. Rothman and Keller \cite{rk} introduced the concept of 2 different fluids, blue and red, each with it's own distribution function. Later on, Gunstensen et al.  \cite{gunstensen} adapted the model proposed by Rothman and Keller into the Lattice Boltzmann method, whose main contribution was adding the perturbation operator, responsible for calculating the interface between both fluids. However, this version of the Color Gradient model was very computationally expensive and employs complicated programming techniques. D'Ortana et al. \cite{dortana} then improved the model by replacing the recoloring step strategy. Continuing the work, Latva-Kokko and Rothman modified this recoloring step and set the basis to extend the application of the model for the 2D and 3D speed models. Later on, the model was extended to the widely used 2DQ9 model by Reis and Phillips \cite{reisPhil}. This thesis will follow the implementation proposed by Leclaire et al. \cite{leclaire1, leclaire2, leclaire3}, where the equilibrium distribution function was enhanced.
 
 
 \section{High Performance Computing}
@@ -208,7 +202,7 @@ Finally, in 2016, Maciej Kubat proposed a new version of the LBM solver.Firstly 
 However, Kubat states that a lot can be done to improve his code, from boundary conditions to code readability and maintainability. 
 \chapter{Methodology}
 \section{Lattice Boltzmann Method}
-The Lattice Boltzmann method is a mesoscopic approach to solve several fluid dynamics problems, \textcolor{red}{as stated in Section}. It relies on a statistical description of the system via a distribution function $f$. This distribution function is responsible for predicting the number of molecules at a certain time, positioned between 2 points and with velocities between 2 values. This function is used in combination with a collision operator $\Omega$ and, with no external force being applied, represent the Boltzmann equation as
+The Lattice Boltzmann method is a mesoscopic approach to solve several fluid dynamics problems, as stated in Section \ref{sec:lbmLit}. It relies on a statistical description of the system via a distribution function $f$. This distribution function is responsible for predicting the number of molecules at a certain time, positioned between 2 points and with velocities between 2 values. This function is used in combination with a collision operator $\Omega$ and, with no external force being applied, represent the Boltzmann equation as
 \begin{equation}\label{eq:boltzEq}
 \frac{\partial f}{\partial t} + c \nabla f = \Omega
 \end{equation}
@@ -217,7 +211,7 @@ However, Eq. \ref{eq:boltzEq} is difficult to solve by itself. To offset this di
 \subsection{Discretization}
 Before starting with the collision step, we must first discretize the domain into a mesh composed of various cells. Each of these cells will in turn affect and be affected by other cells, depending on the chosen speed model, as stated in Section \ref{sec:lbmLit}. As such, we will use a 2DQ9 arrangement for the 2D problems and a 3DQ19, which roughly translates into each cell interacting with another 8 or 18 cells (neighbours), depending on the problem's dimension.
 \subsection{Collision}
-There are a few collision models capable of approximating the collision operator $\Omega$, such as the BGKW \textcolor{red}{cite}, the TRT \textcolor{red}{cite} and the MRT  \textcolor{red}{cite}. However, for the purpose of this thesis, we will focus solely on the BGKW model as this will be the approximation used by the Multiphase model. \par
+There are a few collision models capable of approximating the collision operator $\Omega$, such as the BGKW \cite{bgkw}, the TRT \cite{trt} and the MRT \cite{mrt}. However, for the purpose of this thesis, we will focus solely on the BGKW model as this will be the approximation used by the Multiphase model. \par
 In the BGKW model, we can use the following equation to approximate $\Omega$
 \begin{equation}\label{eq:bgkwEq}
 \Omega = \omega \left( f^{eq} - f\right) = \frac{1}{\tau}\left( f^{eq} - f\right)
@@ -259,7 +253,7 @@ After each node updates their neighbour, the nodes located on the boundaries of 
 		\end{aligned}
 	\end{equation*}
 	\subsubsection{Inlet}
-	 Zou and He \textcolor{red}{cite} proposed a method for solving these boundary conditions. In this case, the boundary simulates a fluid flow entering the domain with a certain velocity. Applying the proposed equations to the BGKW model on a cell located in the north boundary yields:
+	 Zou and He \cite{zouhe} proposed a method for solving these boundary conditions. In this case, the boundary simulates a fluid flow entering the domain with a certain velocity. Applying the proposed equations to the BGKW model on a cell located in the north boundary yields:
 	\begin{equation*}
 		\begin{aligned}
 			\rho &= \frac{1}{1+v} * \left(f_1 + f_3 + 2 * \left(f_2 + f_5 + f_6\right)\right) \\
@@ -279,7 +273,7 @@ From Eq. \ref{eq:boltzEq}, we can define the macroscopic values for density and 
 \end{equation}
 where $m$ represents the molecular mass.
 \section{Color Gradient Model}\label{sec:cgModel}
-Models implementing multiphase flows for the Lattice Boltzmann method can generally be classified into several different categories. For the purpose of this thesis, we will focus on the Rothman-Keller methods, specifically on the model proposed by Reis and Phillips \textcolor{red}{cite}, modified using Latva-Kokko's recoloring operator, as proposed by Leclaire et al. \textcolor{red}{cite leclaire}. \par
+Models implementing multiphase flows for the Lattice Boltzmann method can generally be classified into several different categories. For the purpose of this thesis, we will focus on the Rothman-Keller methods, specifically on the model proposed by Reis and Phillips \cite{reisPhil}, modified using Latva-Kokko's recoloring operator, as proposed by Leclaire et al. \cite{leclaire3}. \par
 In this model, two immiscible fluids are simulated under the LBM, a red fluid and a blue fluid, that only interact with each other in the interface between them. These fluids are associated to their own distribution functions, which implies that the total memory used by the in-house solver is likely to increase. Furthermore, the collision step will need to be created from scratch since this step introduces two new operators, while the standard collision step will also suffer some changes to account for the two fluids. \par
 The fluid's distribution function now becomes
 \begin{equation}\label{eq:cgDistrib}
@@ -321,7 +315,7 @@ The streaming and boundary conditions in this model are analogous to the ones us
 \subsection{Macro-variables update}
 This step is also similar to the one defined in Section \ref{sec:mpUpd}. The main difference is that $\rho$ is the result of the sum of the densities of each fluid and $F_i$ is also the sum of the distribution functions of each fluid. 
 \section{Meshes}
-For the LBM in-house solver we need to prepare structured meshes capable of representing the domain. These meshes allow us to discretize the functions and solve them according to the representation of space. Each mesh is composed of equidistant small spaces that represent the cells used in the equations. To this end, software capable of generating meshes is needed, that can both create the mesh according to the number of nodes required and specify the type of boundary conditions to be used. G. Abbruzzese developed software capable of generating meshes with these requirements \textcolor{red}{cite} which has been used in the previous thesis over the LBM in-house solver. \par
+For the LBM in-house solver we need to prepare structured meshes capable of representing the domain. These meshes allow us to discretize the functions and solve them according to the representation of space. Each mesh is composed of equidistant small spaces that represent the cells used in the equations. To this end, software capable of generating meshes is needed, that can both create the mesh according to the number of nodes required and specify the type of boundary conditions to be used. G. Abbruzzese developed software capable of generating meshes with these requirements \cite{abbru} which has been used in the previous thesis over the LBM in-house solver. \par
 However, only the 3D lattice generator still exists, which means that we are restricted to the 2D meshes that already exist. Luckily, these meshes are sufficient to simulate the requirements of all of the proposed test cases. The boundaries however will need to be hard-coded to match the initial requirements and to adequately simulate the 2D test cases.
 \subsection{Used meshes}
 The test cases for the Color Gradient model are based on a simple square for 2D or a cube for 3D problems. However, the boundaries are specific to each case. All of them use periodic boundaries on the East and West directions and most of them also use them for the North and South directions, the exception being for the Couette flow where the North boundary is an Inlet and the South boundary acts a solid wall.
@@ -363,12 +357,12 @@ Registers are the fastest type of memory available to a thread. Each thread's re
 Shared memory is the second fastest type of memory available to a thread. As opposed to registers, shared memory is, as the name suggests, shared between threads residing in the same block. This means that we can have threads cooperating with each other when using this type of memory. However, memory access needs to be properly managed, otherwise degrading memory access speed when bank conflicts occur. Bank conflicts means that two or more threads are trying to access the same memory address, and when this happens the memory access is serialized between the conflicting threads.\par
 The nature of this memory makes it an excellent candidate for cases where threads require information from other threads to continue with their work, for example in a matrix vector multiplication. In these cases, a proper management of shared memory within the block can greatly boost the algorithms performance. As such, this a memory structure that should be used whenever threads require cooperation since with no bank conflicts shared memory can reach the speed of register memory.
 \subsubsection{Constant memory}
-This a read-only type of memory that is stored in the cache, making access to it faster than global memory. This is the first memory type that can transfer data between the host and the device since before using in the device data needs to be properly initialized within the host code. Cached memory has the benefit that a single read can be broadcast to other 15 threads, and also that consecutive reads from the same address space will not incur any additional memory traffic \textcolor{red}{cite cuda}. However, we can only benefit from a performance gain when using constant memory if we pay attention to the warps inside a block, since the memory read is broadcast to a half-warp (more on this later).
+This a read-only type of memory that is stored in the cache, making access to it faster than global memory. This is the first memory type that can transfer data between the host and the device since before using in the device data needs to be properly initialized within the host code. Cached memory has the benefit that a single read can be broadcast to other 15 threads, and also that consecutive reads from the same address space will not incur any additional memory traffic \cite{cuda_by_example}. However, we can only benefit from a performance gain when using constant memory if we pay attention to the warps inside a block, since the memory read is broadcast to a half-warp (more on this later).
 \subsubsection{Global memory}
 Finally, we reach the slowest yet most versatile memory in a CUDA compliant GPU. Global memory has, as the name suggests, a global scope, meaning that every thread inside the grid can access it, as is the case with constant memory. However, it is not limited to read-only access as all threads can also write data onto it. This is the only other data that can be transferred between host and device (apart from texture memory) but it has the disadvantage of being the slowest memory type. To boost performance, data in global memory will usually be read into a faster memory type like registers or shared memory before having computations performed over it.
 
 \subsection{Warps}
-A warp is a group of 32 threads inside a block. Each block, when it is created, is assigned to a Streaming Multiprocessor that contain 32 processing cores \textcolor{red}{cite webinar}. The threads inside a warp are truly concurrent, meaning that at a given time each thread will execute the same instruction concurrently (lock-step fashion). Therefore, warp-awareness is essential to write highly-optimised code \textcolor{red}{cite salvatore}. One must guarantee that each thread inside the warp will follow the same control path, otherwise risk wasting the full potential of the warps concurrency by achieving warp divergence.
+A warp is a group of 32 threads inside a block. Each block, when it is created, is assigned to a Streaming Multiprocessor that contain 32 processing cores \cite{webinar1, webinar2}. The threads inside a warp are truly concurrent, meaning that at a given time each thread will execute the same instruction concurrently (lock-step fashion). Therefore, "warp-awareness is essential to write highly-optimised code" \cite{salvatore}. One must guarantee that each thread inside the warp will follow the same control path, otherwise risk wasting the full potential of the warps concurrency by achieving warp divergence.
 
 \chapter{Results and Discussion}
 \section{In-house LBM solver}
@@ -387,7 +381,15 @@ The previous authors strived for a optimized and easy to use code. As such, the 
 Similarly, when the solver finishes computations, a Results folder is created containing information pertinent to the solution of the solver. These files include the final solution, the residuals, the run time, etc. The user also has the option of selecting which output format to produce the solution in (.vti, .dat or .csv).
 
 \subsection{Data representation}
-The original code mostly handles multidimensional arrays, following the same logic from the 2D solver onto the 3D version. As such, the arrays either store the macroscopic value of each node (h * m * n in 3D) or the coefficient for the microscopic values of each lattice (19 * h * m * n in 3D) . However, when using CUDA kernels, we will often have the need to copy data from the host (CPU) to the device (GPU), which can prove to be a tiring and inefficient task when dealing with 2, 3 or even 4 dimension arrays. To solve this problem, the previous authors flattened every array, which means that all arrays are represented as one dimensional arrays. Because of this, some calculations are required to access the desired index, \textcolor{red}{as demonstrated by Fig.}
+The original code mostly handles multidimensional arrays, following the same logic from the 2D solver onto the 3D version. As such, the arrays either store the macroscopic value of each node (h * m * n in 3D) or the coefficient for the microscopic values of each lattice (19 * h * m * n in 3D) . However, when using CUDA kernels, we will often have the need to copy data from the host (CPU) to the device (GPU), which can prove to be a tiring and inefficient task when dealing with 2, 3 or even 4 dimension arrays. To solve this problem, the previous authors flattened every array, which means that all arrays are represented as one dimensional arrays. Because of this, some calculations are required to access the desired index, as demonstrated by Figure \ref{fig:flat}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{Resources/Images/flat2d.png}
+	\caption{Index flattening from 2D to 1D array}
+	\label{fig:flat}
+\end{figure}
+
 \par These arrays are stored in a row-major fashion and the lattices are grouped together in 9 or 19 arrays, depending on the dimension of the problem, meaning that neighbours are separated from each other by m * n or h * m * n elements.
 
 \subsection{Performance}
@@ -414,7 +416,7 @@ To gain a better understanding of the code, the solver’s run-times were profil
 \end{figure}
 
 \par The remaining time is split between the collision, streaming and macroscopic values calculation, with boundary condition calculations and file writing occupying a less important slice of execution time. With this profiling, we now know which are the most critical parts of the software (residuals, collision and streaming) and can focus our efforts in optimising those areas when developing the method for multiphase flows.
-\par Finally, the received solver was programmed to run with a 2D configuration in the kernel calls. Both the blocks per grid and threads per block are set up to run with an equal number of elements in the two directions. \textcolor{red}{The number of blocks is calculated dynamically with problem size in mind and sets 1 block per node.} However, the number of threads per block is declared statically with a value of 16x16. This means that the solver will use 16 threads in the x direction and another 16 in the y direction per block, meaning that each block uses 256 threads. To understand how this value affects the solver, I have benchmarked the solver using two more configurations for the Cavity\_128 and Cavity\_256 meshes.
+\par Finally, the received solver was programmed to run with a 2D configuration in the kernel calls. Both the blocks per grid and threads per block are set up to run with an equal number of elements in the two directions. The number of blocks is calculated dynamically with the problem size in mind and sets 1 thread per node. However, the number of threads per block is declared statically with a value of 16x16. This means that the solver will use 16 threads in the x direction and another 16 in the y direction per block, meaning that each block uses 256 threads. To understand how this value affects the solver, I have benchmarked the solver using two more configurations for the Cavity\_128 and Cavity\_256 meshes.
 
 \begin{figure}[H]
 	\centering
@@ -434,11 +436,11 @@ Figure \ref{fig:timesThreads} shows that the initial configuration (16x16) provi
 
 
 \subsection{Validation}
-Now that the received code has been validated to perform under the same conditions as the final version used by the previous authors, we now have to verify whether the results that the received version is producing are the same as the final one. The validation of the results obtained throughout this project will be under the responsibility of Antonio González. As such, the details for this initial validation can be found in his thesis \cite{antonioThesis}.
+Now that the received code has been validated to perform under the same conditions as the final version used by the previous authors, we now have to verify whether the results that the received version is producing are the same as the final one. The validation of the results obtained throughout this project will be under the responsibility of Figueroa. As such, the details for this initial validation can be found in his thesis \cite{antonioThesis}, and the validation results can be found in the Appendix, Section \ref{app:valid}.
 \par This initial validation is essential for the development of a multiphase flow using the in-house solver. Without it, there would be no way of telling whether the solver would be functioning incorrectly due to a faulty algorithm implemented by us or if the solver was already producing wrong results. By doing so we can be sure that our code behaves correctly and that a proper result is achieved.
 
 \section{Developing the Color Gradient model}
-After making sure that the code we received was producing correct results, we could start implementing the Color Gradient (CG) model in the in-house LBM solver. Since there are two people working on this project, a proper separation of responsibilities  was vital for a successful adaption of the solver. To this end, Antonio González \cite{antonioThesis} was in charge of the physical aspects of the model whilst I was in charge of the software side. \par
+After making sure that the code we received was producing correct results, we could start implementing the Color Gradient (CG) model in the in-house LBM solver. Since there are two people working on this project, a proper separation of responsibilities  was vital for a successful adaption of the solver. To this end, Figueroa \cite{antonioThesis} was in charge of the physical aspects of the model whilst I was in charge of the software side. \par
 We first decided to implement the CG model in a serial fashion so as to easily and quickly find potential errors in the code. Antonio would then develop a working script of the model in Matlab and, after validating it, I would take that script and patch it into the LBM solver. After making sure that the model was working in full integration with the LBM solver, I could then start parallelising the algorithms and finally validate the final, parallel results. We felt that this process, while extensive and time consuming, presented the best way of correctly implementing the model, since it was easier to track bugs, and so was repeated for the 3D model.
 \subsection{Initial arguments}
 The LBM solver depends on some initial parameters to initialize the required variables correctly. To do so, a SetUpData.ini file needs to be filled with the desired values. Figure \ref{fig:setupLBM} shows the initial arguments on which the LBM solver depends upon.
@@ -482,7 +484,7 @@ The 3D model adaptation was much easier than the 2D implementation since for the
 One of the most significant improvements from implementing the 3D model was that the previous solver had more enhancements in 3D than in 2D. We could now use the proper streaming and boundary steps since there were no complications when generating 3D meshes and the software could adequately interpolate these meshes and initialize control arrays correctly. 
 
 \section{Validation}
-The validation of the results was performed by Antonio González \cite{antonioThesis}. To do so, every test case was implemented according to their specific needs. Almost every case was based on the same mesh, a simple square or cube depending on the dimension. The only exception was the Rayleigh-Taylor instability where a rectangular mesh was used. Appendix \textcolor{red}{Ref appendix validation} shows that the model produces correct results for every test case. \par
+The validation of the results was performed by Figueroa \cite{antonioThesis}. To do so, every test case was implemented according to their specific needs. Almost every case was based on the same mesh, a simple square or cube depending on the dimension. The only exception was the Rayleigh-Taylor instability where a rectangular mesh was used. Appendix \textcolor{red}{Ref appendix validation} shows that the model produces correct results for every test case. \par
 The solver has the option of producing results in different formats, .dat, .vti and .csv. .VTI files were the addition of last year's authors and can be read using Paraview \cite{paraview}. The main advantage of these files is that they require significantly less memory than the other formats. Because of this, we are able to save time by transferring the results from Cranfield's HPC center faster and also by making post-processing analysis less time consuming. For this reason, we extended the creation of these files to use the new multiphase model arrays.
 \section{Test cases}\label{sec:testcases}
 The validation of the CG model depends not only on the analysis of the actual result of the simulation, but also in the type of test case used. Each test case had different requirements in the software since they depended on different arrays and each used their own type of verification. Because of this, I added the option to change between test cases as an argument in the setup file. During the execution of the solver, this options allows for a correct initialization of the densities and distribution functions, as well as adequately storing information when needed.
@@ -887,23 +889,115 @@ Having completed an in-depth study of the models, we were then ready to start wi
 However, there is much work to be done. Time was a big constraint on this project since introducing new features into an already existing solver proved to be quite a daunting task. There are many unexplored capabilities for the multiphase implementation, like for example introducing new multiphase models or even changing the collision model in the CG implementation to a multi-relaxation time approach. There is even room for further improving the software side of the solver, like making the 2D model more flexible in terms of mesh interpolation or further increasing the performance of the system by employing different computation or memory storage techniques, like the usage of CUDA's texture memory for example. One particular important aspect would be to implement better memory usage so as to increase the size of problems to be computed. \par
 Nonetheless, this was a very exciting and challenging project for our thesis since it provided the opportunity of merging software development with engineering problems, while using newer and different techniques, namely parallel programming under the CUDA platform. There was also a big satisfaction in overcoming the initial barrier of the physical and mathematical demands of this type of solvers and finally being able to produce correct and visual solutions, making it a very interesting topic for a Master's thesis.          
 
-
 %% Back matter
-\backmatter
 \bibliography{AllBib}{}
 \bibliographystyle{plain}
 
+
 \appendix
-\chapter{Appendix}
-\section{Performance}\label{app:perfo}
+\chapter{Performance}\label{app:perfo}
   \begin{figure}[H]
   	\centering
   	\includegraphics[width=\linewidth]{Resources/Images/highComp.png}
   	\caption{Runtime comparison between low and high order color gradient}
   	\label{fig:highComp}
   \end{figure}
-\section{Validation}
-\section{Code}
+\chapter{Validation}
+\section{Previous solver}
+  \begin{figure}[H]
+  	\centering
+  	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/prevValid1.png}
+  	\caption{Validation of the Lid-driven cavity from the previous solver. Re = 100}
+  	\label{fig:prevValid1}
+  \end{figure}
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/prevValid2.png}
+    	\caption{Validation of the Lid-driven cavity from the previous solver. Re = 400}
+    	\label{fig:prevValid2}
+    \end{figure}
+\section{Color Gradient model}
+
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/SteadyBubble.PNG}
+    	\caption{Validation of the steady bubble 2D test case}
+    	\label{fig:steadbub}
+    \end{figure}
+    
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/SteadyBubble3D.PNG}
+    	\caption{Validation of the steady bubble 3D test case}
+    	\label{fig:steadbub3d}
+    \end{figure}
+        
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/DeformingBubble.PNG}
+    	\caption{Validation of the deforming bubble 2D test case}
+    	\label{fig:deform}
+    \end{figure}
+    
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/DeformingBubble3D.PNG}
+    	\caption{Validation of the deforming bubble 3D test case}
+    	\label{fig:deform3D}
+    \end{figure}
+    
+    \begin{figure}[H]
+       	\centering
+       	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/Coalescence2D.PNG}
+       	\caption{Validation of the coalescence 2D test case}
+       	\label{fig:coal}
+    \end{figure}
+    
+    \begin{figure}[H]
+       	\centering
+       	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/Coalescence3D.PNG}
+       	\caption{Validation of the coalescence 3D test case}
+       	\label{fig:coal3D}
+    \end{figure}
+    
+    \begin{figure}[H]
+       	\centering
+       	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/OscillatingBubble.PNG}
+       	\caption{Validation of the oscillating bubble test case}
+       	\label{fig:oscilvalid}
+    \end{figure}
+    
+    \begin{figure}[H]
+       	\centering
+       	\includegraphics[width=0.8\linewidth]{Resources/Images/AntonioValid/YOscillation.jpg}
+       	\caption{Validation of the frequency of the oscillating bubble test case}
+       	\label{fig:oscilfreqvalid}
+    \end{figure}
+    
+    \begin{figure}[H]
+          	\centering
+          	\includegraphics[width=0.8\linewidth]{Resources/Images/AntonioValid/E_G1_K5.jpg}
+          	\caption{Validation of the couette flow test case. K = 5}
+          	\label{fig:couett}
+    \end{figure}
+    
+    \begin{figure}[H]
+       	\centering
+       	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/E_G1_K20.jpg}
+       	\caption{Validation of the couette flow test case. K = 20}
+       	\label{fig:couett20}
+    \end{figure}
+    
+    \begin{figure}[H]
+       	\centering
+       	\includegraphics[width=\linewidth]{Resources/Images/AntonioValid/RTI_Re256.PNG}
+       	\caption{Validation of the Rayleigh-Taylor instability}
+       	\label{fig:rtvalid}
+    \end{figure}
+    
+\chapter{Code}
+
+
 
 
 \end{document}

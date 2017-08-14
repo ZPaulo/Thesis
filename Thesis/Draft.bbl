@@ -15,6 +15,16 @@ Paraview software.
 \newblock https://www.paraview.org/.
 \newblock Accessed: 09-08-2017.
 
+\bibitem{abbru}
+Gennaro Abbruzzese.
+\newblock Development of a 2d lattice boltzmann code, 2013.
+
+\bibitem{bgkw}
+P.~L. Bhatnagar, E.~P. Gross, and M.~Krook.
+\newblock A model for collision processes in gases. i. small amplitude
+  processes in charged and neutral one-component systems.
+\newblock {\em Phys. Rev.}, 94:511--525, May 1954.
+
 \bibitem{wind_flow_cfd}
 B.~Blocken, A.~van~der Hout, J.~Dekker, and O.~Weiler.
 \newblock Cfd simulation of wind flow over natural complex terrain: Case study
@@ -44,15 +54,36 @@ S.~Desai, E.~Leylek, C.-M.B. Lo, P.~Doddegowda, A.~Bychkovsky, and A.R. George.
   car wings, underbodies with wheels, and motorcycle flows.
 \newblock {\em SAE Technical Papers}, 2008.
 
+\bibitem{dortana}
+U.~D'Ortona, D.~Salin, M.~Cieplak, and J.~R. Banavar.
+\newblock Interfacial phenomena in boltzmann cellular automata.
+\newblock {\em EPL (Europhysics Letters)}, 28(5):317, 1994.
+
 \bibitem{cfd_present}
 Joel Ducoste.
 \newblock An overview of computational fluid dynamics.
 \newblock Ghent University, 2008.
 
+\bibitem{salvatore}
+Salvatore Filippone.
+\newblock “gpgpu programming fundamentals” lecture slides, 2017.
+\newblock Cranfield University.
+
 \bibitem{gasautomata}
 U.~Frisch, B.~Hasslacher, and Y.~Pomeau.
 \newblock Lattice-gas automata for the navier-stokes equation.
 \newblock {\em Phys. Rev. Lett.}, 56:1505--1508, Apr 1986.
+
+\bibitem{trt}
+Irina Ginzburg.
+\newblock Equilibrium-type and link-type lattice boltzmann models for generic
+  advection and anisotropic-dispersion equation.
+\newblock {\em Advances in Water Resources}, 28(11):1171 -- 1195, 2005.
+
+\bibitem{antonioThesis}
+Antonio~Figueroa González.
+\newblock Multiphase capability development for a lattice boltzmann solver,
+  2017.
 
 \bibitem{gunstensen}
 Andrew~K Gunstensen, Daniel~H Rothman, St{\'e}phane Zaleski, and Gianluigi
@@ -76,6 +107,31 @@ Maciej Kubat.
 \newblock Development of physics or hpc optimisation of a parallel 2d lattice
   boltzmann solver using gpus cuda, 2016.
 
+\bibitem{leclaire1}
+S\'ebastien Leclaire, Andrea Parmigiani, Orestis Malaspinas, Bastien Chopard,
+  and Jonas Latt.
+\newblock Generalized three-dimensional lattice boltzmann color-gradient method
+  for immiscible two-phase pore-scale imbibition and drainage in porous media.
+\newblock {\em Phys. Rev. E}, 95:033306, Mar 2017.
+
+\bibitem{leclaire2}
+Sébastien Leclaire, Nicolas Pellerin, Marcelo Reggio, and Jean-Yves
+  Trépanier.
+\newblock A multiphase lattice boltzmann method for simulating immiscible
+  liquid-liquid interface dynamics.
+\newblock {\em Applied Mathematical Modelling}, 40(13):6376 -- 6394, 2016.
+
+\bibitem{leclaire3}
+Sébastien Leclaire, Marcelo Reggio, and Jean-Yves Trépanier.
+\newblock Numerical evaluation of two recoloring operators for an immiscible
+  two-phase flow lattice boltzmann model.
+\newblock {\em Applied Mathematical Modelling}, 36(5):2237 -- 2252, 2012.
+
+\bibitem{webinar1}
+Dr.~Justin Luitjens and Dr.~Steven Rennich.
+\newblock “cuda warps and occupancy” gpu computing webinar, 2011.
+\newblock NVIDIA.
+
 \bibitem{pourous}
 N.S. Martys and H.~Chen.
 \newblock Simulation of multicomponent fluids in complex three-dimensional
@@ -92,6 +148,11 @@ A.~A. Mohamad.
 Irene Moulitsas.
 \newblock “high performance computing” lecture slides, 2016.
 \newblock Cranfield University.
+
+\bibitem{webinar2}
+NVIDIA.
+\newblock “advanced cuda webinar” memory optimizations.
+\newblock NVIDIA.
 
 \bibitem{partic_erosion_cfd}
 D.A. Pandya, B.H. Dennis, and R.D. Russell.
@@ -111,10 +172,21 @@ S.~Reichrath and T.W. Davies.
   and future.
 \newblock {\em Agronomie}, 22(1):3--19, 2002.
 
+\bibitem{reisPhil}
+T~Reis and T~N Phillips.
+\newblock Lattice boltzmann model for simulating immiscible two-phase flows.
+\newblock {\em Journal of Physics A: Mathematical and Theoretical},
+  40(14):4033, 2007.
+
 \bibitem{america_cup}
 B.S. Rosen, J.P. Laiosa, and W.H. Davis~Jr.
 \newblock Cfd design studies for america's cup 2000.
 \newblock 2000.
+
+\bibitem{rk}
+Daniel~H. Rothman and Jeffrey~M. Keller.
+\newblock Immiscible cellular-automaton fluids.
+\newblock {\em Journal of Statistical Physics}, 52(3), Aug 1988.
 
 \bibitem{gasBubble}
 K.~Sankaranarayanan, X.~Shan, I.G. Kevrekidis, and S.~Sundaresan.
@@ -126,6 +198,17 @@ K.~Sankaranarayanan, X.~Shan, I.G. Kevrekidis, and S.~Sundaresan.
 Máté~Tibor Szőke.
 \newblock Efficient implementation of a 2d lattice boltzmann solver using
   modern parallelisation techniques, 2014.
+
+\bibitem{mrt}
+Liang Wang, Zhaoli Guo, and Chuguang Zheng.
+\newblock Multi-relaxation-time lattice boltzmann model for axisymmetric flows.
+\newblock {\em Computers & Fluids}, 39(9):1542 -- 1548, 2010.
+
+\bibitem{zouhe}
+Qisu Zou and Xiaoyi He.
+\newblock On pressure and velocity boundary conditions for the lattice
+  boltzmann bgk model.
+\newblock {\em Physics of Fluids}, 9(6):1591--1598, 1997.
 
 \bibitem{koleszar_thesis}
 Ádám Koleszár.
