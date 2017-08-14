@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  13 AUG 2017 19:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.28)  14 AUG 2017 02:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1141,36 +1141,43 @@ Package pdftex.def Info: Resources/Images/serialDelta3D.png used on input line
 851.
 (pdftex.def)             Requested size: 341.43437pt x 195.11069pt.
  [70 <./Resources/Images/serialDelta.png (PNG copy)> <./Resources/Images/serial
-Delta3D.png (PNG copy)>] [71] [72
+Delta3D.png (PNG copy)>]
+<Resources/Images/2dv3d.png, id=378, 599.23875pt x 315.42844pt>
+File: Resources/Images/2dv3d.png Graphic file (type png)
 
-]
+<use Resources/Images/2dv3d.png>
+Package pdftex.def Info: Resources/Images/2dv3d.png used on input line 863.
+(pdftex.def)             Requested size: 426.79135pt x 224.65845pt.
+ [71 <./Resources/Images/2dv3d.png (PNG copy)>] [72]
 Chapter 5.
-[73] [74
+[73
 
-] (./Draft.bbl [75
+] [74] [75] [76
 
-] [76]) [77] [78
+] (./Draft.bbl [77
+
+] [78]) [79] [80
 
 ]
-<Resources/Images/highComp.png, id=404, 953.81343pt x 528.47438pt>
+<Resources/Images/highComp.png, id=411, 953.81343pt x 528.47438pt>
 File: Resources/Images/highComp.png Graphic file (type png)
 
 <use Resources/Images/highComp.png>
-Package pdftex.def Info: Resources/Images/highComp.png used on input line 870.
+Package pdftex.def Info: Resources/Images/highComp.png used on input line 888.
 (pdftex.def)             Requested size: 426.79135pt x 236.47267pt.
- [79 <./Resources/Images/highComp.png (PNG copy)>] (./Draft.aux)
+ [81 <./Resources/Images/highComp.png (PNG copy)>] (./Draft.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 5138 strings out of 494953
- 75924 string characters out of 6180977
- 145034 words of memory out of 5000000
- 8257 multiletter control sequences out of 15000+600000
+ 5144 strings out of 494953
+ 76067 string characters out of 6180977
+ 145046 words of memory out of 5000000
+ 8262 multiletter control sequences out of 15000+600000
  35273 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 38i,11n,39p,1508b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,11n,39p,1745b,462s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist
@@ -1181,10 +1188,10 @@ pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmri8a.pfb>
-Output written on Draft.pdf (95 pages, 2594043 bytes).
+Output written on Draft.pdf (97 pages, 2617941 bytes).
 PDF statistics:
- 445 PDF objects out of 1000 (max. 8388607)
- 270 compressed objects within 3 object streams
+ 453 PDF objects out of 1000 (max. 8388607)
+ 275 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 216 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 221 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -42,6 +42,7 @@
 \contentsline {figure}{\numberline {4.28}{\ignorespaces Runtime comparison for the C. capability version with the final version\relax }}{68}
 \contentsline {figure}{\numberline {4.29}{\ignorespaces Runtime comparison between serial and parallel 2D model for 1000 iterations\relax }}{70}
 \contentsline {figure}{\numberline {4.30}{\ignorespaces Runtime comparison between serial and parallel 3D model for 1000 iterations\relax }}{70}
+\contentsline {figure}{\numberline {4.31}{\ignorespaces MLUPS comparison between 2D and 3D model for 10000 iterations\relax }}{71}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1}{\ignorespaces Runtime comparison between low and high order color gradient\relax }}{79}
+\contentsline {figure}{\numberline {1}{\ignorespaces Runtime comparison between low and high order color gradient\relax }}{81}

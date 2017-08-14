@@ -78,8 +78,9 @@
 \contentsline {subsubsection}{CUDA compute capability}{67}
 \contentsline {subsection}{\numberline {4.6.4}Hardware}{68}
 \contentsline {subsection}{\numberline {4.6.5}Serial vs Parallel}{69}
+\contentsline {subsection}{\numberline {4.6.6}2D vs 3D}{71}
 \contentsline {chapter}{\numberline {5}Conclusions}{73}
-\contentsline {chapter}{Appendix}{79}
-\contentsline {section}{\numberline {.1}Performance}{79}
-\contentsline {section}{\numberline {.2}Validation}{79}
-\contentsline {section}{\numberline {.3}Code}{79}
+\contentsline {chapter}{Appendix}{81}
+\contentsline {section}{\numberline {.1}Performance}{81}
+\contentsline {section}{\numberline {.2}Validation}{81}
+\contentsline {section}{\numberline {.3}Code}{81}
