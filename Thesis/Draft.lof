@@ -3,46 +3,46 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces 2D LBM model using 9 particles. (D2Q9)\relax }}{6}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces 3D LBM model using 19 particles. (D3Q19)\relax }}{6}
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Moore's law over 120 years\relax }}{8}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces A graphical representation of Amdahl's law\relax }}{9}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces 2D LBM model using 9 particles. (D2Q9)\relax }}{8}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces 3D LBM model using 19 particles. (D3Q19)\relax }}{8}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Moore's law over 120 years\relax }}{10}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces A graphical representation of Amdahl's law\relax }}{11}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Streaming step following a 2DQ9 model.\relax }}{17}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Thread arrangement in CUDA platform.\relax }}{24}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Memory arrangement in CUDA compliant GPU.\relax }}{25}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Streaming step following a 2DQ9 model.\relax }}{19}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Thread arrangement in CUDA platform.\relax }}{26}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Memory arrangement in CUDA compliant GPU.\relax }}{27}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces A simplified flowchart of the solver's activity\relax }}{30}
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime for Cavity\_128 and Cavity\_256\relax }}{32}
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Code profiling for the run-times of Cavity\_128 with MacroDiff residuals\relax }}{33}
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Overall time comparison using three different threads per block configuration\relax }}{34}
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Setup file for the LBM solver\relax }}{36}
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Initial arguments for the Color Gradient model\relax }}{37}
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Red fluid density for the Steady bubble case\relax }}{42}
-\contentsline {figure}{\numberline {4.8}{\ignorespaces Blue fluid density for the deforming bubble case\relax }}{43}
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Blue fluid density for the coalescing bubbles case\relax }}{44}
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Blue fluid density for the 2D oscillating bubble\relax }}{45}
-\contentsline {figure}{\numberline {4.11}{\ignorespaces X velocity with a few iterations using the Couette flow case.\relax }}{46}
-\contentsline {figure}{\numberline {4.12}{\ignorespaces Blue fluid density for the 2D Rayleigh-Taylor instability\relax }}{47}
-\contentsline {figure}{\numberline {4.13}{\ignorespaces Runtime comparison for v1.0\relax }}{52}
-\contentsline {figure}{\numberline {4.14}{\ignorespaces Code profiling for v1.0 using single precision in the laptop\relax }}{53}
-\contentsline {figure}{\numberline {4.15}{\ignorespaces Runtime comparison for v2.0 with v1.0\relax }}{55}
-\contentsline {figure}{\numberline {4.16}{\ignorespaces Runtime comparison for v2.1 with v2.0\relax }}{56}
-\contentsline {figure}{\numberline {4.17}{\ignorespaces Runtime comparison for v2.2 with v2.1\relax }}{57}
-\contentsline {figure}{\numberline {4.18}{\ignorespaces Code comparison between CUDA unroll and manual unroll\relax }}{58}
-\contentsline {figure}{\numberline {4.19}{\ignorespaces Runtime comparison for the final version with v2.1\relax }}{59}
-\contentsline {figure}{\numberline {4.20}{\ignorespaces Code profiling for the final version using single precision in the laptop\relax }}{60}
-\contentsline {figure}{\numberline {4.21}{\ignorespaces Runtime comparison between low and high order color gradient in the laptop\relax }}{61}
-\contentsline {figure}{\numberline {4.22}{\ignorespaces Runtime comparison for the C. capability version with the final version\relax }}{62}
-\contentsline {figure}{\numberline {4.23}{\ignorespaces Runtime comparison for version 1.0 on the Grid\relax }}{63}
-\contentsline {figure}{\numberline {4.24}{\ignorespaces Code profiling for v1.0 using single precision in the Grid\relax }}{64}
-\contentsline {figure}{\numberline {4.25}{\ignorespaces Runtime comparison between the final version and version 1.0\relax }}{65}
-\contentsline {figure}{\numberline {4.26}{\ignorespaces Code profiling for the final version using single precision in the Grid\relax }}{66}
-\contentsline {figure}{\numberline {4.27}{\ignorespaces Runtime comparison between low and high order color gradient in the Grid\relax }}{67}
-\contentsline {figure}{\numberline {4.28}{\ignorespaces Runtime comparison for the C. capability version with the final version\relax }}{68}
-\contentsline {figure}{\numberline {4.29}{\ignorespaces Runtime comparison between serial and parallel 2D model for 1000 iterations\relax }}{70}
-\contentsline {figure}{\numberline {4.30}{\ignorespaces Runtime comparison between serial and parallel 3D model for 1000 iterations\relax }}{70}
-\contentsline {figure}{\numberline {4.31}{\ignorespaces MLUPS comparison between 2D and 3D model for 10000 iterations\relax }}{71}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces A simplified flowchart of the solver's activity\relax }}{32}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime for Cavity\_128 and Cavity\_256\relax }}{34}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Code profiling for the run-times of Cavity\_128 with MacroDiff residuals\relax }}{35}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Overall time comparison using three different threads per block configuration\relax }}{36}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Setup file for the LBM solver\relax }}{38}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Initial arguments for the Color Gradient model\relax }}{39}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Red fluid density for the Steady bubble case\relax }}{44}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Blue fluid density for the deforming bubble case\relax }}{45}
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Blue fluid density for the coalescing bubbles case\relax }}{46}
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Blue fluid density for the 2D oscillating bubble\relax }}{47}
+\contentsline {figure}{\numberline {4.11}{\ignorespaces X velocity with a few iterations using the Couette flow case.\relax }}{48}
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Blue fluid density for the 2D Rayleigh-Taylor instability\relax }}{49}
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Runtime comparison for v1.0\relax }}{54}
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Code profiling for v1.0 using single precision in the laptop\relax }}{55}
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Runtime comparison for v2.0 with v1.0\relax }}{57}
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Runtime comparison for v2.1 with v2.0\relax }}{58}
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Runtime comparison for v2.2 with v2.1\relax }}{59}
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Code comparison between CUDA unroll and manual unroll\relax }}{60}
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Runtime comparison for the final version with v2.1\relax }}{61}
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Code profiling for the final version using single precision in the laptop\relax }}{62}
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Runtime comparison between low and high order color gradient in the laptop\relax }}{63}
+\contentsline {figure}{\numberline {4.22}{\ignorespaces Runtime comparison for the C. capability version with the final version\relax }}{64}
+\contentsline {figure}{\numberline {4.23}{\ignorespaces Runtime comparison for version 1.0 on the Grid\relax }}{65}
+\contentsline {figure}{\numberline {4.24}{\ignorespaces Code profiling for v1.0 using single precision in the Grid\relax }}{66}
+\contentsline {figure}{\numberline {4.25}{\ignorespaces Runtime comparison between the final version and version 1.0\relax }}{67}
+\contentsline {figure}{\numberline {4.26}{\ignorespaces Code profiling for the final version using single precision in the Grid\relax }}{68}
+\contentsline {figure}{\numberline {4.27}{\ignorespaces Runtime comparison between low and high order color gradient in the Grid\relax }}{69}
+\contentsline {figure}{\numberline {4.28}{\ignorespaces Runtime comparison for the C. capability version with the final version\relax }}{70}
+\contentsline {figure}{\numberline {4.29}{\ignorespaces Runtime comparison between serial and parallel 2D model for 1000 iterations\relax }}{72}
+\contentsline {figure}{\numberline {4.30}{\ignorespaces Runtime comparison between serial and parallel 3D model for 1000 iterations\relax }}{72}
+\contentsline {figure}{\numberline {4.31}{\ignorespaces MLUPS comparison between 2D and 3D model for 10000 iterations\relax }}{73}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1}{\ignorespaces Runtime comparison between low and high order color gradient\relax }}{81}
+\contentsline {figure}{\numberline {1}{\ignorespaces Runtime comparison between low and high order color gradient\relax }}{83}

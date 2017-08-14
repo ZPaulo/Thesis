@@ -5,9 +5,9 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces 2D memory usage for Cavity 128 with Single precision\relax }}{48}
-\contentsline {table}{\numberline {4.2}{\ignorespaces 3D memory usage for Cavity 128 with Single precision\relax }}{49}
-\contentsline {table}{\numberline {4.3}{\ignorespaces Memory usage for the Color Gradient model in MB\relax }}{49}
-\contentsline {table}{\numberline {4.4}{\ignorespaces Specification of the used GPUs\relax }}{51}
+\contentsline {table}{\numberline {4.1}{\ignorespaces 2D memory usage for Cavity 128 with Single precision\relax }}{50}
+\contentsline {table}{\numberline {4.2}{\ignorespaces 3D memory usage for Cavity 128 with Single precision\relax }}{51}
+\contentsline {table}{\numberline {4.3}{\ignorespaces Memory usage for the Color Gradient model in MB\relax }}{51}
+\contentsline {table}{\numberline {4.4}{\ignorespaces Specification of the used GPUs\relax }}{53}
 \addvspace {10\p@ }
 \addvspace {10\p@ }

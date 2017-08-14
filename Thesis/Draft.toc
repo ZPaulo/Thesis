@@ -5,82 +5,84 @@
 \contentsline {chapter}{List of Abbreviations}{xiii}
 \contentsline {chapter}{Acknowledgements}{xv}
 \contentsline {chapter}{\numberline {1}Introduction}{1}
-\contentsline {chapter}{\numberline {2}Literature review}{3}
-\contentsline {section}{\numberline {2.1}Computational Fluid Dynamics}{3}
-\contentsline {subsection}{\numberline {2.1.1}Macroscopic scale}{4}
-\contentsline {subsection}{\numberline {2.1.2}Microscopic scale}{5}
-\contentsline {section}{\numberline {2.2}Lattice Boltzmann Method}{5}
-\contentsline {subsection}{\numberline {2.2.1}Multiphase flow}{6}
-\contentsline {section}{\numberline {2.3}High Performance Computing}{7}
-\contentsline {subsection}{\numberline {2.3.1}Distributed memory}{9}
-\contentsline {subsection}{\numberline {2.3.2}Shared memory}{10}
-\contentsline {subsection}{\numberline {2.3.3}GPGPU}{11}
-\contentsline {section}{\numberline {2.4}Previous parallelisation works}{12}
-\contentsline {chapter}{\numberline {3}Methodology}{15}
-\contentsline {section}{\numberline {3.1}Lattice Boltzmann Method}{15}
-\contentsline {subsection}{\numberline {3.1.1}Discretization}{16}
-\contentsline {subsection}{\numberline {3.1.2}Collision}{16}
-\contentsline {subsection}{\numberline {3.1.3}Streaming}{17}
-\contentsline {subsection}{\numberline {3.1.4}Boundary update}{17}
-\contentsline {subsubsection}{Wall}{18}
-\contentsline {subsubsection}{Periodic boundary conditions}{18}
-\contentsline {subsubsection}{Inlet}{18}
-\contentsline {subsection}{\numberline {3.1.5}Macro-variables update}{19}
-\contentsline {section}{\numberline {3.2}Color Gradient Model}{19}
-\contentsline {subsection}{\numberline {3.2.1}Single-phase collision operator}{20}
-\contentsline {subsection}{\numberline {3.2.2}Perturbation operator}{21}
-\contentsline {subsection}{\numberline {3.2.3}Recoloring operator}{21}
-\contentsline {subsection}{\numberline {3.2.4}Streaming and Boundary conditions}{22}
-\contentsline {subsection}{\numberline {3.2.5}Macro-variables update}{22}
-\contentsline {section}{\numberline {3.3}Meshes}{22}
-\contentsline {subsection}{\numberline {3.3.1}Used meshes}{23}
-\contentsline {section}{\numberline {3.4}CUDA programming}{23}
-\contentsline {subsection}{\numberline {3.4.1}Thread arrangement}{23}
-\contentsline {subsection}{\numberline {3.4.2}Memory structures}{24}
-\contentsline {subsubsection}{Registers}{26}
-\contentsline {subsubsection}{Shared memory}{26}
-\contentsline {subsubsection}{Constant memory}{27}
-\contentsline {subsubsection}{Global memory}{27}
-\contentsline {subsection}{\numberline {3.4.3}Warps}{27}
-\contentsline {chapter}{\numberline {4}Results and Discussion}{29}
-\contentsline {section}{\numberline {4.1}In-house LBM solver}{29}
-\contentsline {subsection}{\numberline {4.1.1}Code organisation}{29}
-\contentsline {subsection}{\numberline {4.1.2}Data representation}{31}
-\contentsline {subsection}{\numberline {4.1.3}Performance}{31}
-\contentsline {subsection}{\numberline {4.1.4}Validation}{34}
-\contentsline {section}{\numberline {4.2}Developing the Color Gradient model}{35}
-\contentsline {subsection}{\numberline {4.2.1}Initial arguments}{36}
-\contentsline {subsection}{\numberline {4.2.2}2D model}{38}
-\contentsline {subsection}{\numberline {4.2.3}3D model}{40}
-\contentsline {section}{\numberline {4.3}Validation}{41}
-\contentsline {section}{\numberline {4.4}Test cases}{41}
-\contentsline {subsection}{\numberline {4.4.1}Steady bubble}{42}
-\contentsline {subsection}{\numberline {4.4.2}Deforming bubble}{43}
-\contentsline {subsection}{\numberline {4.4.3}Coalescing bubbles}{44}
-\contentsline {subsection}{\numberline {4.4.4}Oscillating bubble}{45}
-\contentsline {subsection}{\numberline {4.4.5}Couette flow}{46}
-\contentsline {subsection}{\numberline {4.4.6}Rayleigh-Taylor instability}{47}
-\contentsline {section}{\numberline {4.5}Memory usage}{48}
-\contentsline {section}{\numberline {4.6}Performance of the parallel code}{50}
-\contentsline {subsection}{\numberline {4.6.1}GPU specification}{51}
-\contentsline {subsection}{\numberline {4.6.2}2D model}{51}
-\contentsline {subsubsection}{Normal distribution function v1.0}{51}
-\contentsline {subsubsection}{Enhanced distribution function v2.0}{54}
-\contentsline {subsubsection}{Optimizations v2.1}{55}
-\contentsline {subsubsection}{Loop unrolling v2.2}{56}
-\contentsline {subsubsection}{Final version v2.3}{58}
-\contentsline {subsubsection}{High order color gradient}{60}
-\contentsline {subsubsection}{CUDA compute capability}{61}
-\contentsline {subsection}{\numberline {4.6.3}3D model}{62}
-\contentsline {subsubsection}{Enhanced distribution function v1.0}{63}
-\contentsline {subsubsection}{Final version v1.1}{64}
-\contentsline {subsubsection}{High order color gradient}{66}
-\contentsline {subsubsection}{CUDA compute capability}{67}
-\contentsline {subsection}{\numberline {4.6.4}Hardware}{68}
-\contentsline {subsection}{\numberline {4.6.5}Serial vs Parallel}{69}
-\contentsline {subsection}{\numberline {4.6.6}2D vs 3D}{71}
-\contentsline {chapter}{\numberline {5}Conclusions}{73}
-\contentsline {chapter}{Appendix}{81}
-\contentsline {section}{\numberline {.1}Performance}{81}
-\contentsline {section}{\numberline {.2}Validation}{81}
-\contentsline {section}{\numberline {.3}Code}{81}
+\contentsline {section}{\numberline {1.1}Objectives}{2}
+\contentsline {section}{\numberline {1.2}Structure}{3}
+\contentsline {chapter}{\numberline {2}Literature review}{5}
+\contentsline {section}{\numberline {2.1}Computational Fluid Dynamics}{5}
+\contentsline {subsection}{\numberline {2.1.1}Macroscopic scale}{6}
+\contentsline {subsection}{\numberline {2.1.2}Microscopic scale}{7}
+\contentsline {section}{\numberline {2.2}Lattice Boltzmann Method}{7}
+\contentsline {subsection}{\numberline {2.2.1}Multiphase flow}{8}
+\contentsline {section}{\numberline {2.3}High Performance Computing}{9}
+\contentsline {subsection}{\numberline {2.3.1}Distributed memory}{11}
+\contentsline {subsection}{\numberline {2.3.2}Shared memory}{12}
+\contentsline {subsection}{\numberline {2.3.3}GPGPU}{13}
+\contentsline {section}{\numberline {2.4}Previous parallelisation works}{14}
+\contentsline {chapter}{\numberline {3}Methodology}{17}
+\contentsline {section}{\numberline {3.1}Lattice Boltzmann Method}{17}
+\contentsline {subsection}{\numberline {3.1.1}Discretization}{18}
+\contentsline {subsection}{\numberline {3.1.2}Collision}{18}
+\contentsline {subsection}{\numberline {3.1.3}Streaming}{19}
+\contentsline {subsection}{\numberline {3.1.4}Boundary update}{19}
+\contentsline {subsubsection}{Wall}{20}
+\contentsline {subsubsection}{Periodic boundary conditions}{20}
+\contentsline {subsubsection}{Inlet}{20}
+\contentsline {subsection}{\numberline {3.1.5}Macro-variables update}{21}
+\contentsline {section}{\numberline {3.2}Color Gradient Model}{21}
+\contentsline {subsection}{\numberline {3.2.1}Single-phase collision operator}{22}
+\contentsline {subsection}{\numberline {3.2.2}Perturbation operator}{23}
+\contentsline {subsection}{\numberline {3.2.3}Recoloring operator}{23}
+\contentsline {subsection}{\numberline {3.2.4}Streaming and Boundary conditions}{24}
+\contentsline {subsection}{\numberline {3.2.5}Macro-variables update}{24}
+\contentsline {section}{\numberline {3.3}Meshes}{24}
+\contentsline {subsection}{\numberline {3.3.1}Used meshes}{25}
+\contentsline {section}{\numberline {3.4}CUDA programming}{25}
+\contentsline {subsection}{\numberline {3.4.1}Thread arrangement}{25}
+\contentsline {subsection}{\numberline {3.4.2}Memory structures}{26}
+\contentsline {subsubsection}{Registers}{28}
+\contentsline {subsubsection}{Shared memory}{28}
+\contentsline {subsubsection}{Constant memory}{29}
+\contentsline {subsubsection}{Global memory}{29}
+\contentsline {subsection}{\numberline {3.4.3}Warps}{29}
+\contentsline {chapter}{\numberline {4}Results and Discussion}{31}
+\contentsline {section}{\numberline {4.1}In-house LBM solver}{31}
+\contentsline {subsection}{\numberline {4.1.1}Code organisation}{31}
+\contentsline {subsection}{\numberline {4.1.2}Data representation}{33}
+\contentsline {subsection}{\numberline {4.1.3}Performance}{33}
+\contentsline {subsection}{\numberline {4.1.4}Validation}{36}
+\contentsline {section}{\numberline {4.2}Developing the Color Gradient model}{37}
+\contentsline {subsection}{\numberline {4.2.1}Initial arguments}{38}
+\contentsline {subsection}{\numberline {4.2.2}2D model}{40}
+\contentsline {subsection}{\numberline {4.2.3}3D model}{42}
+\contentsline {section}{\numberline {4.3}Validation}{43}
+\contentsline {section}{\numberline {4.4}Test cases}{43}
+\contentsline {subsection}{\numberline {4.4.1}Steady bubble}{44}
+\contentsline {subsection}{\numberline {4.4.2}Deforming bubble}{45}
+\contentsline {subsection}{\numberline {4.4.3}Coalescing bubbles}{46}
+\contentsline {subsection}{\numberline {4.4.4}Oscillating bubble}{47}
+\contentsline {subsection}{\numberline {4.4.5}Couette flow}{48}
+\contentsline {subsection}{\numberline {4.4.6}Rayleigh-Taylor instability}{49}
+\contentsline {section}{\numberline {4.5}Memory usage}{50}
+\contentsline {section}{\numberline {4.6}Performance of the parallel code}{52}
+\contentsline {subsection}{\numberline {4.6.1}GPU specification}{53}
+\contentsline {subsection}{\numberline {4.6.2}2D model}{53}
+\contentsline {subsubsection}{Normal distribution function v1.0}{53}
+\contentsline {subsubsection}{Enhanced distribution function v2.0}{56}
+\contentsline {subsubsection}{Optimizations v2.1}{57}
+\contentsline {subsubsection}{Loop unrolling v2.2}{58}
+\contentsline {subsubsection}{Final version v2.3}{60}
+\contentsline {subsubsection}{High order color gradient}{62}
+\contentsline {subsubsection}{CUDA compute capability}{63}
+\contentsline {subsection}{\numberline {4.6.3}3D model}{64}
+\contentsline {subsubsection}{Enhanced distribution function v1.0}{65}
+\contentsline {subsubsection}{Final version v1.1}{66}
+\contentsline {subsubsection}{High order color gradient}{68}
+\contentsline {subsubsection}{CUDA compute capability}{69}
+\contentsline {subsection}{\numberline {4.6.4}Hardware}{70}
+\contentsline {subsection}{\numberline {4.6.5}Serial vs Parallel}{71}
+\contentsline {subsection}{\numberline {4.6.6}2D vs 3D}{73}
+\contentsline {chapter}{\numberline {5}Conclusions}{75}
+\contentsline {chapter}{Appendix}{83}
+\contentsline {section}{\numberline {.1}Performance}{83}
+\contentsline {section}{\numberline {.2}Validation}{83}
+\contentsline {section}{\numberline {.3}Code}{83}
