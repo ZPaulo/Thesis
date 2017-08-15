@@ -16,6 +16,9 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{amsmath}
+\usepackage{enumitem}
+\newlist{abbrv}{itemize}{1}
+\setlist[abbrv,1]{label=,labelwidth=1in,align=parleft,itemsep=0.1\baselineskip,leftmargin=!}
 \raggedbottom
 
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
@@ -59,13 +62,42 @@
 % List of Tables
 \sslistoftables
 
+\chapter{List of Symbols}
+\chaptermark{List of Symbols}
+
+\begin{abbrv}
+	\item[$f$]                   Distribution function
+	\item[$t$]                   Time
+	\item[$\Omega$]              Collision matrix
+	\item[$\omega$]              Collision frequency
+	\item[$f^{eq}$]              Equilibrium distribution function
+	\item[$\tau$]				 Relaxation time
+	\item[$\rho$]				 Density
+	\item[$u$]				 Velocity in x direction
+	\item[$v$]				 Velocity in y direction
+	\item[$m$]				 Molecular mass
+	\item[$W$]				 Weight of the direction
+	\item[$A$]				 Surface tension
+	\item[$B$]				 Perturbation weight
+\end{abbrv}
+
 % The list of abbreviations can't be automatically generated so you need to populate it yourself
 \begin{listofabbreviations}
+	\abbrev{2D}{Two dimensions}
+	\abbrev{3D}{Three dimensions}
     \abbrev{CUDA}{Compute Unified Device Architecture}
     \abbrev{CFD}{Computational Fluid Dynamics}
     \abbrev{GPGPU}{General-purpose computing on graphics processing units}
     \abbrev{GPU}{Graphics Processing Unit}
     \abbrev{LBM}{Lattice Boltzmann Method}
+    \abbrev{BC}{Boundary condition}
+    \abbrev{2DQ9}{Lattice speed model used for 2D}
+    \abbrev{3DQ19}{Lattice speed model used for 3D}
+    \abbrev{HPC}{High Performance Computing}
+    \abbrev{BGKW}{Bhatnagar-Gross-Krook-Welander collision model}
+    \abbrev{TRT}{Two Relaxation Time collision model}
+    \abbrev{MRT}{Multiple Relaxation Time collision model}
+    
 \end{listofabbreviations}
 
 % Acknowledgements
@@ -776,7 +808,7 @@ All of these tests were performed using the same CUDA compute capability for eve
   However, the run-times remain almost the same between both versions, although Delta's single precision performs worse when computed with it's 3.5 compute capability. This is, nonetheless, the proper way to run the solver in each GPU, for which the user must take the machine's capability into account when compiling the program.
  
 \subsection{3D model}
-Similarly to the previous Section, we will now present the results obtained using the 3D model. Each result was obtained using a Cube-like mesh containing 128 nodes in all directions. Although this was not the mesh used when developing the solver, it is the one where we can best see the effects of our parallelization. However, using this mesh takes long amounts of time to compute under 10000 iterations. For this reason, the following tests were obtained using only Delta and Grid. 
+Similarly to the previous Section, we will now present the results obtained using the 3D model. Each result was obtained using a Cube-like mesh containing 128 nodes in all directions. Although this was not the mesh used when developing the solver, it is the one where we can best see the effects of our parallelization. However, using this mesh takes long amounts of time to compute under 10000 iterations. For this reason, the following tests were obtained using only Delta and Grid. Note that the results for the mesh containing 64 nodes in each direction can be found in the Appendix, Section \ref{app:perfo}.
 \subsubsection{Enhanced distribution function v1.0}
 Unlike in the 2D model, in the 3D version we decided to start the implementation using the enhanced distribution function. This was mainly influenced by the fact that most relevant papers regarding this topic also used this enhanced distribution function. Since they presented the best way to validate our results, we decided to also use this version directly.
 
@@ -902,7 +934,32 @@ Nonetheless, this was a very exciting and challenging project for our thesis sin
   	\caption{Runtime comparison between low and high order color gradient}
   	\label{fig:highComp}
   \end{figure}
-\chapter{Validation}
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=\linewidth]{Resources/Images/v13d64.png}
+    	\caption{Runtimes for the 3D model version 1.0 using 64 sized mesh in Grid}
+    	\label{fig:v13d64}
+    \end{figure}
+        \begin{figure}[H]
+        	\centering
+        	\includegraphics[width=\linewidth]{Resources/Images/vfv3d64.png}
+        	\caption{Runtimes comparison for the 3D model between final version and version 1.0 using 64 sized mesh}
+        	\label{fig:vfv3d64}
+        \end{figure}
+            \begin{figure}[H]
+            	\centering
+            	\includegraphics[width=\linewidth]{Resources/Images/cc3d64.png}
+            	\caption{Runtimes comparison for the 3D model between final version and C. capability using 64 sized mesh}
+            	\label{fig:cc3d64}
+            \end{figure}
+            
+              \begin{figure}[H]
+              	\centering
+              	\includegraphics[width=\linewidth]{Resources/Images/high64.png}
+              	\caption{Runtime comparison between low and high order color gradient in the Grid using double precision for 64 sized mesh}
+              	\label{fig:high64}
+              \end{figure}
+\chapter{Validation}\label{app:valid}
 \section{Previous solver}
   \begin{figure}[H]
   	\centering
@@ -995,9 +1052,4 @@ Nonetheless, this was a very exciting and challenging project for our thesis sin
        	\label{fig:rtvalid}
     \end{figure}
     
-\chapter{Code}
-
-
-
-
 \end{document}
