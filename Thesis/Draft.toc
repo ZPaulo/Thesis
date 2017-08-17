@@ -29,10 +29,10 @@
 \contentsline {subsubsection}{Periodic boundary conditions}{19}
 \contentsline {subsubsection}{Inlet}{19}
 \contentsline {subsection}{\numberline {3.1.5}Macro-variables update}{20}
-\contentsline {section}{\numberline {3.2}Color Gradient Model}{20}
+\contentsline {section}{\numberline {3.2}Colour Gradient Model}{20}
 \contentsline {subsection}{\numberline {3.2.1}Single-phase collision operator}{21}
 \contentsline {subsection}{\numberline {3.2.2}Perturbation operator}{22}
-\contentsline {subsection}{\numberline {3.2.3}Recoloring operator}{22}
+\contentsline {subsection}{\numberline {3.2.3}Recolouring operator}{22}
 \contentsline {subsection}{\numberline {3.2.4}Streaming and Boundary conditions}{23}
 \contentsline {subsection}{\numberline {3.2.5}Macro-variables update}{23}
 \contentsline {section}{\numberline {3.3}Meshes}{23}
@@ -51,7 +51,7 @@
 \contentsline {subsection}{\numberline {4.1.2}Data representation}{32}
 \contentsline {subsection}{\numberline {4.1.3}Performance}{33}
 \contentsline {subsection}{\numberline {4.1.4}Validation}{36}
-\contentsline {section}{\numberline {4.2}Developing the Color Gradient model}{36}
+\contentsline {section}{\numberline {4.2}Developing the Colour Gradient model}{36}
 \contentsline {subsection}{\numberline {4.2.1}Initial arguments}{37}
 \contentsline {subsection}{\numberline {4.2.2}2D model}{39}
 \contentsline {subsection}{\numberline {4.2.3}3D model}{41}
@@ -72,12 +72,12 @@
 \contentsline {subsubsection}{Optimizations v2.1}{56}
 \contentsline {subsubsection}{Loop unrolling v2.2}{57}
 \contentsline {subsubsection}{Final version v2.3}{59}
-\contentsline {subsubsection}{High order color gradient}{61}
+\contentsline {subsubsection}{High order colour gradient}{61}
 \contentsline {subsubsection}{CUDA compute capability}{62}
 \contentsline {subsection}{\numberline {4.6.3}3D model}{63}
 \contentsline {subsubsection}{Enhanced distribution function v1.0}{64}
 \contentsline {subsubsection}{Final version v1.1}{65}
-\contentsline {subsubsection}{High order color gradient}{67}
+\contentsline {subsubsection}{High order colour gradient}{67}
 \contentsline {subsubsection}{CUDA compute capability}{68}
 \contentsline {subsection}{\numberline {4.6.4}Hardware}{69}
 \contentsline {subsection}{\numberline {4.6.5}Serial vs Parallel}{70}
@@ -86,4 +86,4 @@
 \contentsline {chapter}{\numberline {A}Performance}{82}
 \contentsline {chapter}{\numberline {B}Validation}{85}
 \contentsline {section}{\numberline {B.1}Previous solver}{86}
-\contentsline {section}{\numberline {B.2}Color Gradient model}{88}
+\contentsline {section}{\numberline {B.2}Colour Gradient model}{88}
